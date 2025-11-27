@@ -61,7 +61,7 @@ class AsyncValue<T> {
 class SwiftFuture<T> extends ChangeNotifier {
   Rx<AsyncValue<T>> _state;
 
-  RxFuture() : _state = Rx(AsyncValue<T>.idle());
+  SwiftFuture() : _state = Rx(AsyncValue<T>.idle());
 
   /// Current async state
   AsyncValue<T> get value {

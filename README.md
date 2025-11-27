@@ -10,13 +10,13 @@ A reactive state management library for Flutter with automatic dependency tracki
 ✅ **Reactive State (Rx)** - Automatic dependency tracking  
 ✅ **Mark Widget** - Auto-rebuild when dependencies change  
 ✅ **Computed (Derived State)** - Automatically computed values with nested dependency support  
-✅ **RxFuture / Async State** - Loading/error/success states for async operations  
-✅ **Form Validation** - Field validation with built-in validators  
-✅ **Persistence** - Automatic save/load of reactive values  
+✅ **SwiftFuture / Async State** - Loading/error/success states for async operations  
+✅ **SwiftField / Form Validation** - Field validation with built-in validators  
+✅ **SwiftPersisted / Persistence** - Automatic save/load of reactive values  
 ✅ **Middleware / Interceptors** - Action interception and logging  
 ✅ **Batch Update Transactions** - Prevent unnecessary rebuilds  
 ✅ **Debug Logger** - Configurable logging with history  
-✅ **Animation Tween** - Reactive animation values  
+✅ **SwiftTween / Animation Tween** - Reactive animation values  
 ✅ **Lifecycle Controller** - Widget lifecycle management  
 ✅ **Global Store / Dependency Injection** - Service registration and state management  
 
@@ -26,7 +26,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  swift_flutter: ^1.0.0
+  swift_flutter: ^1.1.0
 ```
 
 Then run:
@@ -88,17 +88,17 @@ Mark(
 ### Async State
 
 ```dart
-final rxFuture = RxFuture<String>();
+final swiftFuture = SwiftFuture<String>();
 
 // Execute async operation
-rxFuture.execute(() async {
+swiftFuture.execute(() async {
   await Future.delayed(Duration(seconds: 2));
   return 'Data loaded!';
 });
 
 // Display state
 Mark(
-  builder: (context) => rxFuture.value.when(
+  builder: (context) => swiftFuture.value.when(
     idle: () => Text('Click to load'),
     loading: () => CircularProgressIndicator(),
     success: (data) => Text(data),
@@ -110,7 +110,7 @@ Mark(
 ### Form Validation
 
 ```dart
-final emailField = RxField<String>('');
+final emailField = SwiftField<String>('');
 emailField.addValidator(Validators.required());
 emailField.addValidator(Validators.email());
 
@@ -147,7 +147,7 @@ All features include comprehensive test coverage:
 flutter test
 ```
 
-**58 tests passing** ✅
+**67+ tests passing** ✅
 
 ## Contributing
 

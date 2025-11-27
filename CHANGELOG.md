@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-01-XX
+
+### Changed
+- **BREAKING**: Renamed all classes to use "Swift" prefix for consistency:
+  - `RxFuture` → `SwiftFuture`
+  - `RxField` → `SwiftField`
+  - `RxTween` → `SwiftTween`
+  - `RxPersisted` → `SwiftPersisted`
+- Updated all examples, tests, and documentation to use new naming
+- Improved API consistency across the library
+
 ## [1.0.1] - 2025-01-XX
 
 ### Changed
