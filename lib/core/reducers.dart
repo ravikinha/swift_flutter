@@ -40,7 +40,7 @@ class ReduxStore<T> extends Rx<T> {
       }
 
       Logger.debug('Action dispatched: ${action.type}', action.payload);
-    } catch (e, stackTrace) {
+    } catch (e) {
       Logger.error('Error dispatching action: ${action.type}', e);
       rethrow;
     }

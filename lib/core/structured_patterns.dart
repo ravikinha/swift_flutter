@@ -1,6 +1,4 @@
 import 'rx.dart';
-import 'computed.dart';
-import 'reducers.dart';
 import 'logger.dart';
 import 'transaction.dart';
 
@@ -80,7 +78,7 @@ class StructuredStore<TState, TEvent> extends Rx<StructuredState<TState, TEvent>
       });
 
       Logger.debug('Event dispatched: ${event.runtimeType}', event);
-    } catch (e, stackTrace) {
+    } catch (e) {
       Logger.error('Error handling event: ${event.runtimeType}', e);
       rethrow;
     }

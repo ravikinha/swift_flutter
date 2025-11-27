@@ -274,7 +274,7 @@ class SwiftFuture<T> extends ChangeNotifier {
             final result = await _recoveryFunction!();
             _state.value = AsyncValue<T>.success(result);
             return result;
-          } catch (e, st) {
+          } catch (e) {
             Logger.error('Custom recovery failed', e);
             return null;
           }

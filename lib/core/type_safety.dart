@@ -1,9 +1,8 @@
 import 'rx.dart';
 import 'computed.dart';
-import 'logger.dart';
 
 /// Type-safe reactive value with compile-time checks
-/// Provides better type safety than plain Rx<T>
+/// Provides better type safety than plain Rx&lt;T&gt;
 class TypedRx<T> extends Rx<T> {
   TypedRx(super.value);
 
@@ -145,6 +144,8 @@ extension RxTypeSafety<T> on Rx<T> {
 
   /// Assert type at runtime
   Rx<T> assertType([String? message]) {
+    // Runtime type check for dynamic Rx values
+    // ignore: unnecessary_type_check
     if (value is! T) {
       final errorMsg = message ?? 'Type assertion failed for Rx<$T>';
       throw ArgumentError(errorMsg);

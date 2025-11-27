@@ -1,9 +1,6 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/animation.dart';
 import 'rx.dart';
 import '../ui/mark.dart';
-import 'logger.dart';
 
 /// Reactive tween that animates between values using AnimationController
 class SwiftTween<T> extends ChangeNotifier {

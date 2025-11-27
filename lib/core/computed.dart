@@ -12,7 +12,6 @@ class Computed<T> extends ChangeNotifier {
   bool _isDirty = true;
   bool _enableMemoization = false;
   Object? _lastMemoKey;
-  final Set<Computed<dynamic>> _visitedInCycle = {};
   static final Set<Computed<dynamic>> _computingStack = {};
 
   /// Create a computed value

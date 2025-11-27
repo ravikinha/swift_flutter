@@ -35,8 +35,8 @@ class Transaction {
     if (_inTransaction) {
       _pendingNotifiers.add(notifier);
     } else {
-      // Direct call is safe here as we're calling on the instance
-      notifier.notifyListeners();
+      // Use extension method which safely calls notifyListeners
+      notifier.notifyListenersTransaction();
     }
   }
 
@@ -44,8 +44,8 @@ class Transaction {
     final notifiers = List<ChangeNotifier>.from(_pendingNotifiers);
     _pendingNotifiers.clear();
     for (final notifier in notifiers) {
-      // Direct call is safe here as we're calling on the instance
-      notifier.notifyListeners();
+      // Use extension method which safely calls notifyListeners
+      notifier.notifyListenersTransaction();
     }
   }
 }
@@ -63,7 +63,8 @@ extension TransactionNotifier on ChangeNotifier {
     if (Transaction.isActive) {
       Transaction.scheduleNotificationFor(this);
     } else {
-      // Safe to call notifyListeners from extension method
+      // Safe to call notifyListeners from extension method on ChangeNotifier
+      // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
       notifyListeners();
     }
   }

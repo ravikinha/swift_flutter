@@ -132,7 +132,7 @@ class PaginationController<T> extends ChangeNotifier {
       });
 
       Logger.debug('Loaded page $page with ${items.length} items');
-    } catch (e, stackTrace) {
+    } catch (e) {
       Transaction.run(() {
         _state.value = _state.value.copyWith(
           isLoading: false,
