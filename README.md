@@ -42,67 +42,80 @@ flutter pub get
 ```dart
 import 'package:swift_flutter/swift_flutter.dart';
 
-// Automatic type inference (for simple types)
-final counter = swift(0);        // Automatically Rx<int>
-final name = swift('Hello');     // Automatically Rx<String>
-final flag = swift(true);        // Automatically Rx<bool>
-final price = swift(99.99);      // Automatically Rx<double>
+// Create reactive state with automatic type inference
+// The swift() function automatically infers the type from the value
+final counter = swift(0);        // Creates Rx<int> automatically
+final name = swift('Hello');     // Creates Rx<String> automatically
+final flag = swift(true);        // Creates Rx<bool> automatically
+final price = swift(99.99);      // Creates Rx<double> automatically
 
-// Explicit typing (recommended for models/complex types)
-final counter = swift<int>(0);                    // Explicit Rx<int>
-final user = swift<User>(User('John'));           // For custom models - type required
-final list = swift<List<String>>(['a', 'b']);     // For complex generics
-final nullable = swift<String?>(null);            // For nullable types
+// For custom models or complex types, use explicit type annotation
+// This ensures type safety and better IDE support
+final counter = swift<int>(0);                    // Explicitly typed as Rx<int>
+final user = swift<User>(User('John'));           // Required for custom classes
+final list = swift<List<String>>(['a', 'b']);    // Required for generic types
+final nullable = swift<String?>(null);            // Required for nullable types
 
-// Traditional way (still works)
+// Alternative: Use Rx constructor directly (still supported)
 final explicit = Rx<int>(0);
 
-// Use in widget with automatic rebuild
+// Wrap your widget with Mark to enable automatic rebuilds
+// Mark automatically tracks dependencies and rebuilds when values change
 Mark(
   builder: (context) => Text('Count: ${counter.value}'),
 )
 
-// Update value - widget rebuilds automatically!
+// Simply update the value - the widget rebuilds automatically!
+// No need to call setState() or manage listeners manually
 counter.value = 10;
 ```
 
-### Computed Values
+### Computed Values (Derived State)
 
 ```dart
-// Automatic type inference
-final price = swift(100.0);  // Rx<double>
-final quantity = swift(2);  // Rx<int>
+// Create reactive state variables
+// These will be tracked as dependencies for computed values
+final price = swift(100.0);  // Reactive price value
+final quantity = swift(2);   // Reactive quantity value
 
-// Or explicit typing
+// Or use explicit typing for better type safety
 final price = swift<double>(100.0);
 final quantity = swift<int>(2);
 
-// Automatically recomputes when price or quantity changes
+// Create a computed value that automatically updates
+// when its dependencies (price or quantity) change
+// The computation function is only called when dependencies change
 final total = Computed(() => price.value * quantity.value);
 
+// Use the computed value in your UI
+// It will automatically update when price or quantity changes
 Mark(
   builder: (context) => Text('Total: \$${total.value}'),
 )
 ```
 
-### Async State
+### Async State Management
 
 ```dart
+// Create a SwiftFuture to manage async operations
+// It automatically tracks loading, success, and error states
 final swiftFuture = SwiftFuture<String>();
 
-// Execute async operation
+// Execute an async operation
+// The state automatically transitions: idle → loading → success/error
 swiftFuture.execute(() async {
   await Future.delayed(Duration(seconds: 2));
   return 'Data loaded!';
 });
 
-// Display state
+// Display different UI based on the current async state
+// The when() method provides a type-safe way to handle all states
 Mark(
   builder: (context) => swiftFuture.value.when(
-    idle: () => Text('Click to load'),
-    loading: () => CircularProgressIndicator(),
-    success: (data) => Text(data),
-    error: (error, stack) => Text('Error: $error'),
+    idle: () => Text('Click to load'),              // Initial state
+    loading: () => CircularProgressIndicator(),     // Loading indicator
+    success: (data) => Text(data),                  // Success with data
+    error: (error, stack) => Text('Error: $error'), // Error handling
   ),
 )
 ```
