@@ -36,7 +36,6 @@
 /// ```
 ///
 /// See the [README](https://github.com/ravikinha/swift_flutter) for more examples.
-library swift_flutter;
 
 // Core
 export 'core/rx.dart' show Rx, swift;
