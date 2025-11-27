@@ -6,7 +6,7 @@
 // - Global store / Dependency injection
 // - Lifecycle management
 // - Computed values
-// - Async state (RxFuture)
+// - Async state (SwiftFuture)
 // - Form validation
 // - Persistence
 // - Middleware / Interceptors
