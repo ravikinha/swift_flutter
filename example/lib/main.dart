@@ -755,13 +755,15 @@ class PersistenceExample extends StatefulWidget {
 }
 
 class _PersistenceExampleState extends State<PersistenceExample> {
+  // RxPersisted is a specialized class that extends Rx<T>
+  // It automatically saves/loads values from storage
   late final RxPersisted<int> counter;
   final storage = MemoryStorage();
 
   @override
   void initState() {
     super.initState();
-    // Type still needed for RxPersisted due to generic constraints
+    // RxPersisted needs explicit type and storage configuration
     counter = RxPersisted<int>(0, 'example_counter', storage);
   }
 
