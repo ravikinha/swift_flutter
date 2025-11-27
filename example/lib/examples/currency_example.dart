@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:swift_flutter/swift_flutter.dart';
 import 'package:swift_flutter/core/currency.dart';
 import 'package:swift_flutter/core/extensions.dart';
 
@@ -21,25 +20,6 @@ class _CurrencyExampleState extends State<CurrencyExample> {
     super.dispose();
   }
 
-  void _updateAmount(String value) {
-    // Automatically remove commas and parse the cleaned value
-    final cleaned = value.numbersWithDecimal;
-    final parsed = cleaned.toDoubleSafe();
-    
-    if (parsed != null) {
-      setState(() {
-        amount = parsed;
-      });
-    } else if (cleaned.isEmpty || cleaned == '.') {
-      // Allow empty or just decimal point while typing
-      setState(() {
-        amount = 0.0;
-      });
-    }
-    
-    // Update the controller to show cleaned value (but keep user input for better UX)
-    // We'll use a formatter instead to clean on input
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -417,8 +397,8 @@ class _CurrencyExampleState extends State<CurrencyExample> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        border: Border.all(color: color.withOpacity(0.3)),
+        color: color.withValues(alpha: 0.1),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -426,7 +406,7 @@ class _CurrencyExampleState extends State<CurrencyExample> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
+              color: color.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, color: color, size: 24),

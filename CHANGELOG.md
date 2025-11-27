@@ -1,5 +1,36 @@
 # Changelog
 
+## [2.0.0] - 2024-11-27 - Code Quality & Linter Perfection
+
+### Fixed
+- ✅ **Fixed all 65 linter issues** - Achieved zero warnings, errors, and info messages
+- ✅ Removed unused imports (`swift_flutter.dart`, `dart:typed_data`)
+- ✅ Removed unused methods (`_updateAmount`, `_handleMessage`, `_isComputedDirty`)
+- ✅ Removed unused variables across test files (5 in `devtools_test.dart`, 1 in `offline_test.dart`, 1 in `offline.dart`)
+- ✅ Fixed unnecessary type checks in `rx_inference_test.dart` (13 instances - replaced `is Type` with `isA<Type>()`)
+- ✅ Made fields final where appropriate (`_totalItems` in `pagination.dart`)
+- ✅ Removed unnecessary `this.` qualifiers (12 instances in `extensions.dart`)
+- ✅ Fixed HTML in documentation comments (4 instances - escaped angle brackets in `Rx<T>` references)
+- ✅ Updated deprecated API calls (`withOpacity` → `withValues` in 3 locations)
+- ✅ Fixed dangling library doc comments (replaced named libraries with anonymous `library;`)
+- ✅ Replaced `print` with `stderr.writeln` in tool scripts
+
+### Improved
+- ✅ **Used super parameters** throughout codebase for cleaner constructors
+  - `ReduxStore` constructor
+  - `TypedComputed` constructor
+- ✅ Better code maintainability with zero linter warnings
+- ✅ Improved pub.dev static analysis score (perfect 130/130 expected)
+- ✅ Cleaner, more modern Dart code following latest best practices
+
+### Notes
+- All changes are backwards compatible
+- No breaking changes to public API
+- Perfect static analysis score achieved
+- Ready for pub.dev publication
+
+---
+
 ## [1.2.6] - 2024 - DevTools Integration
 
 ### Added

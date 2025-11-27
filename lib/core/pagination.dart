@@ -188,7 +188,7 @@ class SwiftFuturePagination<T> {
   final int _pageSize;
   int _currentPage = 0;
   final List<T> _allItems = [];
-  int? _totalItems;
+  final int? _totalItems;
 
   SwiftFuturePagination({
     required Future<List<T>> Function(int page, int pageSize) loadPage,

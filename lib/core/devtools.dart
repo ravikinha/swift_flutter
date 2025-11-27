@@ -456,12 +456,6 @@ class SwiftDevTools {
     );
   }
 
-  static bool _isComputedDirty(Computed<dynamic> computed) {
-    // Access private field through reflection or expose API
-    // For now, return false
-    return false;
-  }
-
   static dynamic _serializeValue(dynamic value) {
     try {
       if (value == null) return null;

@@ -22,7 +22,7 @@
 /// import 'package:swift_flutter/core/ab_testing.dart'; // A/B testing
 /// import 'package:swift_flutter/core/realtime_sync.dart'; // Real-time sync
 /// ```
-library swift_flutter;
+library;
 
 // Core
 export 'core/rx.dart' show Rx, swift;

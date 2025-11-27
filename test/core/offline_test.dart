@@ -322,13 +322,10 @@ void main() {
     });
 
     test('should track pending sync', () async {
-      var synced = false;
       final state = OfflineRx<int>(
         0,
         queueManager: manager,
-        syncFunction: (value) async {
-          synced = true;
-        },
+        syncFunction: (value) async {},
       );
 
       state.value = 10;

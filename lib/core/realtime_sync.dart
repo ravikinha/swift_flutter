@@ -98,14 +98,6 @@ class WebSocketSyncProvider implements SyncProvider {
 
   @override
   bool get isConnected => _isConnected;
-
-  void _handleMessage(dynamic message) {
-    // Production: Parse message and route to appropriate subscribers
-    // final json = jsonDecode(message);
-    // final channel = json['channel'];
-    // final data = json['data'];
-    // _subscriptions[channel]?.forEach((callback) => callback(data));
-  }
 }
 
 /// Firebase Realtime Database sync provider (placeholder)

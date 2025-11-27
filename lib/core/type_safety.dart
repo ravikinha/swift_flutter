@@ -40,9 +40,8 @@ class TypedRx<T> extends Rx<T> {
 class TypedComputed<T> extends Computed<T> {
   final bool _enableMemoization;
   
-  TypedComputed(T Function() compute, {bool enableMemoization = false})
-      : _enableMemoization = enableMemoization,
-        super(compute, enableMemoization: enableMemoization);
+  TypedComputed(super.compute, {super.enableMemoization = false})
+      : _enableMemoization = enableMemoization;
 
   /// Create with type validation
   factory TypedComputed.withValidator(

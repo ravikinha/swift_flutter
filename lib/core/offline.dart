@@ -326,7 +326,7 @@ class OfflineQueueManager {
       final data = await _storage!.load(_storageKey);
       if (data == null) return;
 
-      final json = jsonDecode(data) as Map<String, dynamic>;
+      jsonDecode(data);
 
       // Note: Actual deserialization depends on your action types
       // This is a simplified version

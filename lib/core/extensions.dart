@@ -286,7 +286,7 @@ extension IntExtensions on int {
   /// 1500000000000.toReadable(); // '1.5T'
   /// ```
   String toReadable() {
-    final absValue = this.abs();
+    final absValue = abs();
     final isNegative = this < 0;
     final sign = isNegative ? '-' : '';
     
@@ -926,7 +926,7 @@ extension IterableExtensions<T> on Iterable<T> {
   }
 }
 
-/// Extension methods for Rx<int> to support arithmetic and financial operations on reactive values.
+/// Extension methods for `Rx<int>` to support arithmetic and financial operations on reactive values.
 extension RxIntExtensions on Rx<int> {
   /// Adds a value to the reactive integer and updates it.
   ///
@@ -936,7 +936,7 @@ extension RxIntExtensions on Rx<int> {
   /// counter.add(5); // counter.value is now 15
   /// ```
   void add(int value) {
-    this.value = this.value + value;
+    this.value += value;
   }
 
   /// Subtracts a value from the reactive integer and updates it.
@@ -947,7 +947,7 @@ extension RxIntExtensions on Rx<int> {
   /// counter.sub(3); // counter.value is now 7
   /// ```
   void sub(int value) {
-    this.value = this.value - value;
+    this.value -= value;
   }
 
   /// Multiplies the reactive integer by a value and updates it.
@@ -958,7 +958,7 @@ extension RxIntExtensions on Rx<int> {
   /// counter.mul(3); // counter.value is now 30
   /// ```
   void mul(int value) {
-    this.value = this.value * value;
+    this.value *= value;
   }
 
   /// Applies a percentage to the reactive integer (adds percentage).
@@ -1006,7 +1006,7 @@ extension RxIntExtensions on Rx<int> {
   }
 }
 
-/// Extension methods for Rx<double> to support arithmetic and financial operations on reactive values.
+/// Extension methods for `Rx<double>` to support arithmetic and financial operations on reactive values.
 extension RxDoubleExtensions on Rx<double> {
   /// Adds a value to the reactive double and updates it.
   ///
@@ -1016,7 +1016,7 @@ extension RxDoubleExtensions on Rx<double> {
   /// price.add(5.5); // price.value is now 16.0
   /// ```
   void add(double value) {
-    this.value = this.value + value;
+    this.value += value;
   }
 
   /// Subtracts a value from the reactive double and updates it.
@@ -1027,7 +1027,7 @@ extension RxDoubleExtensions on Rx<double> {
   /// price.sub(3.2); // price.value is now 7.3
   /// ```
   void sub(double value) {
-    this.value = this.value - value;
+    this.value -= value;
   }
 
   /// Multiplies the reactive double by a value and updates it.
@@ -1038,7 +1038,7 @@ extension RxDoubleExtensions on Rx<double> {
   /// price.mul(2.0); // price.value is now 21.0
   /// ```
   void mul(double value) {
-    this.value = this.value * value;
+    this.value *= value;
   }
 
   /// Applies a percentage to the reactive double (adds percentage).
@@ -1049,7 +1049,7 @@ extension RxDoubleExtensions on Rx<double> {
   /// price.applyPercent(20); // price.value is now 120.0
   /// ```
   void applyPercent(double percent) {
-    this.value = this.value * (1 + percent / 100);
+    value = value * (1 + percent / 100);
   }
 
   /// Applies a discount percentage to the reactive double (subtracts percentage).
@@ -1060,7 +1060,7 @@ extension RxDoubleExtensions on Rx<double> {
   /// price.discount(20); // price.value is now 80.0
   /// ```
   void discount(double percent) {
-    this.value = this.value * (1 - percent / 100);
+    value = value * (1 - percent / 100);
   }
 
   /// Applies a tax percentage to the reactive double (adds percentage).
@@ -1071,7 +1071,7 @@ extension RxDoubleExtensions on Rx<double> {
   /// price.tax(10); // price.value is now 110.0
   /// ```
   void tax(double percent) {
-    this.value = this.value * (1 + percent / 100);
+    value = value * (1 + percent / 100);
   }
 
   /// Adds GST to the reactive double.
@@ -1082,7 +1082,7 @@ extension RxDoubleExtensions on Rx<double> {
   /// price.addGST(10); // price.value is now 110.0
   /// ```
   void addGST(double percent) {
-    this.value = this.value * (1 + percent / 100);
+    value = value * (1 + percent / 100);
   }
 
   /// Removes GST from the reactive double.
@@ -1093,7 +1093,7 @@ extension RxDoubleExtensions on Rx<double> {
   /// price.removeGST(10); // price.value is now 100.0
   /// ```
   void removeGST(double percent) {
-    this.value = this.value / (1 + percent / 100);
+    value = value / (1 + percent / 100);
   }
 
   /// Rounds the reactive double to a specified number of decimal places.
@@ -1105,7 +1105,7 @@ extension RxDoubleExtensions on Rx<double> {
   /// ```
   void roundTo(int decimals) {
     final multiplier = _powerOf10(decimals);
-    this.value = (this.value * multiplier).round() / multiplier;
+    value = (value * multiplier).round() / multiplier;
   }
 
   double _powerOf10(int exponent) {
@@ -1118,7 +1118,7 @@ extension RxDoubleExtensions on Rx<double> {
   }
 }
 
-/// Extension methods for Rx<String> to support string operations on reactive values.
+/// Extension methods for `Rx<String>` to support string operations on reactive values.
 extension RxStringExtensions on Rx<String> {
   /// Adds (concatenates) a string to the reactive string and updates it.
   ///
@@ -1128,11 +1128,11 @@ extension RxStringExtensions on Rx<String> {
   /// name.add(' World'); // name.value is now 'Hello World'
   /// ```
   void add(String value) {
-    this.value = this.value + value;
+    this.value += value;
   }
 }
 
-/// Extension methods for Rx<bool> to support toggle operation on reactive values.
+/// Extension methods for `Rx<bool>` to support toggle operation on reactive values.
 extension RxBoolExtensions on Rx<bool> {
   /// Toggles the reactive boolean value.
   ///

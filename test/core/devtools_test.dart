@@ -44,7 +44,7 @@ void main() {
     test('should track Rx creation', () {
       SwiftDevTools.enable();
       
-      final counter = swift(0, name: 'counter');
+      swift(0, name: 'counter');
       
       final summary = SwiftDevTools.getSummary();
       expect(summary['rxCount'], 1);
@@ -117,8 +117,8 @@ void main() {
     test('should get state inspector data', () {
       SwiftDevTools.enable();
       
-      final counter = swift(42, name: 'counter');
-      final name = swift('Test', name: 'name');
+      swift(42, name: 'counter');
+      swift('Test', name: 'name');
       
       final inspector = SwiftDevTools.getStateInspector();
       expect(inspector['totalCount'], greaterThanOrEqualTo(2));
@@ -257,8 +257,8 @@ void main() {
     test('should serialize complex values in state inspector', () {
       SwiftDevTools.enable();
       
-      final list = swift([1, 2, 3], name: 'list');
-      final map = swift({'key': 'value'}, name: 'map');
+      swift([1, 2, 3], name: 'list');
+      swift({'key': 'value'}, name: 'map');
       
       final inspector = SwiftDevTools.getStateInspector();
       expect(inspector['states'], isA<Map<String, dynamic>>());
@@ -267,9 +267,9 @@ void main() {
     test('should track multiple Rx values', () {
       SwiftDevTools.enable();
       
-      final a = swift(1, name: 'a');
-      final b = swift(2, name: 'b');
-      final c = swift(3, name: 'c');
+      swift(1, name: 'a');
+      swift(2, name: 'b');
+      swift(3, name: 'c');
       
       final summary = SwiftDevTools.getSummary();
       expect(summary['rxCount'], 3);
@@ -309,7 +309,6 @@ void main() {
       SwiftDevTools.enable();
       
       final counter = swift(0, name: 'counter');
-      final id = SwiftDevTools.getRxId(counter);
       
       // Dispose the counter
       counter.dispose();

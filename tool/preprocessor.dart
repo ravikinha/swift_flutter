@@ -21,7 +21,7 @@ void main() async {
     await outputDir.create(recursive: true);
   }
 
-  print('🔍 Scanning Dart files in ${sourceDir.path}...');
+  stderr.writeln('🔍 Scanning Dart files in ${sourceDir.path}...');
 
   final dartFiles = sourceDir
       .listSync(recursive: true)
@@ -53,9 +53,9 @@ void main() async {
     await outputFile.parent.create(recursive: true);
 
     await outputFile.writeAsString(transformed);
-    print('✅ Processed: $relativePath');
+    stderr.writeln('✅ Processed: $relativePath');
   }
 
-  print('\n✨ Done! Generated files saved in lib/generated/\n');
-  print('➡️  To run: flutter run -t lib/generated/main.dart');
+  stderr.writeln('\n✨ Done! Generated files saved in lib/generated/\n');
+  stderr.writeln('➡️  To run: flutter run -t lib/generated/main.dart');
 }

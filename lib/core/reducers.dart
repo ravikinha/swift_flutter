@@ -18,15 +18,16 @@ class ReduxStore<T> extends Rx<T> {
   final List<Action> _actionHistory = [];
   int _historyLimit = 50;
   bool _enableHistory = true;
+  final String? _storeName;
 
   ReduxStore(
-    T initialState,
+    super.initialState,
     this._reducer, {
-    String? name,
-  }) : super(initialState, name: name) {
+    super.name,
+  }) : _storeName = name {
     // Register with DevTools for time-travel debugging
     if (SwiftDevTools.isEnabled) {
-      SwiftDevTools.registerReduxStore(this, name);
+      SwiftDevTools.registerReduxStore(this, _storeName);
     }
   }
 
