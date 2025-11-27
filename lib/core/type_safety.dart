@@ -103,8 +103,8 @@ class ReactiveChain<T> {
   /// Map to another type
   ReactiveChain<R> map<R>(R Function(T) transform) {
     final computed = Computed<R>(() {
-      final value = _source is Rx<T> ? (_source as Rx<T>).value : (_source as Computed<T>).value;
-      return transform(value);
+      final val = _source is Rx<T> ? (_source as Rx<T>).value : (_source as Computed<T>).value;
+      return transform(val);
     });
     return ReactiveChain<R>(computed);
   }
@@ -112,11 +112,11 @@ class ReactiveChain<T> {
   /// Filter values
   ReactiveChain<T> where(bool Function(T) test) {
     final computed = Computed<T>(() {
-      final value = _source is Rx<T> ? (_source as Rx<T>).value : (_source as Computed<T>).value;
-      if (!test(value)) {
-        throw StateError('Value $value does not pass filter');
+      final val = _source is Rx<T> ? (_source as Rx<T>).value : (_source as Computed<T>).value;
+      if (!test(val)) {
+        throw StateError('Value $val does not pass filter');
       }
-      return value;
+      return val;
     });
     return ReactiveChain<T>(computed);
   }
