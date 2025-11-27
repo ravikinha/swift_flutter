@@ -56,3 +56,6 @@ app.*.map.json
 *.lock
 local.properties
 *.iml
+
+# Test/Development projects
+/project/
