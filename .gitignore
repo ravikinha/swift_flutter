@@ -43,3 +43,16 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Platform-specific app folders (not needed for package)
+/android/
+/ios/
+/macos/
+/windows/
+/linux/
+/web/
+
+# Build artifacts
+*.lock
+local.properties
+*.iml

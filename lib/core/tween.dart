@@ -38,7 +38,8 @@ class RxTween<T> extends ChangeNotifier {
   }
 
   void _updateValue() {
-    final newValue = _tween.lerp(_progress.value);
+    // Use transform instead of lerp to avoid protected member access
+    final newValue = _tween.transform(_progress.value);
     if (_currentValue != newValue) {
       _currentValue = newValue;
       notifyListeners();

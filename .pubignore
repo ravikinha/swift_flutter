@@ -1,0 +1,28 @@
+# Platform-specific app folders (not needed for package)
+/android/
+/ios/
+/macos/
+/windows/
+/linux/
+/web/
+
+# Build artifacts
+/build/
+*.lock
+local.properties
+*.iml
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Example app build files
+/example/build/
+/example/android/
+/example/ios/
+/example/macos/
+/example/windows/
+/example/linux/
+/example/web/
+

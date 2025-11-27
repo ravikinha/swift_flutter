@@ -1,6 +1,9 @@
 # swift_flutter
 
-A reactive state management library for Flutter with automatic dependency tracking.
+[![pub package](https://img.shields.io/pub/v/swift_flutter.svg)](https://pub.dev/packages/swift_flutter)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+A reactive state management library for Flutter with automatic dependency tracking. Inspired by MobX and Vue's reactivity system, but built specifically for Flutter.
 
 ## Features
 
@@ -19,17 +22,22 @@ A reactive state management library for Flutter with automatic dependency tracki
 
 ## Installation
 
-Add to your `pubspec.yaml`:
+Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  swift_flutter:
-    git:
-      url: https://github.com/ravikinha/swift_flutter.git
-      ref: main
+  swift_flutter: ^1.0.0
+```
+
+Then run:
+
+```bash
+flutter pub get
 ```
 
 ## Quick Start
+
+### Basic Reactive State
 
 ```dart
 import 'package:swift_flutter/swift_flutter.dart';
@@ -42,23 +50,77 @@ Mark(
   builder: (context) => Text('Count: ${counter.value}'),
 )
 
-// Update value
-counter.value = 10; // Widget rebuilds automatically!
+// Update value - widget rebuilds automatically!
+counter.value = 10;
 ```
 
-## Examples
+### Computed Values
 
-See `lib/views/main.dart` for comprehensive examples of all features.
+```dart
+final price = Rx<double>(100.0);
+final quantity = Rx<int>(2);
 
-Run examples:
-```bash
-flutter run -t lib/views/main.dart
+// Automatically recomputes when price or quantity changes
+final total = Computed(() => price.value * quantity.value);
+
+Mark(
+  builder: (context) => Text('Total: \$${total.value}'),
+)
+```
+
+### Async State
+
+```dart
+final rxFuture = RxFuture<String>();
+
+// Execute async operation
+rxFuture.execute(() async {
+  await Future.delayed(Duration(seconds: 2));
+  return 'Data loaded!';
+});
+
+// Display state
+Mark(
+  builder: (context) => rxFuture.value.when(
+    idle: () => Text('Click to load'),
+    loading: () => CircularProgressIndicator(),
+    success: (data) => Text(data),
+    error: (error, stack) => Text('Error: $error'),
+  ),
+)
+```
+
+### Form Validation
+
+```dart
+final emailField = RxField<String>('');
+emailField.addValidator(Validators.required());
+emailField.addValidator(Validators.email());
+
+TextField(
+  onChanged: (value) => emailField.value = value,
+  decoration: InputDecoration(
+    errorText: emailField.error,
+  ),
+)
 ```
 
 ## Documentation
 
+- [Full API Documentation](https://pub.dev/documentation/swift_flutter)
 - [Architecture Review](ARCHITECTURE_REVIEW.md)
 - [Performance Comparison](PERFORMANCE_COMPARISON.md)
+
+## Example
+
+See the [example](example/) directory for a complete example app demonstrating all features.
+
+Run the example:
+
+```bash
+cd example
+flutter run
+```
 
 ## Testing
 
@@ -70,10 +132,24 @@ flutter test
 
 **58 tests passing** ✅
 
-## License
-
-MIT
-
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Author
+
+[ravikinha](https://github.com/ravikinha)
+
+## Support
+
+If you find this package useful, please consider giving it a ⭐ on [pub.dev](https://pub.dev/packages/swift_flutter) and [GitHub](https://github.com/ravikinha/swift_flutter)!
