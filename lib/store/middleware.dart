@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 /// Action interface for middleware
 abstract class Action {
   String get type;
@@ -21,18 +23,19 @@ abstract class Middleware {
 class LoggingMiddleware extends Middleware {
   @override
   Future<Action?> before(Action action) async {
-    print('🔵 [Middleware] Before: ${action.type}');
+    // Use debugPrint instead of print for production code
+    debugPrint('🔵 [Middleware] Before: ${action.type}');
     return action;
   }
 
   @override
   Future<void> after(Action action, dynamic result) async {
-    print('🟢 [Middleware] After: ${action.type} -> $result');
+    debugPrint('🟢 [Middleware] After: ${action.type} -> $result');
   }
 
   @override
   Future<void> onError(Object error, StackTrace stackTrace, Action action) async {
-    print('🔴 [Middleware] Error in ${action.type}: $error');
+    debugPrint('🔴 [Middleware] Error in ${action.type}: $error');
   }
 }
 

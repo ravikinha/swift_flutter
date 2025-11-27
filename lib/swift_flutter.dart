@@ -1,19 +1,11 @@
-// swift_flutter - A reactive state management library for Flutter
-//
-// This library provides:
-// - Reactive state (Rx)
-// - Automatic dependency tracking (Mark)
-// - Global store / Dependency injection
-// - Lifecycle management
-// - Computed values
-// - Async state (SwiftFuture)
-// - Form validation
-// - Persistence
-// - Middleware / Interceptors
-// - Batch transactions
-// - Debug logging
-// - Animation tweens
-
+/// A reactive state management library for Flutter with automatic dependency tracking.
+///
+/// This is the main entry point for the swift_flutter package.
+/// Import this library to access all features.
+///
+/// ```dart
+/// import 'package:swift_flutter/swift_flutter.dart';
+/// ```
 library swift_flutter;
 
 // Core

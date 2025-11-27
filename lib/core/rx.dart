@@ -51,9 +51,17 @@ class Rx<T> extends ChangeNotifier {
   String toString() => _value.toString();
 }
 
-/// Creates an Rx with optional type inference
-/// Usage with automatic inference: swift(0) creates Rx<int>
-/// Usage with explicit type: swift<int>(0) creates Rx<int>
-/// Usage for models: swift<MyModel>(myModel) creates Rx<MyModel>
+/// Creates an Rx with optional type inference.
+///
+/// Usage with automatic inference: `swift(0)` creates `Rx<int>`.
+/// Usage with explicit type: `swift<int>(0)` creates `Rx<int>`.
+/// Usage for models: `swift<MyModel>(myModel)` creates `Rx<MyModel>`.
+///
+/// Example:
+/// ```dart
+/// final counter = swift(0);        // Automatically Rx<int>
+/// final name = swift('Hello');     // Automatically Rx<String>
+/// final user = swift<User>(user);  // Explicit type for models
+/// ```
 Rx<T> swift<T>(T value) => Rx<T>(value);
 

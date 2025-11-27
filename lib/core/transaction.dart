@@ -28,12 +28,14 @@ class Transaction {
   /// Checks if currently in a transaction
   static bool get isActive => _inTransaction;
 
-  /// Schedules a notification for a notifier to be sent after transaction completes
-  /// Uses Set to deduplicate - same notifier will only notify once per transaction
+  /// Schedules a notification for a notifier to be sent after transaction completes.
+  ///
+  /// Uses Set to deduplicate - same notifier will only notify once per transaction.
   static void scheduleNotificationFor(ChangeNotifier notifier) {
     if (_inTransaction) {
       _pendingNotifiers.add(notifier);
     } else {
+      // Direct call is safe here as we're calling on the instance
       notifier.notifyListeners();
     }
   }
@@ -42,19 +44,26 @@ class Transaction {
     final notifiers = List<ChangeNotifier>.from(_pendingNotifiers);
     _pendingNotifiers.clear();
     for (final notifier in notifiers) {
+      // Direct call is safe here as we're calling on the instance
       notifier.notifyListeners();
     }
   }
 }
 
-/// Extension to make ChangeNotifier transaction-aware
+/// Extension to make ChangeNotifier transaction-aware.
+///
+/// This extension adds the [notifyListenersTransaction] method which
+/// respects transaction context and batches notifications.
 extension TransactionNotifier on ChangeNotifier {
-  /// Notifies listeners, respecting transaction context
-  /// Batches notifications - same notifier will only notify once per transaction
+  /// Notifies listeners, respecting transaction context.
+  ///
+  /// Batches notifications - same notifier will only notify once per transaction.
+  /// This is safe to use as it's an extension method on ChangeNotifier.
   void notifyListenersTransaction() {
     if (Transaction.isActive) {
       Transaction.scheduleNotificationFor(this);
     } else {
+      // Safe to call notifyListeners from extension method
       notifyListeners();
     }
   }

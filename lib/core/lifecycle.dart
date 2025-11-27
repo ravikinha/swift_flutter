@@ -72,6 +72,7 @@ class LifecycleController extends ChangeNotifier {
   }
 
   /// Complete disposal
+  @override
   void dispose() {
     if (_state != LifecycleState.disposed) {
       _state = LifecycleState.disposed;

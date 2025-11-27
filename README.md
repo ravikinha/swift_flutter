@@ -463,7 +463,7 @@ See the [example](example/) directory for a complete Flutter app demonstrating a
 
 - [Full API Documentation](https://pub.dev/documentation/swift_flutter)
 - [Architecture Review](ARCHITECTURE_REVIEW.md)
-- [Performance Comparison](PERFORMANCE_COMPARISON.md)
+- [Performance & Feature Comparison](PERFORMANCE_COMPARISON.md) - Comprehensive comparison with Provider, Riverpod, GetX, Bloc, MobX, and Redux
 
 ## Example
 

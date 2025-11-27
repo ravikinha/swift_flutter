@@ -1,28 +1,45 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 
 /// Registry for tracking active Mark widgets (stack-based for nested support)
 class MarkRegistry {
-  static final List<_MarkState> _stack = [];
+  static final List<MarkState> _stack = [];
 
-  static _MarkState? get current => 
+  static MarkState? get current => 
     _stack.isNotEmpty ? _stack.last : null;
 
-  static void push(_MarkState mark) => _stack.add(mark);
+  static void push(MarkState mark) => _stack.add(mark);
   static void pop() => _stack.removeLast();
 }
 
+/// Internal state for Mark widget
+class MarkState {
+
 /// Widget that automatically rebuilds when its reactive dependencies change
+/// Widget that automatically rebuilds when its reactive dependencies change.
+///
+/// Wrap any widget that depends on reactive state (Rx, Computed, etc.) with Mark
+/// to enable automatic rebuilds when dependencies change.
+///
+/// Example:
+/// ```dart
+/// final counter = swift(0);
+///
+/// Mark(
+///   builder: (context) => Text('Count: ${counter.value}'),
+/// )
+/// ```
 class Mark extends StatefulWidget {
+  /// Builder function that creates the widget
   final Widget Function(BuildContext) builder;
   
+  /// Creates a Mark widget
   const Mark({super.key, required this.builder});
 
   @override
   State<Mark> createState() => _MarkState();
 }
 
-class _MarkState extends State<Mark> {
+class _MarkState extends State<Mark> implements MarkState {
   final Set<ChangeNotifier> dependencies = {};
 
   void register(ChangeNotifier controller) {

@@ -41,7 +41,7 @@ class Computed<T> extends ChangeNotifier {
     _dependencies.clear();
 
     // Track dependencies during computation
-    final tracker = _ComputedTracker();
+    final tracker = ComputedTracker();
     ComputedTrackerRegistry.push(tracker);
 
     try {
