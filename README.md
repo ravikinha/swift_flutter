@@ -27,6 +27,7 @@ A reactive state management library for Flutter with automatic dependency tracki
 ✅ **Circular Dependency Detection** - Automatic detection of circular dependencies  
 ✅ **Memoization** - Performance optimization for computed values  
 ✅ **Enhanced Testing Utilities** - Comprehensive test helpers  
+✅ **DevTools Integration** - Full Flutter DevTools support with zero overhead  
 
 ## Installation
 
@@ -702,6 +703,7 @@ See the [example](example/) directory for a complete Flutter app demonstrating a
 - [Architecture Review](ARCHITECTURE_REVIEW.md)
 - [Advanced Patterns & Best Practices](ADVANCED_PATTERNS.md)
 - [Library Review](LIBRARY_REVIEW.md)
+- [DevTools Integration](DEVTOOLS.md)
 
 ## Example
 

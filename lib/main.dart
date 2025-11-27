@@ -60,6 +60,7 @@ export 'core/debug.dart';
 export 'core/routing.dart';
 export 'core/type_safety.dart';
 export 'core/structured_patterns.dart';
+export 'core/devtools.dart';
 
 // Store
 export 'store/store.dart';

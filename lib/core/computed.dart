@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'rx.dart';
 import '../ui/mark.dart';
 import 'logger.dart';
+import 'devtools.dart' show SwiftDevTools;
 
 /// Computed value that automatically updates when dependencies change
 class Computed<T> extends ChangeNotifier {
@@ -17,8 +18,13 @@ class Computed<T> extends ChangeNotifier {
   /// Create a computed value
   /// 
   /// [enableMemoization] - If true, caches results when inputs haven't changed
-  Computed(this._compute, {bool enableMemoization = false}) {
+  /// [name] - Optional name for DevTools tracking
+  Computed(this._compute, {bool enableMemoization = false, String? name}) {
     _enableMemoization = enableMemoization;
+    // Zero overhead: only track if DevTools is enabled
+    if (SwiftDevTools.isEnabled) {
+      SwiftDevTools.trackComputedCreation(this, name);
+    }
     _updateDependencies();
   }
 
@@ -37,6 +43,13 @@ class Computed<T> extends ChangeNotifier {
     final mark = MarkRegistry.current;
     if (mark != null) {
       mark.register(this);
+      // Zero overhead: only track if DevTools is enabled
+      if (SwiftDevTools.isEnabled && SwiftDevTools.isTrackingDependencies) {
+        SwiftDevTools.trackDependency(
+          SwiftDevTools.getMarkId(mark),
+          SwiftDevTools.getComputedId(this),
+        );
+      }
     }
     return _value as T;
   }
@@ -80,6 +93,22 @@ class Computed<T> extends ChangeNotifier {
 
       _value = _compute();
       _dependencies.addAll(tracker.rxDependencies);
+      
+      // Zero overhead: track dependencies if DevTools is enabled
+      if (SwiftDevTools.isEnabled && SwiftDevTools.isTrackingDependencies) {
+        for (var dep in tracker.rxDependencies) {
+          SwiftDevTools.trackDependency(
+            SwiftDevTools.getComputedId(this),
+            SwiftDevTools.getRxId(dep),
+          );
+        }
+        for (var computedDep in tracker.computedDependencies) {
+          SwiftDevTools.trackDependency(
+            SwiftDevTools.getComputedId(this),
+            SwiftDevTools.getComputedId(computedDep),
+          );
+        }
+      }
       
       // Clear old computed dependencies
       for (var computedDep in _computedDependencies) {

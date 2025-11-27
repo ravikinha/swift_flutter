@@ -3,13 +3,20 @@ import '../ui/mark.dart';
 import 'computed.dart';
 import 'transaction.dart';
 import 'performance_monitor.dart';
+import 'devtools.dart' show SwiftDevTools;
 
 /// Reactive state container that automatically tracks dependencies
 class Rx<T> extends ChangeNotifier {
   T _value;
+  String? _devToolsName;
   
   /// Constructor - type is automatically inferred from the value
-  Rx(this._value);
+  Rx(this._value, {String? name}) : _devToolsName = name {
+    // Zero overhead: only track if DevTools is enabled
+    if (SwiftDevTools.isEnabled) {
+      SwiftDevTools._trackRxCreation(this, _devToolsName);
+    }
+  }
   
   /// Factory constructor for automatic type inference.
   ///
@@ -22,12 +29,24 @@ class Rx<T> extends ChangeNotifier {
     final computedTracker = ComputedTrackerRegistry.current;
     if (computedTracker != null) {
       computedTracker.dependencies.add(this);
+      // Zero overhead: only track if DevTools is enabled
+      if (SwiftDevTools.isEnabled && SwiftDevTools.isTrackingDependencies) {
+        // Note: ComputedTracker doesn't have ID, skip for now
+        // DevTools extension can infer from stack
+      }
     }
     
     // Then check for mark widget
     final mark = MarkRegistry.current;
     if (mark != null) {
       mark.register(this);
+      // Zero overhead: only track if DevTools is enabled
+      if (SwiftDevTools.isEnabled && SwiftDevTools.isTrackingDependencies) {
+        SwiftDevTools.trackDependency(
+          SwiftDevTools.getMarkId(mark),
+          SwiftDevTools.getRxId(this),
+        );
+      }
     }
     return _value;
   }
@@ -36,16 +55,34 @@ class Rx<T> extends ChangeNotifier {
   set value(T newValue) {
     if (_value == newValue) return;
     
+    final oldValue = _value;
     final stopwatch = Stopwatch()..start();
     _value = newValue;
     notifyListenersTransaction();
     stopwatch.stop();
     
+    // Zero overhead: only track if enabled
     if (PerformanceMonitor.isEnabled && stopwatch.elapsedMilliseconds > 0) {
       PerformanceMonitor.trackUpdate(
         runtimeType.toString(),
         stopwatch.elapsed,
       );
+    }
+    
+    // Zero overhead: only track if DevTools is enabled
+    if (SwiftDevTools.isEnabled) {
+      SwiftDevTools.trackStateChange(
+        SwiftDevTools.getRxId(this),
+        oldValue,
+        newValue,
+      );
+      if (SwiftDevTools.isTrackingPerformance) {
+        SwiftDevTools.trackPerformanceEvent(
+          _devToolsName ?? runtimeType.toString(),
+          stopwatch.elapsed,
+          {'type': 'RxUpdate'},
+        );
+      }
     }
   }
 
@@ -85,5 +122,5 @@ class Rx<T> extends ChangeNotifier {
 /// final name = swift('Hello');     // Automatically Rx<String>
 /// final user = swift<User>(user);  // Explicit type for models
 /// ```
-Rx<T> swift<T>(T value) => Rx<T>(value);
+Rx<T> swift<T>(T value, {String? name}) => Rx<T>(value, name: name);
 

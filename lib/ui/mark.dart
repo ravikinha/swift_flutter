@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/performance_monitor.dart';
+import '../core/devtools.dart' show SwiftDevTools;
 
 /// Internal state interface for Mark widget
 abstract class MarkState {
@@ -50,6 +51,11 @@ class _MarkState extends State<Mark> implements MarkState {
     if (!dependencies.contains(controller)) {
       dependencies.add(controller);
       controller.addListener(_rebuild);
+      
+      // Zero overhead: track Mark widget if DevTools is enabled
+      if (SwiftDevTools.isEnabled && SwiftDevTools.isTrackingDependencies) {
+        SwiftDevTools.trackMarkCreation(this, widget.runtimeType.toString());
+      }
     }
   }
 
