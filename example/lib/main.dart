@@ -140,13 +140,18 @@ class RxExample extends StatefulWidget {
 }
 
 class _RxExampleState extends State<RxExample> {
-  // Automatic type inference - no need to specify types!
+  // Using swift() helper for automatic type inference
+  // swift() creates Rx<T> instances - cleaner than Rx<int>(0)
   final counter = swift(0);  // Automatically inferred as Rx<int>
   final name = swift('Swift Flutter');  // Automatically inferred as Rx<String>
   
   // Or use explicit typing if you prefer:
   // final counter = swift<int>(0);
   // final name = swift<String>('Swift Flutter');
+  
+  // Note: RxFuture, RxField, RxTween, RxPersisted are different classes
+  // They are specialized wrappers, not Rx<T> instances
+  // That's why they keep the Rx prefix in their class names
 
   @override
   void dispose() {
@@ -312,15 +317,19 @@ class RxFutureExample extends StatefulWidget {
 }
 
 class _RxFutureExampleState extends State<RxFutureExample> {
+  // RxFuture is a specialized class for async operations
+  // It's different from Rx<T> - it manages loading/error/success states
   final rxFuture = RxFuture<String>();
 
   Future<String> _fetchData() async {
     await Future.delayed(const Duration(seconds: 2));
-    if (DateTime.now().second % 2 == 0) {
-      return 'Success! Data loaded at ${DateTime.now().toString().substring(11, 19)}';
-    } else {
-      throw Exception('Simulated error');
-    }
+    // Always return success for demo
+    return 'Success! Data loaded at ${DateTime.now().toString().substring(11, 19)}';
+  }
+  
+  Future<String> _fetchDataWithError() async {
+    await Future.delayed(const Duration(seconds: 2));
+    throw Exception('Simulated error for testing');
   }
 
   @override
@@ -372,6 +381,11 @@ class _RxFutureExampleState extends State<RxFutureExample> {
             ElevatedButton(
               onPressed: () => rxFuture.execute(_fetchData),
               child: const Text('Load Data'),
+            ),
+            const SizedBox(width: 8),
+            ElevatedButton(
+              onPressed: () => rxFuture.execute(_fetchDataWithError),
+              child: const Text('Test Error'),
             ),
             const SizedBox(width: 8),
             ElevatedButton(
@@ -579,6 +593,8 @@ class TweenExample extends StatefulWidget {
 }
 
 class _TweenExampleState extends State<TweenExample> {
+  // RxTween is a specialized class for reactive animations
+  // It manages tween interpolation with reactive progress
   late final RxTween<double> sizeTween;
   late final RxTween<Color?> colorTween;
 
