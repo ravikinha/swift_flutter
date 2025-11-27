@@ -123,16 +123,28 @@ Mark(
 ### Form Validation
 
 ```dart
+// Create a reactive form field with validation support
+// SwiftField extends Rx<T> and adds validation capabilities
 final emailField = SwiftField<String>('');
-emailField.addValidator(Validators.required());
-emailField.addValidator(Validators.email());
 
+// Add validation rules
+// Validators are checked automatically when the value changes
+emailField.addValidator(Validators.required());  // Field must not be empty
+emailField.addValidator(Validators.email());      // Must be a valid email format
+
+// Use the field in a TextField
+// The error message is automatically displayed when validation fails
 TextField(
-  onChanged: (value) => emailField.value = value,
+  onChanged: (value) => emailField.value = value,  // Update field value
   decoration: InputDecoration(
-    errorText: emailField.error,
+    errorText: emailField.error,  // Shows validation error if any
   ),
 )
+
+// Check validation status programmatically
+if (emailField.isValid) {
+  // Proceed with form submission
+}
 ```
 
 ## Documentation
