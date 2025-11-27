@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 
+/// Internal state interface for Mark widget
+abstract class MarkState {
+  /// Register a ChangeNotifier as a dependency
+  void register(ChangeNotifier controller);
+}
+
 /// Registry for tracking active Mark widgets (stack-based for nested support)
 class MarkRegistry {
   static final List<MarkState> _stack = [];
@@ -11,10 +17,6 @@ class MarkRegistry {
   static void pop() => _stack.removeLast();
 }
 
-/// Internal state for Mark widget
-class MarkState {
-
-/// Widget that automatically rebuilds when its reactive dependencies change
 /// Widget that automatically rebuilds when its reactive dependencies change.
 ///
 /// Wrap any widget that depends on reactive state (Rx, Computed, etc.) with Mark
@@ -42,6 +44,7 @@ class Mark extends StatefulWidget {
 class _MarkState extends State<Mark> implements MarkState {
   final Set<ChangeNotifier> dependencies = {};
 
+  @override
   void register(ChangeNotifier controller) {
     if (!dependencies.contains(controller)) {
       dependencies.add(controller);
@@ -83,4 +86,3 @@ class _MarkState extends State<Mark> implements MarkState {
     }
   }
 }
-
