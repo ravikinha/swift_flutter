@@ -1,16 +1,5 @@
 import 'package:flutter/material.dart';
-import '../core/rx.dart';
-import '../core/computed.dart';
-import '../core/rx_future.dart';
-import '../core/rx_field.dart';
-import '../core/transaction.dart';
-import '../core/tween.dart';
-import '../core/logger.dart';
-import '../core/lifecycle.dart';
-import '../core/persistence.dart';
-import '../store/store.dart';
-import '../store/middleware.dart';
-import '../ui/mark.dart';
+import 'package:swift_flutter/swift_flutter.dart';
 
 void main() {
   // Enable logger for debugging
