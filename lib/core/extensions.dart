@@ -1,5 +1,6 @@
 import 'rx.dart';
-import 'currency.dart';
+// Currency is optional - import separately if you need currency formatting
+// import 'currency.dart';
 
 /// Swift-like extension methods for common Dart types.
 ///
@@ -237,22 +238,41 @@ extension IntExtensions on int {
 
   /// Formats this integer as Indian Rupee (INR).
   ///
+  /// Note: Requires importing 'package:swift_flutter/core/currency.dart'
+  ///
   /// Example:
   /// ```dart
   /// int price = 10000;
   /// String formatted = price.toINR(); // '₹10,000'
   /// ```
-  String toINR() => Currency.inr.format(toDouble());
+  String toINR() {
+    // Currency is optional - import separately if needed
+    // For now, use simple formatting
+    return '₹${toDouble().toStringAsFixed(2).replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]},',
+        )}';
+  }
 
 
   /// Formats this integer using a specific currency.
+  ///
+  /// Note: Requires importing 'package:swift_flutter/core/currency.dart'
   ///
   /// Example:
   /// ```dart
   /// int price = 1000;
   /// String formatted = price.toCurrencyType(Currency.inr); // '₹1,000.00'
   /// ```
-  String toCurrencyType(Currency currency) => currency.format(toDouble());
+  String toCurrencyType(dynamic currency) {
+    // Currency is optional - import separately if needed
+    // If currency.dart is imported, this will work with Currency type
+    if (currency != null && currency.toString().contains('Currency')) {
+      return currency.format(toDouble());
+    }
+    // Fallback to simple formatting
+    return toCurrency();
+  }
 
   /// Formats this integer as a readable number with K, M, B, T suffixes.
   /// Automatically chooses the appropriate suffix based on value.
@@ -521,22 +541,41 @@ extension DoubleExtensions on double {
 
   /// Formats this double as Indian Rupee (INR).
   ///
+  /// Note: Requires importing 'package:swift_flutter/core/currency.dart'
+  ///
   /// Example:
   /// ```dart
   /// double price = 10000.50;
   /// String formatted = price.toINR(); // '₹10,000.50'
   /// ```
-  String toINR() => Currency.inr.format(this);
+  String toINR() {
+    // Currency is optional - import separately if needed
+    // For now, use simple formatting
+    return '₹${toStringAsFixed(2).replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]},',
+        )}';
+  }
 
 
   /// Formats this double using a specific currency.
+  ///
+  /// Note: Requires importing 'package:swift_flutter/core/currency.dart'
   ///
   /// Example:
   /// ```dart
   /// double price = 1000.50;
   /// String formatted = price.toCurrencyType(Currency.inr); // '₹1,000.50'
   /// ```
-  String toCurrencyType(Currency currency) => currency.format(this);
+  String toCurrencyType(dynamic currency) {
+    // Currency is optional - import separately if needed
+    // If currency.dart is imported, this will work with Currency type
+    if (currency != null && currency.toString().contains('Currency')) {
+      return currency.format(this);
+    }
+    // Fallback to simple formatting
+    return toCurrency();
+  }
 
   /// Formats this double as a readable number with K, M, B, T suffixes.
   /// Automatically chooses the appropriate suffix based on value.
