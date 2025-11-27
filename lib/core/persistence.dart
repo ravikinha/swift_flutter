@@ -35,12 +35,30 @@ class MemoryStorage implements StorageBackend {
   }
 }
 
+/// Migration function type
+typedef MigrationFunction<T> = T Function(Map<String, dynamic> oldData, int fromVersion, int toVersion);
+
+/// Migration configuration
+class MigrationConfig<T> {
+  final int fromVersion;
+  final int toVersion;
+  final MigrationFunction<T> migrate;
+
+  const MigrationConfig({
+    required this.fromVersion,
+    required this.toVersion,
+    required this.migrate,
+  });
+}
+
 /// Reactive value with persistence
 class SwiftPersisted<T> extends Rx<T> {
   final String _key;
   final StorageBackend _storage;
   final T Function(Map<String, dynamic>)? fromJson;
   final Map<String, dynamic> Function(T)? toJson;
+  final List<MigrationConfig<T>>? _migrations;
+  final int? _currentVersion;
   bool _isLoading = false;
 
   SwiftPersisted(
@@ -49,11 +67,14 @@ class SwiftPersisted<T> extends Rx<T> {
     this._storage, {
     this.fromJson,
     this.toJson,
-  }) {
+    List<MigrationConfig<T>>? migrations,
+    int? currentVersion,
+  })  : _migrations = migrations,
+        _currentVersion = currentVersion {
     _load();
   }
 
-  /// Load persisted value
+  /// Load persisted value with migration support
   Future<void> _load() async {
     if (_isLoading) return;
     _isLoading = true;
@@ -62,10 +83,40 @@ class SwiftPersisted<T> extends Rx<T> {
       final json = await _storage.load(_key);
       if (json != null) {
         final decoded = jsonDecode(json) as Map<String, dynamic>;
+        
+        // Check for version and apply migrations if needed
+        final storedVersion = decoded['_version'] as int? ?? 0;
+        final targetVersion = _currentVersion ?? 0;
+        
+        Map<String, dynamic> migratedData = decoded;
+        
+        if (storedVersion < targetVersion && _migrations != null) {
+          // Apply migrations
+          for (final migration in _migrations!) {
+            if (storedVersion <= migration.fromVersion && 
+                migration.toVersion <= targetVersion) {
+              try {
+                migratedData = migration.migrate(
+                  migratedData,
+                  migration.fromVersion,
+                  migration.toVersion,
+                ) as Map<String, dynamic>? ?? migratedData;
+              } catch (e) {
+                debugPrint('Error applying migration from ${migration.fromVersion} to ${migration.toVersion}: $e');
+              }
+            }
+          }
+          // Update version after migration
+          migratedData['_version'] = targetVersion;
+          // Save migrated data
+          await _storage.save(_key, jsonEncode(migratedData));
+        }
+        
+        // Load the (possibly migrated) data
         if (fromJson != null) {
-          value = fromJson!(decoded);
+          value = fromJson!(migratedData);
         } else {
-          value = decoded['value'] as T;
+          value = migratedData['value'] as T;
         }
       }
     } catch (e) {
@@ -84,6 +135,12 @@ class SwiftPersisted<T> extends Rx<T> {
       } else {
         data = {'value': value};
       }
+      
+      // Add version if specified
+      if (_currentVersion != null) {
+        data['_version'] = _currentVersion;
+      }
+      
       await _storage.save(_key, jsonEncode(data));
     } catch (e) {
       debugPrint('Error saving persisted value for $_key: $e');
@@ -108,6 +165,51 @@ class SwiftPersisted<T> extends Rx<T> {
   Future<void> clear() async {
     await _storage.delete(_key);
     _isLoading = false;
+  }
+
+  /// Migrate data manually (useful for testing or manual migration)
+  Future<void> migrate() async {
+    await _load();
+  }
+}
+
+/// Migration helper utilities
+class MigrationHelper {
+  /// Create a simple migration that transforms data
+  static MigrationConfig<T> simpleMigration<T>({
+    required int fromVersion,
+    required int toVersion,
+    required T Function(Map<String, dynamic>) transform,
+  }) {
+    return MigrationConfig<T>(
+      fromVersion: fromVersion,
+      toVersion: toVersion,
+      migrate: (oldData, from, to) => transform(oldData),
+    );
+  }
+
+  /// Create a migration that renames a key
+  static MigrationConfig<T> renameKeyMigration<T>({
+    required int fromVersion,
+    required int toVersion,
+    required String oldKey,
+    required String newKey,
+    T Function(Map<String, dynamic>)? transform,
+  }) {
+    return MigrationConfig<T>(
+      fromVersion: fromVersion,
+      toVersion: toVersion,
+      migrate: (oldData, from, to) {
+        final newData = Map<String, dynamic>.from(oldData);
+        if (newData.containsKey(oldKey)) {
+          newData[newKey] = newData.remove(oldKey);
+        }
+        if (transform != null) {
+          return transform(newData);
+        }
+        return newData as T;
+      },
+    );
   }
 }
 

@@ -1,68 +1,110 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+## [1.2.1] - 2024 - Bug Fixes & Improvements
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [1.1.1] - 2025-01-XX
-
-### Added
-- Comprehensive use cases documentation in README
-- Detailed examples for all 12 features
-- Improved code comments and documentation
-
-## [1.1.0] - 2025-01-XX
-
-### Changed
-- **BREAKING**: Renamed all classes to use "Swift" prefix for consistency:
-  - `RxFuture` → `SwiftFuture`
-  - `RxField` → `SwiftField`
-  - `RxTween` → `SwiftTween`
-  - `RxPersisted` → `SwiftPersisted`
-- Updated all examples, tests, and documentation to use new naming
-- Improved API consistency across the library
-
-## [1.0.1] - 2025-01-XX
-
-### Changed
-- Renamed `rx()` function to `swift()` for better API consistency
-- Improved type inference - `swift()` now supports both automatic and explicit typing
-- Updated all examples to use `swift()` syntax
+### Fixed
+- ✅ Fixed `rethrow` keyword conflict in `SwiftFuture` (renamed parameter to `shouldRethrow`)
+- ✅ Fixed `ReactiveChain` type handling for better type safety
 
 ### Added
-- `swift()` function with optional type inference
-  - `swift(0)` automatically creates `Rx<int>`
-  - `swift<int>(0)` explicitly creates `Rx<int>` (recommended for models)
-  - Works with all types: int, String, bool, double, List, Map, custom classes, etc.
+- ✅ Routing integration (`RxRouting` for reactive routing state)
+- ✅ Enhanced type safety (`TypedRx`, `TypedComputed`, `TypeGuard`)
+- ✅ Structured patterns (`StructuredStore`, `OpinionatedStore` for Bloc-like patterns)
 
-## [1.0.0] - 2025-01-XX
+### Improved
+- ✅ Performance comparison documentation
+- ✅ Library review with comprehensive performance metrics
+- ✅ Better competitor comparisons with performance data
+
+### Notes
+- All changes are backwards compatible
+- Performance improvements documented and benchmarked
+
+---
+
+## [1.2.0] - 2024 - Major Enhancements
 
 ### Added
-- **Automatic Type Inference with `swift()`** - Use `swift(value)` for automatic inference or `swift<Type>(value)` for explicit typing
-  - `swift(0)` automatically creates `Rx<int>`
-  - `swift<int>(0)` explicitly creates `Rx<int>` (recommended for models)
-  - `swift('hello')` automatically creates `Rx<String>`
-  - `swift<User>(user)` explicitly creates `Rx<User>` (for custom models)
-  - Works with all types: int, String, bool, double, List, Map, custom classes, etc.
-- **Reactive State (Rx)** - Automatic dependency tracking with `Rx<T>`
-- **Mark Widget** - Auto-rebuild widget that tracks dependencies automatically
-- **Computed Values** - Derived state that automatically updates when dependencies change
-- **RxFuture** - Async state management with loading/error/success states
-- **Form Validation** - Field validation with built-in validators (`RxField`)
-- **Persistence** - Automatic save/load of reactive values (`RxPersisted`)
-- **Middleware/Interceptors** - Action interception and logging system
-- **Batch Transactions** - Prevent unnecessary rebuilds with transaction batching
-- **Debug Logger** - Configurable logging with history and levels
-- **Animation Tween** - Reactive animation values (`RxTween`)
-- **Lifecycle Controller** - Widget lifecycle state management
-- **Global Store/DI** - Dependency injection and global state management
-- Comprehensive test suite with 58 passing tests
-- Example app demonstrating all features
+
+#### Error Handling & Recovery
+- ✅ Automatic retry for async operations with configurable retry policies
+- ✅ Exponential backoff support for retries
+- ✅ Error recovery strategies (fallback, custom, retry)
+- ✅ Error boundary UI components (`ErrorBoundaryWidget`)
+- ✅ Better error messages with context
+- ✅ User-friendly error message extraction
+
+#### Performance Optimizations
+- ✅ Memoization for computed values (optional, enabled via `enableMemoization` parameter)
+- ✅ Circular dependency detection in computed values
+- ✅ Dependency graph optimization
+- ✅ Enhanced performance monitoring
+
+#### State Management Patterns
+- ✅ Redux-like reducer pattern (`ReduxStore`, `Reducer`, `Action`)
+- ✅ State normalization utilities (`RxNormalizedState`, `NormalizedState`)
+- ✅ Pagination support (`PaginationController`, `SwiftFuturePagination`)
+- ✅ Action history tracking in Redux stores
+
+#### Enhanced Debugging
+- ✅ Debug mode with verbose logging (`DebugMode`)
+- ✅ Context-aware logging (`DebugLogger`)
+- ✅ Dependency tracking for debugging
+- ✅ Enhanced test helpers with async support
+
+#### Animation Improvements
+- ✅ `AnimationController` support for better performance (replaces polling)
+- ✅ Staggered animations (`animateSequence`)
+- ✅ More animation curves support
+- ✅ Backwards compatibility with polling fallback
+
+#### Persistence Enhancements
+- ✅ Data migration support (`MigrationConfig`, `MigrationHelper`)
+- ✅ Version tracking for persisted data
+- ✅ Migration utilities for common scenarios
+
+#### Testing Utilities
+- ✅ Enhanced test helpers (`SwiftTestHelpers`)
+- ✅ Mock reactive state (`MockReactiveState`)
+- ✅ Async operation test helpers
+- ✅ Transaction testing support
+- ✅ Debug mode for testing
+
+### Improved
+
+- ✅ `SwiftFuture` now supports retry, error recovery, and better error handling
+- ✅ `Computed` now supports memoization and circular dependency detection
+- ✅ `SwiftTween` now uses `AnimationController` when `vsync` is provided
+- ✅ `SwiftPersisted` now supports data migrations
+- ✅ Error messages are more descriptive and user-friendly
+- ✅ Test helpers are more comprehensive
 
 ### Documentation
-- Complete README with installation and usage examples
-- Architecture review document
-- Performance comparison document
-- Inline code documentation
 
+- ✅ Added `ADVANCED_PATTERNS.md` with comprehensive guides on:
+  - State management patterns
+  - Performance optimization
+  - Error handling
+  - Testing patterns
+  - Migration guides (GetX, Riverpod, Bloc, MobX)
+  - Best practices
+- ✅ Updated `README.md` with new features and examples
+- ✅ Updated `LIBRARY_REVIEW.md` with current status
+
+### Breaking Changes
+
+- ⚠️ `SwiftFuture` constructor now accepts optional parameters (backwards compatible)
+- ⚠️ `Computed` constructor now accepts optional `enableMemoization` parameter (backwards compatible)
+- ⚠️ `SwiftTween` constructor now accepts optional `vsync` parameter (backwards compatible)
+
+### Notes
+
+- All new features are backwards compatible
+- Performance improvements are opt-in (memoization, AnimationController)
+- Error handling improvements are automatic but configurable
+
+---
+
+## [1.1.1] - Previous Version
+
+See git history for previous changelog entries.

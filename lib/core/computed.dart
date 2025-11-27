@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'rx.dart';
 import '../ui/mark.dart';
+import 'logger.dart';
 
 /// Computed value that automatically updates when dependencies change
 class Computed<T> extends ChangeNotifier {
@@ -9,8 +10,16 @@ class Computed<T> extends ChangeNotifier {
   final Set<Rx<dynamic>> _dependencies = {};
   final Set<Computed<dynamic>> _computedDependencies = {};
   bool _isDirty = true;
+  bool _enableMemoization = false;
+  Object? _lastMemoKey;
+  final Set<Computed<dynamic>> _visitedInCycle = {};
+  static final Set<Computed<dynamic>> _computingStack = {};
 
-  Computed(this._compute) {
+  /// Create a computed value
+  /// 
+  /// [enableMemoization] - If true, caches results when inputs haven't changed
+  Computed(this._compute, {bool enableMemoization = false}) {
+    _enableMemoization = enableMemoization;
     _updateDependencies();
   }
 
@@ -34,6 +43,19 @@ class Computed<T> extends ChangeNotifier {
   }
 
   void _updateDependencies() {
+    // Check for circular dependencies
+    if (_computingStack.contains(this)) {
+      final cycle = _computingStack.toList();
+      cycle.add(this);
+      Logger.error(
+        'Circular dependency detected in Computed',
+        'Cycle: ${cycle.map((c) => c.runtimeType).join(" -> ")}',
+      );
+      throw StateError(
+        'Circular dependency detected in Computed. Cycle: ${cycle.map((c) => c.runtimeType).join(" -> ")}',
+      );
+    }
+
     // Clear old listeners
     for (var dep in _dependencies) {
       dep.removeListener(_markDirty);
@@ -43,8 +65,20 @@ class Computed<T> extends ChangeNotifier {
     // Track dependencies during computation
     final tracker = ComputedTracker();
     ComputedTrackerRegistry.push(tracker);
+    _computingStack.add(this);
 
     try {
+      // Check memoization if enabled
+      if (_enableMemoization) {
+        final memoKey = _computeMemoKey();
+        if (memoKey != null && memoKey == _lastMemoKey && !_isDirty) {
+          // Value hasn't changed, skip recomputation
+          _computingStack.remove(this);
+          return;
+        }
+        _lastMemoKey = memoKey;
+      }
+
       _value = _compute();
       _dependencies.addAll(tracker.rxDependencies);
       
@@ -60,6 +94,7 @@ class Computed<T> extends ChangeNotifier {
         computedDep.addListener(_markDirty);
       }
     } finally {
+      _computingStack.remove(this);
       ComputedTrackerRegistry.pop();
     }
 
@@ -70,9 +105,29 @@ class Computed<T> extends ChangeNotifier {
     _isDirty = false;
   }
 
+  /// Compute memoization key based on dependency values
+  Object? _computeMemoKey() {
+    if (_dependencies.isEmpty && _computedDependencies.isEmpty) {
+      return null;
+    }
+    
+    final keys = <Object?>[];
+    for (var dep in _dependencies) {
+      keys.add(dep.rawValue);
+    }
+    for (var computedDep in _computedDependencies) {
+      keys.add(computedDep._value);
+    }
+    return keys;
+  }
+
   void _markDirty() {
     if (!_isDirty) {
       _isDirty = true;
+      // Invalidate memoization key
+      if (_enableMemoization) {
+        _lastMemoKey = null;
+      }
       notifyListeners();
     }
   }

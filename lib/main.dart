@@ -48,6 +48,18 @@ export 'core/tween.dart';
 export 'core/logger.dart';
 export 'core/lifecycle.dart';
 export 'core/persistence.dart';
+export 'core/performance_monitor.dart';
+export 'core/error_boundary.dart';
+export 'core/test_helpers.dart';
+export 'core/scope.dart';
+export 'core/lazy_rx.dart';
+export 'core/reducers.dart';
+export 'core/normalization.dart';
+export 'core/pagination.dart';
+export 'core/debug.dart';
+export 'core/routing.dart';
+export 'core/type_safety.dart';
+export 'core/structured_patterns.dart';
 
 // Store
 export 'store/store.dart';

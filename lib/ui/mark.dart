@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/performance_monitor.dart';
 
 /// Internal state interface for Mark widget
 abstract class MarkState {
@@ -69,6 +70,11 @@ class _MarkState extends State<Mark> implements MarkState {
 
   @override
   Widget build(BuildContext context) {
+    // Track rebuild if monitoring is enabled
+    if (PerformanceMonitor.isEnabled) {
+      PerformanceMonitor.trackRebuild(widget.runtimeType.toString());
+    }
+
     // Clear previous dependencies
     for (var c in dependencies) {
       c.removeListener(_rebuild);

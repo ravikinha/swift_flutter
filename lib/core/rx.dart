@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import '../ui/mark.dart';
 import 'computed.dart';
 import 'transaction.dart';
+import 'performance_monitor.dart';
 
 /// Reactive state container that automatically tracks dependencies
 class Rx<T> extends ChangeNotifier {
@@ -34,15 +35,35 @@ class Rx<T> extends ChangeNotifier {
   /// Sets a new value and notifies listeners if changed
   set value(T newValue) {
     if (_value == newValue) return;
+    
+    final stopwatch = Stopwatch()..start();
     _value = newValue;
     notifyListenersTransaction();
+    stopwatch.stop();
+    
+    if (PerformanceMonitor.isEnabled && stopwatch.elapsedMilliseconds > 0) {
+      PerformanceMonitor.trackUpdate(
+        runtimeType.toString(),
+        stopwatch.elapsed,
+      );
+    }
   }
 
   /// Updates the value and notifies listeners if changed
   void update(T newValue) {
     if (_value == newValue) return;
+    
+    final stopwatch = Stopwatch()..start();
     _value = newValue;
     notifyListenersTransaction();
+    stopwatch.stop();
+    
+    if (PerformanceMonitor.isEnabled && stopwatch.elapsedMilliseconds > 0) {
+      PerformanceMonitor.trackUpdate(
+        runtimeType.toString(),
+        stopwatch.elapsed,
+      );
+    }
   }
 
   /// Gets the value without registering as dependency (for internal use)

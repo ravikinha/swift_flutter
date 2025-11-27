@@ -10,15 +10,23 @@ A reactive state management library for Flutter with automatic dependency tracki
 ✅ **Reactive State (Rx)** - Automatic dependency tracking  
 ✅ **Mark Widget** - Auto-rebuild when dependencies change  
 ✅ **Computed (Derived State)** - Automatically computed values with nested dependency support  
-✅ **SwiftFuture / Async State** - Loading/error/success states for async operations  
+✅ **SwiftFuture / Async State** - Loading/error/success states with automatic retry and error recovery  
 ✅ **SwiftField / Form Validation** - Field validation with built-in validators  
-✅ **SwiftPersisted / Persistence** - Automatic save/load of reactive values  
+✅ **SwiftPersisted / Persistence** - Automatic save/load with migration support  
 ✅ **Middleware / Interceptors** - Action interception and logging  
 ✅ **Batch Update Transactions** - Prevent unnecessary rebuilds  
 ✅ **Debug Logger** - Configurable logging with history  
-✅ **SwiftTween / Animation Tween** - Reactive animation values  
+✅ **SwiftTween / Animation Tween** - Reactive animation values with AnimationController  
 ✅ **Lifecycle Controller** - Widget lifecycle management  
 ✅ **Global Store / Dependency Injection** - Service registration and state management  
+✅ **Redux-like Reducers** - Predictable state updates with action/reducer pattern  
+✅ **State Normalization** - Efficient collection management  
+✅ **Pagination** - Built-in pagination support  
+✅ **Error Boundaries** - Error handling with UI components  
+✅ **Performance Monitoring** - Built-in performance tracking  
+✅ **Circular Dependency Detection** - Automatic detection of circular dependencies  
+✅ **Memoization** - Performance optimization for computed values  
+✅ **Enhanced Testing Utilities** - Comprehensive test helpers  
 
 ## Installation
 
@@ -455,7 +463,236 @@ store.addMiddleware(LoggingMiddleware());
 store.dispatch(MyAction());
 ```
 
-### 12. Complete Example App
+### 12. Async State with Retry and Error Recovery
+
+Handle async operations with automatic retry and error recovery:
+
+```dart
+// Create SwiftFuture with retry configuration
+final dataFuture = SwiftFuture<String>(
+  retryConfig: RetryConfig(
+    maxAttempts: 3,
+    delay: Duration(seconds: 1),
+    backoffMultiplier: 2.0, // Exponential backoff
+    shouldRetry: (error) => error is NetworkException,
+  ),
+  recoveryStrategy: ErrorRecoveryStrategy.fallback,
+  fallbackValue: 'Default value',
+);
+
+// Execute with automatic retry
+await dataFuture.execute(() async {
+  return await fetchData();
+});
+
+// Use in UI
+Mark(
+  builder: (context) => dataFuture.value.when(
+    idle: () => Text('Click to load'),
+    loading: () => Text('Loading... (attempt ${dataFuture.currentAttempt + 1})'),
+    success: (data) => Text(data),
+    error: (error, stack) => Column(
+      children: [
+        Text('Error: ${dataFuture.errorMessage}'),
+        ElevatedButton(
+          onPressed: () => dataFuture.retry(),
+          child: Text('Retry'),
+        ),
+      ],
+    ),
+  ),
+)
+```
+
+### 13. Redux-like State Management
+
+Use Redux-like pattern for predictable state updates:
+
+```dart
+// Define actions
+class IncrementAction implements Action {
+  @override
+  String get type => 'INCREMENT';
+}
+
+// Define reducer
+final counterReducer = (int state, Action action) {
+  switch (action.type) {
+    case 'INCREMENT':
+      return state + 1;
+    default:
+      return state;
+  }
+};
+
+// Create store
+final counterStore = ReduxStore<int>(0, counterReducer);
+
+// Use in widget
+Mark(
+  builder: (context) => Text('Count: ${counterStore.value}'),
+)
+
+// Dispatch actions
+counterStore.dispatch(IncrementAction());
+```
+
+### 14. State Normalization
+
+Efficiently manage collections with normalized state:
+
+```dart
+final usersState = RxNormalizedState<User>();
+
+// Add users
+usersState.upsert('user1', User(id: 'user1', name: 'John'));
+usersState.upsertMany({
+  'user2': User(id: 'user2', name: 'Jane'),
+  'user3': User(id: 'user3', name: 'Bob'),
+});
+
+// Get by ID
+final user = usersState.getById('user1');
+
+// Use in widget
+Mark(
+  builder: (context) => ListView(
+    children: usersState.ids.map((id) {
+      final user = usersState.getById(id);
+      return ListTile(title: Text(user?.name ?? ''));
+    }).toList(),
+  ),
+)
+```
+
+### 15. Pagination
+
+Handle paginated data easily:
+
+```dart
+final paginationController = PaginationController<User>(
+  loadPage: (page, pageSize) async {
+    final response = await api.getUsers(page: page, pageSize: pageSize);
+    return response.users;
+  },
+  pageSize: 20,
+);
+
+// Load initial page
+await paginationController.loadInitial();
+
+// Use in widget
+Mark(
+  builder: (context) => ListView(
+    children: [
+      ...paginationController.items.map((user) => UserTile(user: user)),
+      if (paginationController.hasMore)
+        ElevatedButton(
+          onPressed: () => paginationController.loadNext(),
+          child: Text('Load More'),
+        ),
+    ],
+  ),
+)
+```
+
+### 16. Error Boundary
+
+Catch and handle errors gracefully:
+
+```dart
+ErrorBoundaryWidget(
+  errorBuilder: (context, error, stackTrace) {
+    return ErrorWidget(
+      error: error,
+      onRetry: () {
+        // Retry logic
+      },
+    );
+  },
+  child: MyWidget(),
+)
+```
+
+### 17. Performance Optimization
+
+Enable memoization for expensive computed values:
+
+```dart
+final expensiveComputation = Computed<int>(
+  () {
+    // Expensive computation
+    return heavyCalculation();
+  },
+  enableMemoization: true, // Enable memoization
+);
+```
+
+### 18. Debug Mode
+
+Enable debug mode for development:
+
+```dart
+DebugMode.enable(
+  verboseLogging: true,
+  trackDependencies: true,
+);
+
+// Use debug logger
+DebugLogger.logWithContext(
+  'State updated',
+  context: {'counter': counter.value},
+);
+```
+
+### 19. Persistence with Migration
+
+Handle data migrations when schema changes:
+
+```dart
+final persistedCounter = SwiftPersisted<int>(
+  0,
+  'counter_key',
+  storage,
+  currentVersion: 2,
+  migrations: [
+    MigrationHelper.simpleMigration<int>(
+      fromVersion: 1,
+      toVersion: 2,
+      transform: (data) => data['value'] as int? ?? 0,
+    ),
+  ],
+);
+```
+
+### 20. Enhanced Animations
+
+Use AnimationController for better performance:
+
+```dart
+class _MyWidgetState extends State<MyWidget> with SingleTickerProviderStateMixin {
+  late final SwiftTween<double> sizeTween;
+
+  @override
+  void initState() {
+    super.initState();
+    sizeTween = SwiftTween<double>(
+      Tween(begin: 50.0, end: 200.0),
+      vsync: this, // Use AnimationController
+    );
+  }
+
+  // Animate with staggered sequence
+  Future<void> animate() async {
+    await sizeTween.animateSequence(
+      [0.0, 0.5, 1.0],
+      stagger: Duration(milliseconds: 100),
+    );
+  }
+}
+```
+
+### 21. Complete Example App
 
 See the [example](example/) directory for a complete Flutter app demonstrating all features with interactive examples.
 
@@ -463,7 +700,8 @@ See the [example](example/) directory for a complete Flutter app demonstrating a
 
 - [Full API Documentation](https://pub.dev/documentation/swift_flutter)
 - [Architecture Review](ARCHITECTURE_REVIEW.md)
-- [Performance & Feature Comparison](PERFORMANCE_COMPARISON.md) - Comprehensive comparison with Provider, Riverpod, GetX, Bloc, MobX, and Redux
+- [Advanced Patterns & Best Practices](ADVANCED_PATTERNS.md)
+- [Library Review](LIBRARY_REVIEW.md)
 
 ## Example
 

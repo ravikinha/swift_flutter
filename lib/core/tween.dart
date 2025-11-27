@@ -1,18 +1,39 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/animation.dart';
 import 'rx.dart';
 import '../ui/mark.dart';
+import 'logger.dart';
 
-/// Reactive tween that animates between values
+/// Reactive tween that animates between values using AnimationController
 class SwiftTween<T> extends ChangeNotifier {
   final Tween<T> _tween;
   final Rx<double> _progress;
   T? _currentValue;
+  AnimationController? _controller;
+  Animation<double>? _animation;
+  TickerProvider? _tickerProvider;
 
-  SwiftTween(this._tween, {double initialProgress = 0.0})
-      : _progress = Rx(initialProgress.clamp(0.0, 1.0)) {
+  SwiftTween(
+    this._tween, {
+    double initialProgress = 0.0,
+    TickerProvider? vsync,
+  })  : _progress = Rx(initialProgress.clamp(0.0, 1.0)) {
+    _tickerProvider = vsync;
     _progress.addListener(_updateValue);
     _updateValue();
+    
+    if (_tickerProvider != null) {
+      _controller = AnimationController(
+        vsync: _tickerProvider!,
+        duration: const Duration(milliseconds: 300),
+      );
+      _animation = CurvedAnimation(
+        parent: _controller!,
+        curve: Curves.easeInOut,
+      );
+      _animation!.addListener(_onAnimationUpdate);
+    }
   }
 
   /// Current progress (0.0 to 1.0)
@@ -46,8 +67,41 @@ class SwiftTween<T> extends ChangeNotifier {
     }
   }
 
-  /// Animate to a target progress value
+  void _onAnimationUpdate() {
+    if (_animation != null && _controller != null) {
+      _progress.value = _animation!.value;
+    }
+  }
+
+  /// Animate to a target progress value using AnimationController if available
   Future<void> animateTo(
+    double target, {
+    Duration duration = const Duration(milliseconds: 300),
+    Curve curve = Curves.easeInOut,
+  }) async {
+    final end = target.clamp(0.0, 1.0);
+
+    if (_controller != null && _tickerProvider != null) {
+      // Use AnimationController (more efficient)
+      _controller!.duration = duration;
+      _animation = CurvedAnimation(
+        parent: _controller!,
+        curve: curve,
+      );
+      _animation!.removeListener(_onAnimationUpdate);
+      _animation!.addListener(_onAnimationUpdate);
+
+      final startProgress = _progress.value;
+      _controller!.value = startProgress;
+      await _controller!.animateTo(end);
+    } else {
+      // Fallback to polling (for backwards compatibility)
+      await _animateToPolling(end, duration: duration, curve: curve);
+    }
+  }
+
+  /// Fallback animation using polling (for when vsync is not available)
+  Future<void> _animateToPolling(
     double target, {
     Duration duration = const Duration(milliseconds: 300),
     Curve curve = Curves.easeInOut,
@@ -72,9 +126,37 @@ class SwiftTween<T> extends ChangeNotifier {
     }
   }
 
+  /// Animate multiple values in sequence (staggered animation)
+  Future<void> animateSequence(
+    List<double> targets, {
+    Duration duration = const Duration(milliseconds: 300),
+    Duration stagger = const Duration(milliseconds: 100),
+    Curve curve = Curves.easeInOut,
+  }) async {
+    for (var i = 0; i < targets.length; i++) {
+      if (i > 0) {
+        await Future.delayed(stagger);
+      }
+      await animateTo(targets[i], duration: duration, curve: curve);
+    }
+  }
+
+  /// Stop current animation
+  void stop() {
+    _controller?.stop();
+  }
+
+  /// Reset animation
+  void reset() {
+    _controller?.reset();
+    _progress.value = 0.0;
+  }
+
   @override
   void dispose() {
     _progress.removeListener(_updateValue);
+    _animation?.removeListener(_onAnimationUpdate);
+    _controller?.dispose();
     _progress.dispose();
     super.dispose();
   }
