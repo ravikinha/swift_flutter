@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.2.3] - 2024 - Extension Cleanup & Duplicate Removal
+
+### Removed
+- ✅ Removed `NumExtensions` extension (duplicate of `IntExtensions` + `DoubleExtensions`)
+- ✅ Removed `gst()` alias from all extensions (duplicate of `addGST()`)
+- ✅ Removed currency shortcut methods `toUSD()`, `toEUR()`, `toGBP()`, `toJPY()` from `Int` and `Double` extensions
+- ✅ Kept `toINR()` shortcut for convenience (popular in India)
+- ✅ Kept `toCurrencyType(Currency)` for all currency formatting needs
+
+### Improved
+- ✅ Cleaner API with reduced duplication (from ~120 to ~92 extension methods)
+- ✅ Better code maintainability by removing redundant implementations
+- ✅ Updated all examples and tests to use the cleaner API
+- ✅ All unique features preserved - no functionality lost
+
+### Notes
+- All changes are backwards compatible for unique features
+- Extension count reduced from ~120 to ~92 methods
+- Better performance by keeping only `Int` and `Double` extensions (not `Num`)
+
+---
+
 ## [1.2.2] - 2024 - Code Quality & Linting Fixes
 
 ### Fixed

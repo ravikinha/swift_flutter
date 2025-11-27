@@ -18,6 +18,8 @@ export 'core/tween.dart';
 export 'core/logger.dart';
 export 'core/lifecycle.dart';
 export 'core/persistence.dart';
+export 'core/extensions.dart';
+export 'core/currency.dart';
 
 // Store
 export 'store/store.dart';
