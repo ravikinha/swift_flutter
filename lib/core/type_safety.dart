@@ -22,6 +22,7 @@ class TypedRx<T> extends Rx<T> {
   @override
   set value(T newValue) {
     // Runtime type check - note: this is a runtime check, compile-time type is already enforced
+    // The type is already enforced at compile time, so we can just set it
     super.value = newValue;
   }
 
@@ -81,7 +82,8 @@ class TypeGuard {
   /// Assert value is of type T, throw if not
   static T assertType<T>(dynamic value, [String? message]) {
     if (value is! T) {
-      throw TypeError('Expected type $T, got ${value.runtimeType}${message != null ? ': $message' : ''}');
+      final errorMsg = message ?? 'Expected type $T, got ${value.runtimeType}';
+      throw ArgumentError(errorMsg);
     }
     return value;
   }
@@ -144,7 +146,8 @@ extension RxTypeSafety<T> on Rx<T> {
   /// Assert type at runtime
   Rx<T> assertType([String? message]) {
     if (value is! T) {
-      throw TypeError('Type assertion failed for Rx<$T>${message != null ? ': $message' : ''}');
+      final errorMsg = message ?? 'Type assertion failed for Rx<$T>';
+      throw ArgumentError(errorMsg);
     }
     return this;
   }
