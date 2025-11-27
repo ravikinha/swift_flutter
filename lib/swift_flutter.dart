@@ -6,6 +6,7 @@
 /// ```dart
 /// import 'package:swift_flutter/swift_flutter.dart';
 /// ```
+library swift_flutter;
 
 // Core
 export 'core/rx.dart' show Rx, swift;

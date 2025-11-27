@@ -101,7 +101,7 @@ class Computed<T> extends ChangeNotifier {
 }
 
 /// Tracker for computed dependencies
-class _ComputedTracker {
+class ComputedTracker {
   final Set<Rx<dynamic>> rxDependencies = {};
   final Set<Computed<dynamic>> computedDependencies = {};
   
@@ -110,12 +110,12 @@ class _ComputedTracker {
 
 /// Registry for computed trackers (stack-based)
 class ComputedTrackerRegistry {
-  static final List<_ComputedTracker> _stack = [];
+  static final List<ComputedTracker> _stack = [];
 
-  static _ComputedTracker? get current => 
+  static ComputedTracker? get current => 
     _stack.isNotEmpty ? _stack.last : null;
 
-  static void push(_ComputedTracker tracker) => _stack.add(tracker);
+  static void push(ComputedTracker tracker) => _stack.add(tracker);
   static void pop() => _stack.removeLast();
 }
 
