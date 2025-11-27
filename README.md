@@ -26,7 +26,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  swift_flutter: ^1.1.0
+  swift_flutter: ^1.1.1
 ```
 
 Then run:
@@ -146,6 +146,318 @@ if (emailField.isValid) {
   // Proceed with form submission
 }
 ```
+
+## Use Cases & Examples
+
+### 1. Reactive State (Rx)
+
+Create reactive state that automatically updates UI when values change.
+
+```dart
+// Create reactive state with automatic type inference
+final counter = swift(0);
+final name = swift('Swift Flutter');
+
+// Use in widget - automatically rebuilds when value changes
+Mark(
+  builder: (context) => Column(
+    children: [
+      Text('Count: ${counter.value}'),
+      Text('Name: ${name.value}'),
+      ElevatedButton(
+        onPressed: () => counter.value++,
+        child: const Text('Increment'),
+      ),
+    ],
+  ),
+)
+```
+
+### 2. Computed Values (Derived State)
+
+Create computed values that automatically update when dependencies change.
+
+```dart
+// Base reactive values
+final price = swift(100.0);
+final quantity = swift(2);
+
+// Computed value - automatically recalculates when price or quantity changes
+final total = Computed(() => price.value * quantity.value);
+final summary = Computed(() => 'Total: \$${total.value.toStringAsFixed(2)}');
+
+// Use in UI
+Mark(
+  builder: (context) => Text(summary.value),
+)
+```
+
+### 3. Async State Management (SwiftFuture)
+
+Handle async operations with automatic loading, success, and error states.
+
+```dart
+final dataFuture = SwiftFuture<String>();
+
+// Execute async operation
+Future<void> loadData() async {
+  await dataFuture.execute(() async {
+    await Future.delayed(Duration(seconds: 2));
+    return 'Data loaded successfully!';
+  });
+}
+
+// Display state in UI
+Mark(
+  builder: (context) => dataFuture.value.when(
+    idle: () => ElevatedButton(
+      onPressed: loadData,
+      child: Text('Load Data'),
+    ),
+    loading: () => CircularProgressIndicator(),
+    success: (data) => Text('Success: $data'),
+    error: (error, stack) => Text('Error: $error'),
+  ),
+)
+```
+
+### 4. Form Validation (SwiftField)
+
+Create form fields with built-in validation and error handling.
+
+```dart
+final emailField = SwiftField<String>('');
+final passwordField = SwiftField<String>('');
+
+// Add validators
+emailField.addValidator(Validators.required());
+emailField.addValidator(Validators.email());
+passwordField.addValidator(Validators.required());
+passwordField.addValidator(Validators.minLength(8));
+
+// Use in form
+Column(
+  children: [
+    TextField(
+      onChanged: (value) => emailField.value = value,
+      decoration: InputDecoration(
+        labelText: 'Email',
+        errorText: emailField.error,
+      ),
+    ),
+    TextField(
+      onChanged: (value) => passwordField.value = value,
+      obscureText: true,
+      decoration: InputDecoration(
+        labelText: 'Password',
+        errorText: passwordField.error,
+      ),
+    ),
+    ElevatedButton(
+      onPressed: emailField.isValid && passwordField.isValid
+          ? () => print('Form is valid!')
+          : null,
+      child: Text('Submit'),
+    ),
+  ],
+)
+```
+
+### 5. Batch Updates (Transactions)
+
+Batch multiple updates to prevent unnecessary rebuilds.
+
+```dart
+final x = swift(0);
+final y = swift(0);
+final z = swift(0);
+
+// Batch multiple updates - only one rebuild occurs
+Transaction.run(() {
+  x.value = 10;
+  y.value = 20;
+  z.value = 30;
+});
+
+// All three values update, but widget rebuilds only once
+Mark(
+  builder: (context) => Text('x: ${x.value}, y: ${y.value}, z: ${z.value}'),
+)
+```
+
+### 6. Reactive Animations (SwiftTween)
+
+Create reactive animations that respond to state changes.
+
+```dart
+late final SwiftTween<double> sizeTween;
+late final SwiftTween<Color?> colorTween;
+
+@override
+void initState() {
+  super.initState();
+  sizeTween = TweenHelper.doubleTween(begin: 50.0, end: 200.0);
+  colorTween = TweenHelper.colorTween(
+    begin: Colors.blue,
+    end: Colors.red,
+  );
+}
+
+// Animate to target value
+Future<void> animate() async {
+  await sizeTween.animateTo(1.0, duration: Duration(seconds: 1));
+}
+
+// Use in UI
+Mark(
+  builder: (context) => Container(
+    width: sizeTween.value,
+    height: sizeTween.value,
+    color: colorTween.value,
+  ),
+)
+```
+
+### 7. Widget Lifecycle Management
+
+Track and manage widget lifecycle states.
+
+```dart
+class MyWidget extends StatefulWidget {
+  @override
+  State<MyWidget> createState() => _MyWidgetState();
+}
+
+class _MyWidgetState extends State<MyWidget> with LifecycleMixin {
+  @override
+  void onInitialized() {
+    super.onInitialized();
+    // Called when widget is initialized
+    print('Widget initialized');
+  }
+
+  @override
+  void onActivated() {
+    super.onActivated();
+    // Called when widget becomes active
+    print('Widget activated');
+  }
+
+  @override
+  void onDeactivated() {
+    super.onDeactivated();
+    // Called when widget becomes inactive
+    print('Widget deactivated');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Text('Lifecycle: ${lifecycleState}');
+  }
+}
+```
+
+### 8. Persistent Storage (SwiftPersisted)
+
+Automatically save and load reactive values from storage.
+
+```dart
+final storage = MemoryStorage(); // Use SharedPreferences in production
+late final SwiftPersisted<int> counter;
+
+@override
+void initState() {
+  super.initState();
+  counter = SwiftPersisted<int>(0, 'counter_key', storage);
+}
+
+// Value is automatically saved when changed
+counter.value = 42; // Saved automatically
+
+// Value is automatically loaded on initialization
+Mark(
+  builder: (context) => Text('Counter: ${counter.value}'),
+)
+```
+
+### 9. Global Store / Dependency Injection
+
+Register and retrieve services and state globally.
+
+```dart
+// Register a service
+class UserService {
+  String getUser() => 'John Doe';
+}
+
+store.registerService<UserService>(UserService());
+
+// Register reactive state
+final globalCounter = swift(0);
+store.registerState('counter', globalCounter);
+
+// Retrieve service
+final userService = store.getService<UserService>();
+print(userService.getUser()); // 'John Doe'
+
+// Retrieve state
+final counter = store.getState<Rx<int>>('counter');
+print(counter.value); // 0
+```
+
+### 10. Debug Logging
+
+Configure logging with different levels and history.
+
+```dart
+// Enable and configure logger
+Logger.setEnabled(true);
+Logger.setLevel(LogLevel.debug);
+
+// Log messages
+Logger.debug('Debug message');
+Logger.info('Info message');
+Logger.warning('Warning message');
+Logger.error('Error message');
+
+// Get log history
+final history = Logger.getHistory();
+for (final entry in history) {
+  print('${entry.level}: ${entry.message}');
+}
+
+// Clear history
+Logger.clearHistory();
+```
+
+### 11. Middleware / Interceptors
+
+Intercept and modify actions in the global store.
+
+```dart
+class LoggingMiddleware extends Middleware {
+  @override
+  Future<Action?> before(Action action) async {
+    print('Before action: ${action.runtimeType}');
+    return action;
+  }
+
+  @override
+  Future<void> after(Action action, dynamic result) async {
+    print('After action: ${action.runtimeType}, result: $result');
+  }
+}
+
+// Register middleware
+store.addMiddleware(LoggingMiddleware());
+
+// Dispatch action - middleware intercepts it
+store.dispatch(MyAction());
+```
+
+### 12. Complete Example App
+
+See the [example](example/) directory for a complete Flutter app demonstrating all features with interactive examples.
 
 ## Documentation
 
