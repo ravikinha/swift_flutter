@@ -1,0 +1,48 @@
+import 'package:flutter/foundation.dart';
+import '../ui/mark.dart';
+import 'computed.dart';
+import 'transaction.dart';
+
+/// Reactive state container that automatically tracks dependencies
+class Rx<T> extends ChangeNotifier {
+  T _value;
+  
+  Rx(this._value);
+
+  /// Gets the current value and registers this Rx as a dependency
+  T get value {
+    // Check for computed tracker first
+    final computedTracker = ComputedTrackerRegistry.current;
+    if (computedTracker != null) {
+      computedTracker.dependencies.add(this);
+    }
+    
+    // Then check for mark widget
+    final mark = MarkRegistry.current;
+    if (mark != null) {
+      mark.register(this);
+    }
+    return _value;
+  }
+
+  /// Sets a new value and notifies listeners if changed
+  set value(T newValue) {
+    if (_value == newValue) return;
+    _value = newValue;
+    notifyListenersTransaction();
+  }
+
+  /// Updates the value and notifies listeners if changed
+  void update(T newValue) {
+    if (_value == newValue) return;
+    _value = newValue;
+    notifyListenersTransaction();
+  }
+
+  /// Gets the value without registering as dependency (for internal use)
+  T get rawValue => _value;
+
+  @override
+  String toString() => _value.toString();
+}
+
