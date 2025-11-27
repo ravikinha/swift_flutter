@@ -238,17 +238,22 @@ counter.value++;
 ### When to Use swift_flutter
 
 ✅ **Best For:**
-- Small to medium apps
+- Small to medium apps (currently optimized)
 - Rapid prototyping
 - Developers familiar with MobX/Vue reactivity
 - Apps needing form validation
 - Apps requiring reactive animations
 - Projects wanting minimal dependencies
 
-❌ **Not Ideal For:**
-- Very large enterprise apps (yet)
-- Teams requiring extensive DevTools
-- Projects needing code generation benefits
+⚠️ **Large Apps (with enhancements):**
+- Can scale to large apps with planned enhancements (see [Large App Enhancements](LARGE_APP_ENHANCEMENTS.md))
+- Requires: State scoping, DevTools integration, code generation
+- Roadmap available for enterprise features
+
+❌ **Not Ideal For (currently):**
+- Very large enterprise apps (without enhancements)
+- Teams requiring extensive DevTools (basic support available)
+- Projects needing code generation benefits (planned)
 - Apps with complex async flows (Bloc might be better)
 
 ---
@@ -489,6 +494,7 @@ final total = Computed(() => price.value * quantity.value);
 
 - [swift_flutter Documentation](README.md)
 - [Architecture Review](ARCHITECTURE_REVIEW.md)
+- [Large App Enhancements](LARGE_APP_ENHANCEMENTS.md) - Roadmap for scaling to large apps
 - [Flutter State Management Guide](https://docs.flutter.dev/development/data-and-backend/state-mgmt)
 - [Provider Documentation](https://pub.dev/packages/provider)
 - [Riverpod Documentation](https://riverpod.dev)

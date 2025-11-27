@@ -10,8 +10,9 @@ class Rx<T> extends ChangeNotifier {
   /// Constructor - type is automatically inferred from the value
   Rx(this._value);
   
-  /// Factory constructor for automatic type inference
-  /// Usage: Rx.of(0) instead of Rx<int>(0)
+  /// Factory constructor for automatic type inference.
+  ///
+  /// Usage: `Rx.of(0)` instead of `Rx<int>(0)`.
   factory Rx.of(T value) => Rx<T>(value);
 
   /// Gets the current value and registers this Rx as a dependency
