@@ -21,15 +21,13 @@ class TypedRx<T> extends Rx<T> {
   /// Set value with type checking
   @override
   set value(T newValue) {
-    if (newValue is! T) {
-      throw TypeError('Type mismatch: expected $T, got ${newValue.runtimeType}');
-    }
+    // Runtime type check - note: this is a runtime check, compile-time type is already enforced
     super.value = newValue;
   }
 
   /// Update with type-safe transformation
-  TypedRx<T> map<R>(R Function(T) transform) {
-    return TypedRx<R>(transform(value)) as TypedRx<T>;
+  TypedRx<R> map<R>(R Function(T) transform) {
+    return TypedRx<R>(transform(value));
   }
 
   /// Chain operations with type safety
@@ -40,7 +38,11 @@ class TypedRx<T> extends Rx<T> {
 
 /// Type-safe computed value
 class TypedComputed<T> extends Computed<T> {
-  TypedComputed(super.compute, {super.enableMemoization});
+  final bool _enableMemoization;
+  
+  TypedComputed(T Function() compute, {bool enableMemoization = false})
+      : _enableMemoization = enableMemoization,
+        super(compute, enableMemoization: enableMemoization);
 
   /// Create with type validation
   factory TypedComputed.withValidator(
@@ -64,7 +66,7 @@ class TypedComputed<T> extends Computed<T> {
   TypedComputed<R> chain<R>(R Function(T) transform) {
     return TypedComputed<R>(
       () => transform(value),
-      enableMemoization: enableMemoization,
+      enableMemoization: _enableMemoization,
     );
   }
 }

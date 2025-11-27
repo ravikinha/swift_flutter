@@ -53,7 +53,7 @@ export 'core/error_boundary.dart';
 export 'core/test_helpers.dart';
 export 'core/scope.dart';
 export 'core/lazy_rx.dart';
-export 'core/reducers.dart';
+export 'core/reducers.dart' show ReduxStore, Reducer, combineReducers, applyMiddleware, ReduxMiddleware;
 export 'core/normalization.dart';
 export 'core/pagination.dart';
 export 'core/debug.dart';
@@ -63,7 +63,7 @@ export 'core/structured_patterns.dart';
 
 // Store
 export 'store/store.dart';
-export 'store/middleware.dart';
+export 'store/middleware.dart' show Middleware, LoggingMiddleware, ExampleAction;
 
 // UI
 export 'ui/mark.dart';
