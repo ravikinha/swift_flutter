@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:swift_flutter/swift_flutter.dart';
+import 'package:swift_flutter/core/extensions.dart';
 
 /// Swift-like Extensions Example
 class ExtensionsExample extends StatefulWidget {

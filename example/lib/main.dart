@@ -12,6 +12,7 @@ import 'examples/store_example.dart';
 import 'examples/logger_example.dart';
 import 'examples/extensions_example.dart';
 import 'examples/currency_example.dart';
+import 'examples/devtools_example.dart';
 
 void main() {
   // Enable logger for debugging
@@ -123,6 +124,12 @@ class ExampleHomePage extends StatelessWidget {
             '12. Currency Extensions',
             const CurrencyExample(),
             Colors.brown,
+          ),
+          _buildFeatureCard(
+            context,
+            '13. DevTools Integration',
+            const DevToolsExample(),
+            Colors.deepOrange,
           ),
         ],
       ),

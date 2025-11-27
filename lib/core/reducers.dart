@@ -1,6 +1,7 @@
 import 'rx.dart';
 import 'transaction.dart';
 import 'logger.dart';
+import 'devtools.dart' show SwiftDevTools;
 
 /// Action interface for Redux-like pattern
 abstract class Action {
@@ -20,8 +21,14 @@ class ReduxStore<T> extends Rx<T> {
 
   ReduxStore(
     T initialState,
-    this._reducer,
-  ) : super(initialState);
+    this._reducer, {
+    String? name,
+  }) : super(initialState, name: name) {
+    // Register with DevTools for time-travel debugging
+    if (SwiftDevTools.isEnabled) {
+      SwiftDevTools.registerReduxStore(this, name);
+    }
+  }
 
   /// Dispatch an action to update state
   void dispatch(Action action) {

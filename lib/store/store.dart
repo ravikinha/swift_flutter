@@ -3,10 +3,6 @@ import 'middleware.dart';
 
 /// Global store for dependency injection and state management
 class Store {
-  static final Store _instance = Store._internal();
-  factory Store() => _instance;
-  Store._internal();
-
   final Map<Type, dynamic> _services = {};
   final Map<String, Rx<dynamic>> _state = {};
   final List<Middleware> _middlewares = [];

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:swift_flutter/swift_flutter.dart';
+import 'package:swift_flutter/core/currency.dart';
+import 'package:swift_flutter/core/extensions.dart';
 
 /// Currency Extensions Example
 class CurrencyExample extends StatefulWidget {

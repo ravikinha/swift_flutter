@@ -1,5 +1,39 @@
 # Changelog
 
+## [1.2.6] - 2024 - DevTools Integration
+
+### Added
+- ✅ **Full DevTools Integration** - Complete DevTools support with zero overhead when disabled
+- ✅ **State Inspector** - View all reactive state (Rx, Computed, ReduxStore) with real-time values
+- ✅ **Dependency Graph** - Visualize dependency relationships between reactive state
+- ✅ **State History Tracking** - Track state changes over time with timestamps
+- ✅ **Performance Monitoring** - Built-in performance event tracking and reporting
+- ✅ **Time-Travel Debugging** - Debug ReduxStore with action history and state snapshots
+- ✅ **DevTools Example** - Complete example widget demonstrating all DevTools features
+- ✅ **Comprehensive Tests** - 24+ tests covering all DevTools functionality
+
+### Enhanced
+- ✅ **Better State Tracking** - Improved object reference tracking for state inspector
+- ✅ **ReduxStore Integration** - Automatic registration with DevTools for time-travel debugging
+- ✅ **Summary Statistics** - Get overview of all tracked state and dependencies
+- ✅ **Export Fixes** - Resolved Action class conflicts between reducers and middleware
+
+### Improved
+- ✅ **Zero Overhead** - DevTools tracking only active when explicitly enabled
+- ✅ **Memory Efficient** - Proper cleanup and reference management
+- ✅ **Developer Experience** - Easy-to-use API for debugging and monitoring
+
+### Documentation
+- ✅ Added DevTools example in example app
+- ✅ Comprehensive test coverage for DevTools features
+
+### Notes
+- DevTools is opt-in and disabled by default (zero overhead)
+- All tracking is conditional and lazy-loaded
+- Perfect for debugging and performance monitoring in development
+
+---
+
 ## [1.2.5] - 2024 - Bundle Size Optimization
 
 ### Optimized

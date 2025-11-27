@@ -29,6 +29,12 @@ class SwiftDevTools {
   static final Map<String, _ComputedInfo> _computedRegistry = {};
   static final Map<String, _MarkInfo> _markRegistry = {};
   
+  // References for actual objects (for state inspector)
+  // Note: In debug mode, keeping strong references is acceptable for DevTools
+  static final Map<String, Rx<dynamic>> _rxRefs = {};
+  static final Map<String, Computed<dynamic>> _computedRefs = {};
+  static final Map<String, ReduxStore<dynamic>> _reduxStoreRefs = {};
+  
   /// Track Mark widget creation (internal use)
   static void trackMarkCreation(dynamic mark, String name) {
     if (!_enabled || !_trackDependencies) return;
@@ -108,6 +114,9 @@ class SwiftDevTools {
       createdAt: DateTime.now(),
     );
     
+    // Store reference for state inspector
+    _rxRefs[id] = rx;
+    
     _stateNodes[id] = _StateNode(
       id: id,
       type: 'Rx',
@@ -127,6 +136,9 @@ class SwiftDevTools {
       type: computed.runtimeType.toString(),
       createdAt: DateTime.now(),
     );
+    
+    // Store reference for state inspector
+    _computedRefs[id] = computed;
     
     _stateNodes[id] = _StateNode(
       id: id,
@@ -214,9 +226,16 @@ class SwiftDevTools {
             'type': 'Rx',
             'name': entry.value.name,
             'value': _serializeValue(rx.rawValue),
-            // Note: hasListeners is protected, cannot access directly
-            'hasListeners': 'unknown',
-            'listenerCount': 0,
+            'createdAt': entry.value.createdAt.toIso8601String(),
+            'id': entry.key,
+          };
+        } else {
+          // Object was garbage collected
+          allState[entry.key] = {
+            'type': 'Rx',
+            'name': entry.value.name,
+            'value': '<disposed>',
+            'status': 'disposed',
           };
         }
       } catch (e) {
@@ -233,7 +252,15 @@ class SwiftDevTools {
             'type': 'Computed',
             'name': entry.value.name,
             'value': _serializeValue(computed.value),
-            'isDirty': _isComputedDirty(computed),
+            'createdAt': entry.value.createdAt.toIso8601String(),
+            'id': entry.key,
+          };
+        } else {
+          allState[entry.key] = {
+            'type': 'Computed',
+            'name': entry.value.name,
+            'value': '<disposed>',
+            'status': 'disposed',
           };
         }
       } catch (e) {
@@ -250,17 +277,36 @@ class SwiftDevTools {
           'type': 'StoreState',
           'name': key,
           'value': _serializeValue(state.rawValue),
-          // Note: hasListeners is protected, cannot access directly
-          'hasListeners': 'unknown',
+          'id': 'store:$key',
         };
       } catch (e) {
         allState['store:$key'] = {'error': e.toString()};
+      }
+    }
+    
+    // Get Redux stores
+    for (final entry in _reduxStoreRefs.entries) {
+      try {
+        final reduxStore = entry.value;
+        allState[entry.key] = {
+          'type': 'ReduxStore',
+          'name': _stateNodes[entry.key]?.name ?? 'ReduxStore',
+          'value': _serializeValue(reduxStore.value),
+          'actionHistoryCount': reduxStore.actionHistory.length,
+          'id': entry.key,
+        };
+      } catch (e) {
+        allState[entry.key] = {'error': e.toString()};
       }
     }
 
     return {
       'states': allState,
       'totalCount': allState.length,
+      'rxCount': _rxRegistry.length,
+      'computedCount': _computedRegistry.length,
+      'markCount': _markRegistry.length,
+      'reduxStoreCount': _reduxStoreRefs.length,
       'timestamp': DateTime.now().toIso8601String(),
     };
   }
@@ -299,28 +345,77 @@ class SwiftDevTools {
   /// Get time-travel debugging data (for ReduxStore)
   static Map<String, dynamic>? getTimeTravelData(String storeId) {
     if (!_enabled) {
-      return null;
+      return {'error': 'DevTools not enabled'};
     }
 
     // Try to find ReduxStore by ID
     try {
-      final store = _getStoreById(storeId);
-      if (store is ReduxStore) {
+      final reduxStore = _getStoreById(storeId);
+      if (reduxStore != null && reduxStore is ReduxStore) {
         return {
-          'currentState': _serializeValue(store.value),
-          'actionHistory': store.actionHistory.map((a) => {
+          'currentState': _serializeValue(reduxStore.value),
+          'actionHistory': reduxStore.actionHistory.map((a) => {
             'type': a.type,
             'payload': a.payload,
             'timestamp': DateTime.now().toIso8601String(),
           }).toList(),
           'canTimeTravel': true,
+          'actionCount': reduxStore.actionHistory.length,
         };
       }
     } catch (e) {
       return {'error': e.toString()};
     }
 
-    return null;
+    return {'error': 'ReduxStore not found with id: $storeId'};
+  }
+  
+  /// Get all Redux stores
+  static List<Map<String, dynamic>> getAllReduxStores() {
+    if (!_enabled) {
+      return [];
+    }
+    
+    final stores = <Map<String, dynamic>>[];
+    for (final entry in _reduxStoreRefs.entries) {
+      try {
+        final reduxStore = entry.value;
+        stores.add({
+          'id': entry.key,
+          'name': _stateNodes[entry.key]?.name ?? 'ReduxStore',
+          'currentState': _serializeValue(reduxStore.value),
+          'actionCount': reduxStore.actionHistory.length,
+        });
+      } catch (e) {
+        stores.add({
+          'id': entry.key,
+          'error': e.toString(),
+        });
+      }
+    }
+    return stores;
+  }
+  
+  /// Get summary statistics
+  static Map<String, dynamic> getSummary() {
+    if (!_enabled) {
+      return {'error': 'DevTools not enabled'};
+    }
+    
+    return {
+      'enabled': _enabled,
+      'trackDependencies': _trackDependencies,
+      'trackStateHistory': _trackStateHistory,
+      'trackPerformance': _trackPerformance,
+      'rxCount': _rxRegistry.length,
+      'computedCount': _computedRegistry.length,
+      'markCount': _markRegistry.length,
+      'reduxStoreCount': _reduxStoreRefs.length,
+      'dependencyEdges': _dependencyGraph.length,
+      'stateHistorySize': _stateHistory.length,
+      'performanceEvents': _performanceEvents.length,
+      'timestamp': DateTime.now().toIso8601String(),
+    };
   }
 
   /// Clear all tracking data
@@ -338,24 +433,27 @@ class SwiftDevTools {
   static String getMarkId(dynamic mark) => mark.hashCode.toString();
 
   static Rx<dynamic>? _getRxById(String id) {
-    for (final entry in _rxRegistry.entries) {
-      if (entry.key == id) {
-        // We can't directly get Rx from ID, so return null
-        // DevTools extension should maintain its own mapping
-        return null;
-      }
-    }
-    return null;
+    return _rxRefs[id];
   }
 
   static Computed<dynamic>? _getComputedById(String id) {
-    // Similar limitation - DevTools extension should maintain mapping
-    return null;
+    return _computedRefs[id];
   }
 
   static dynamic _getStoreById(String id) {
-    // DevTools extension should maintain mapping
-    return null;
+    return _reduxStoreRefs[id];
+  }
+  
+  /// Register ReduxStore for time-travel debugging
+  static void registerReduxStore(ReduxStore<dynamic> store, String? name) {
+    if (!_enabled) return;
+    final id = 'redux_${store.hashCode}';
+    _reduxStoreRefs[id] = store;
+    _stateNodes[id] = _StateNode(
+      id: id,
+      type: 'ReduxStore',
+      name: name ?? store.runtimeType.toString(),
+    );
   }
 
   static bool _isComputedDirty(Computed<dynamic> computed) {
@@ -398,6 +496,9 @@ class SwiftDevTools {
     _computedRegistry.clear();
     _markRegistry.clear();
     _performanceEvents.clear();
+    _rxRefs.clear();
+    _computedRefs.clear();
+    _reduxStoreRefs.clear();
   }
 }
 
