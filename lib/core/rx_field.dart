@@ -10,7 +10,7 @@ class SwiftField<T> extends Rx<T> {
   final Rx<String?> _error = Rx<String?>(null);
   bool _touched = false;
 
-  RxField(super.initialValue);
+  SwiftField(super.initialValue);
 
   /// Current error message
   String? get error {
