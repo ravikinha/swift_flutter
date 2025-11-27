@@ -14,7 +14,7 @@ class Rx<T> extends ChangeNotifier {
   Rx(this._value, {String? name}) : _devToolsName = name {
     // Zero overhead: only track if DevTools is enabled
     if (SwiftDevTools.isEnabled) {
-      SwiftDevTools._trackRxCreation(this, _devToolsName);
+      SwiftDevTools.trackRxCreation(this, _devToolsName);
     }
   }
   

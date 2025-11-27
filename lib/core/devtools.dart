@@ -2,8 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'rx.dart';
 import 'computed.dart';
 import 'performance_monitor.dart';
-import 'logger.dart';
-import '../ui/mark.dart';
 import '../store/store.dart';
 import 'reducers.dart';
 
@@ -102,7 +100,7 @@ class SwiftDevTools {
   static void trackRxCreation(Rx<dynamic> rx, String? name) {
     if (!_enabled || !_trackDependencies) return;
     
-    final id = _getRxId(rx);
+    final id = getRxId(rx);
     _rxRegistry[id] = _RxInfo(
       id: id,
       name: name ?? rx.runtimeType.toString(),
@@ -122,7 +120,7 @@ class SwiftDevTools {
   static void trackComputedCreation(Computed<dynamic> computed, String? name) {
     if (!_enabled || !_trackDependencies) return;
     
-    final id = _getComputedId(computed);
+    final id = getComputedId(computed);
     _computedRegistry[id] = _ComputedInfo(
       id: id,
       name: name ?? computed.runtimeType.toString(),
@@ -216,8 +214,9 @@ class SwiftDevTools {
             'type': 'Rx',
             'name': entry.value.name,
             'value': _serializeValue(rx.rawValue),
-            'hasListeners': rx.hasListeners,
-            'listenerCount': rx.hasListeners ? 'unknown' : 0,
+            // Note: hasListeners is protected, cannot access directly
+            'hasListeners': 'unknown',
+            'listenerCount': 0,
           };
         }
       } catch (e) {
@@ -251,7 +250,8 @@ class SwiftDevTools {
           'type': 'StoreState',
           'name': key,
           'value': _serializeValue(state.rawValue),
-          'hasListeners': state.hasListeners,
+          // Note: hasListeners is protected, cannot access directly
+          'hasListeners': 'unknown',
         };
       } catch (e) {
         allState['store:$key'] = {'error': e.toString()};
@@ -336,11 +336,6 @@ class SwiftDevTools {
   static String getComputedId(Computed<dynamic> computed) => computed.hashCode.toString();
   /// Get unique ID for Mark (internal use)
   static String getMarkId(dynamic mark) => mark.hashCode.toString();
-  
-  // Internal helpers
-  static String _getRxId(Rx<dynamic> rx) => getRxId(rx);
-  static String _getComputedId(Computed<dynamic> computed) => getComputedId(computed);
-  static String _getMarkId(dynamic mark) => getMarkId(mark);
 
   static Rx<dynamic>? _getRxById(String id) {
     for (final entry in _rxRegistry.entries) {
