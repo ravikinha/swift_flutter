@@ -17,7 +17,7 @@
 library swift_flutter;
 
 // Core
-export 'core/rx.dart';
+export 'core/rx.dart' show Rx, swift;
 export 'core/computed.dart';
 export 'core/rx_future.dart';
 export 'core/rx_field.dart';

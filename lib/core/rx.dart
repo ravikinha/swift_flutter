@@ -7,7 +7,12 @@ import 'transaction.dart';
 class Rx<T> extends ChangeNotifier {
   T _value;
   
+  /// Constructor - type is automatically inferred from the value
   Rx(this._value);
+  
+  /// Factory constructor for automatic type inference
+  /// Usage: Rx.of(0) instead of Rx<int>(0)
+  factory Rx.of(T value) => Rx<T>(value);
 
   /// Gets the current value and registers this Rx as a dependency
   T get value {
@@ -45,4 +50,10 @@ class Rx<T> extends ChangeNotifier {
   @override
   String toString() => _value.toString();
 }
+
+/// Creates an Rx with optional type inference
+/// Usage with automatic inference: swift(0) creates Rx<int>
+/// Usage with explicit type: swift<int>(0) creates Rx<int>
+/// Usage for models: swift<MyModel>(myModel) creates Rx<MyModel>
+Rx<T> swift<T>(T value) => Rx<T>(value);
 

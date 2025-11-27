@@ -5,9 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2025-01-XX
+
+### Changed
+- Renamed `rx()` function to `swift()` for better API consistency
+- Improved type inference - `swift()` now supports both automatic and explicit typing
+- Updated all examples to use `swift()` syntax
+
+### Added
+- `swift()` function with optional type inference
+  - `swift(0)` automatically creates `Rx<int>`
+  - `swift<int>(0)` explicitly creates `Rx<int>` (recommended for models)
+  - Works with all types: int, String, bool, double, List, Map, custom classes, etc.
+
 ## [1.0.0] - 2025-01-XX
 
 ### Added
+- **Automatic Type Inference with `swift()`** - Use `swift(value)` for automatic inference or `swift<Type>(value)` for explicit typing
+  - `swift(0)` automatically creates `Rx<int>`
+  - `swift<int>(0)` explicitly creates `Rx<int>` (recommended for models)
+  - `swift('hello')` automatically creates `Rx<String>`
+  - `swift<User>(user)` explicitly creates `Rx<User>` (for custom models)
+  - Works with all types: int, String, bool, double, List, Map, custom classes, etc.
 - **Reactive State (Rx)** - Automatic dependency tracking with `Rx<T>`
 - **Mark Widget** - Auto-rebuild widget that tracks dependencies automatically
 - **Computed Values** - Derived state that automatically updates when dependencies change

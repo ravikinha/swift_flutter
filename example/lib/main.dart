@@ -151,8 +151,13 @@ class RxExample extends StatefulWidget {
 }
 
 class _RxExampleState extends State<RxExample> {
-  final counter = Rx<int>(0);
-  final name = Rx<String>('Swift Flutter');
+  // Automatic type inference - no need to specify types!
+  final counter = swift(0);  // Automatically inferred as Rx<int>
+  final name = swift('Swift Flutter');  // Automatically inferred as Rx<String>
+  
+  // Or use explicit typing if you prefer:
+  // final counter = swift<int>(0);
+  // final name = swift<String>('Swift Flutter');
 
   @override
   void dispose() {
@@ -214,8 +219,13 @@ class ComputedExample extends StatefulWidget {
 }
 
 class _ComputedExampleState extends State<ComputedExample> {
-  final price = Rx<double>(100.0);
-  final quantity = Rx<int>(2);
+  // Automatic type inference
+  final price = swift(100.0);  // Automatically inferred as Rx<double>
+  final quantity = swift(2);  // Automatically inferred as Rx<int>
+  
+  // Or use explicit typing:
+  // final price = swift<double>(100.0);
+  // final quantity = swift<int>(2);
   late final Computed<double> total;
   late final Computed<String> summary;
 
@@ -482,9 +492,10 @@ class TransactionExample extends StatefulWidget {
 }
 
 class _TransactionExampleState extends State<TransactionExample> {
-  final x = Rx<int>(0);
-  final y = Rx<int>(0);
-  final z = Rx<int>(0);
+  // Automatic type inference
+  final x = swift(0);
+  final y = swift(0);
+  final z = swift(0);
   int rebuildCount = 0;
 
   @override
@@ -743,7 +754,8 @@ class _PersistenceExampleState extends State<PersistenceExample> {
   @override
   void initState() {
     super.initState();
-    counter = RxPersisted(0, 'example_counter', storage);
+    // Type still needed for RxPersisted due to generic constraints
+    counter = RxPersisted<int>(0, 'example_counter', storage);
   }
 
   @override

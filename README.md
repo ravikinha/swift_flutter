@@ -42,8 +42,20 @@ flutter pub get
 ```dart
 import 'package:swift_flutter/swift_flutter.dart';
 
-// Create reactive state
-final counter = Rx<int>(0);
+// Automatic type inference (for simple types)
+final counter = swift(0);        // Automatically Rx<int>
+final name = swift('Hello');     // Automatically Rx<String>
+final flag = swift(true);        // Automatically Rx<bool>
+final price = swift(99.99);      // Automatically Rx<double>
+
+// Explicit typing (recommended for models/complex types)
+final counter = swift<int>(0);                    // Explicit Rx<int>
+final user = swift<User>(User('John'));           // For custom models - type required
+final list = swift<List<String>>(['a', 'b']);     // For complex generics
+final nullable = swift<String?>(null);            // For nullable types
+
+// Traditional way (still works)
+final explicit = Rx<int>(0);
 
 // Use in widget with automatic rebuild
 Mark(
@@ -57,8 +69,13 @@ counter.value = 10;
 ### Computed Values
 
 ```dart
-final price = Rx<double>(100.0);
-final quantity = Rx<int>(2);
+// Automatic type inference
+final price = swift(100.0);  // Rx<double>
+final quantity = swift(2);  // Rx<int>
+
+// Or explicit typing
+final price = swift<double>(100.0);
+final quantity = swift<int>(2);
 
 // Automatically recomputes when price or quantity changes
 final total = Computed(() => price.value * quantity.value);
