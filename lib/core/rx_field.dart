@@ -5,7 +5,7 @@ import '../ui/mark.dart';
 typedef Validator<T> = String? Function(T value);
 
 /// Form field with validation
-class RxField<T> extends Rx<T> {
+class SwiftField<T> extends Rx<T> {
   final List<Validator<T>> _validators = [];
   final Rx<String?> _error = Rx<String?>(null);
   bool _touched = false;

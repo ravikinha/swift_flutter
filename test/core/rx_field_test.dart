@@ -2,16 +2,16 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:swift_flutter/core/rx_field.dart';
 
 void main() {
-  group('RxField', () {
+  group('SwiftField', () {
     test('should initialize with value', () {
-      final field = RxField<String>('test');
+      final field = SwiftField<String>('test');
       expect(field.value, 'test');
       expect(field.error, null);
       expect(field.isValid, true);
     });
 
     test('should validate with required validator', () {
-      final field = RxField<String>('');
+      final field = SwiftField<String>('');
       field.addValidator(Validators.required());
       
       expect(field.validate(), false);
@@ -20,7 +20,7 @@ void main() {
     });
 
     test('should validate with minLength', () {
-      final field = RxField<String>('ab');
+      final field = SwiftField<String>('ab');
       field.addValidator(Validators.minLength(5));
       
       expect(field.validate(), false);
@@ -28,7 +28,7 @@ void main() {
     });
 
     test('should validate with email', () {
-      final field = RxField<String>('invalid-email');
+      final field = SwiftField<String>('invalid-email');
       field.addValidator(Validators.email());
       
       expect(field.validate(), false);
@@ -40,7 +40,7 @@ void main() {
     });
 
     test('should mark as touched', () {
-      final field = RxField<String>('');
+      final field = SwiftField<String>('');
       field.addValidator(Validators.required());
       
       expect(field.touched, false);
@@ -50,7 +50,7 @@ void main() {
     });
 
     test('should auto-validate after touch', () {
-      final field = RxField<String>('');
+      final field = SwiftField<String>('');
       field.addValidator(Validators.required());
       field.markAsTouched();
       
@@ -59,7 +59,7 @@ void main() {
     });
 
     test('should reset field', () {
-      final field = RxField<String>('');
+      final field = SwiftField<String>('');
       field.addValidator(Validators.required());
       field.markAsTouched();
       

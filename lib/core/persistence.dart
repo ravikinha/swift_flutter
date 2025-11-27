@@ -36,14 +36,14 @@ class MemoryStorage implements StorageBackend {
 }
 
 /// Reactive value with persistence
-class RxPersisted<T> extends Rx<T> {
+class SwiftPersisted<T> extends Rx<T> {
   final String _key;
   final StorageBackend _storage;
   final T Function(Map<String, dynamic>)? fromJson;
   final Map<String, dynamic> Function(T)? toJson;
   bool _isLoading = false;
 
-  RxPersisted(
+  SwiftPersisted(
     super.initialValue,
     this._key,
     this._storage, {

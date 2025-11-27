@@ -2,53 +2,53 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:swift_flutter/core/rx_future.dart';
 
 void main() {
-  group('RxFuture', () {
+  group('SwiftFuture', () {
     test('should start in idle state', () {
-      final rxFuture = RxFuture<String>();
-      expect(rxFuture.value.isIdle, true);
-      expect(rxFuture.isLoading, false);
-      expect(rxFuture.isSuccess, false);
-      expect(rxFuture.isError, false);
+      final swiftFuture = SwiftFuture<String>();
+      expect(swiftFuture.value.isIdle, true);
+      expect(swiftFuture.isLoading, false);
+      expect(swiftFuture.isSuccess, false);
+      expect(swiftFuture.isError, false);
     });
 
     test('should update to loading state', () async {
-      final rxFuture = RxFuture<String>();
-      final future = rxFuture.call(() async {
+      final swiftFuture = SwiftFuture<String>();
+      final future = swiftFuture.call(() async {
         await Future.delayed(Duration(milliseconds: 10));
         return 'success';
       });
       
-      expect(rxFuture.isLoading, true);
+      expect(swiftFuture.isLoading, true);
       await future;
-      expect(rxFuture.isSuccess, true);
-      expect(rxFuture.data, 'success');
+      expect(swiftFuture.isSuccess, true);
+      expect(swiftFuture.data, 'success');
     });
 
     test('should handle errors', () async {
-      final rxFuture = RxFuture<String>();
+      final swiftFuture = SwiftFuture<String>();
       
       try {
-        await rxFuture.call(() async {
+        await swiftFuture.call(() async {
           throw Exception('Test error');
         });
       } catch (e) {
         // Expected
       }
       
-      expect(rxFuture.isError, true);
-      expect(rxFuture.error, isA<Exception>());
+      expect(swiftFuture.isError, true);
+      expect(swiftFuture.error, isA<Exception>());
     });
 
     test('should reset to idle', () {
-      final rxFuture = RxFuture<String>();
-      rxFuture.reset();
-      expect(rxFuture.value.isIdle, true);
+      final swiftFuture = SwiftFuture<String>();
+      swiftFuture.reset();
+      expect(swiftFuture.value.isIdle, true);
     });
 
     test('should use when method correctly', () {
-      final rxFuture = RxFuture<String>();
+      final swiftFuture = SwiftFuture<String>();
       
-      final result = rxFuture.value.when(
+      final result = swiftFuture.value.when(
         idle: () => 'idle',
         loading: () => 'loading',
         success: (data) => 'success: $data',

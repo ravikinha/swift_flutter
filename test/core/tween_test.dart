@@ -3,7 +3,7 @@ import 'package:flutter/animation.dart';
 import 'package:swift_flutter/core/tween.dart';
 
 void main() {
-  group('RxTween', () {
+  group('SwiftTween', () {
     test('should initialize with progress', () {
       final tween = TweenHelper.doubleTween(begin: 0.0, end: 100.0);
       expect(tween.progress, 0.0);

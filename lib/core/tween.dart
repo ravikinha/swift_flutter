@@ -4,12 +4,12 @@ import 'rx.dart';
 import '../ui/mark.dart';
 
 /// Reactive tween that animates between values
-class RxTween<T> extends ChangeNotifier {
+class SwiftTween<T> extends ChangeNotifier {
   final Tween<T> _tween;
   final Rx<double> _progress;
   T? _currentValue;
 
-  RxTween(this._tween, {double initialProgress = 0.0})
+  SwiftTween(this._tween, {double initialProgress = 0.0})
       : _progress = Rx(initialProgress.clamp(0.0, 1.0)) {
     _progress.addListener(_updateValue);
     _updateValue();
@@ -82,28 +82,28 @@ class RxTween<T> extends ChangeNotifier {
 
 /// Helper for creating common tweens
 class TweenHelper {
-  static RxTween<double> doubleTween({
+  static SwiftTween<double> doubleTween({
     required double begin,
     required double end,
     double initialProgress = 0.0,
   }) {
-    return RxTween(Tween(begin: begin, end: end), initialProgress: initialProgress);
+    return SwiftTween(Tween(begin: begin, end: end), initialProgress: initialProgress);
   }
 
-  static RxTween<int> intTween({
+  static SwiftTween<int> intTween({
     required int begin,
     required int end,
     double initialProgress = 0.0,
   }) {
-    return RxTween(IntTween(begin: begin, end: end), initialProgress: initialProgress);
+    return SwiftTween(IntTween(begin: begin, end: end), initialProgress: initialProgress);
   }
 
-  static RxTween<Color?> colorTween({
+  static SwiftTween<Color?> colorTween({
     required Color begin,
     required Color end,
     double initialProgress = 0.0,
   }) {
-    return RxTween<Color?>(ColorTween(begin: begin, end: end), initialProgress: initialProgress);
+    return SwiftTween<Color?>(ColorTween(begin: begin, end: end), initialProgress: initialProgress);
   }
 }
 

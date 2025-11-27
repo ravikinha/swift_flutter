@@ -54,8 +54,8 @@ class ExampleHomePage extends StatelessWidget {
           ),
           _buildFeatureCard(
             context,
-            '3. RxFuture (Async State)',
-            const RxFutureExample(),
+            '3. SwiftFuture (Async State)',
+            const SwiftFutureExample(),
             Colors.orange,
           ),
           _buildFeatureCard(
@@ -149,9 +149,9 @@ class _RxExampleState extends State<RxExample> {
   // final counter = swift<int>(0);
   // final name = swift<String>('Swift Flutter');
   
-  // Note: RxFuture, RxField, RxTween, RxPersisted are different classes
+  // Note: SwiftFuture, SwiftField, SwiftTween, SwiftPersisted are different classes
   // They are specialized wrappers, not Rx<T> instances
-  // That's why they keep the Rx prefix in their class names
+  // They use the Swift prefix to match the library naming convention
 
   @override
   void dispose() {
@@ -309,17 +309,17 @@ class _ComputedExampleState extends State<ComputedExample> {
 // 3. RXFUTURE (ASYNC STATE) EXAMPLE
 // =======================================================
 
-class RxFutureExample extends StatefulWidget {
-  const RxFutureExample({super.key});
+class SwiftFutureExample extends StatefulWidget {
+  const SwiftFutureExample({super.key});
 
   @override
-  State<RxFutureExample> createState() => _RxFutureExampleState();
+  State<SwiftFutureExample> createState() => _SwiftFutureExampleState();
 }
 
-class _RxFutureExampleState extends State<RxFutureExample> {
-  // RxFuture is a specialized class for async operations
+class _SwiftFutureExampleState extends State<SwiftFutureExample> {
+  // SwiftFuture is a specialized class for async operations
   // It's different from Rx<T> - it manages loading/error/success states
-  final rxFuture = RxFuture<String>();
+  final swiftFuture = SwiftFuture<String>();
 
   Future<String> _fetchData() async {
     await Future.delayed(const Duration(seconds: 2));
@@ -334,7 +334,7 @@ class _RxFutureExampleState extends State<RxFutureExample> {
 
   @override
   void dispose() {
-    rxFuture.dispose();
+    swiftFuture.dispose();
     super.dispose();
   }
 
@@ -344,7 +344,7 @@ class _RxFutureExampleState extends State<RxFutureExample> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Mark(
-          builder: (context) => rxFuture.value.when(
+          builder: (context) => swiftFuture.value.when(
             idle: () => const Text('Click to load data', style: TextStyle(fontSize: 16)),
             loading: () => const Row(
               children: [
@@ -379,17 +379,17 @@ class _RxFutureExampleState extends State<RxFutureExample> {
         Row(
           children: [
             ElevatedButton(
-              onPressed: () => rxFuture.execute(_fetchData),
+              onPressed: () => swiftFuture.execute(_fetchData),
               child: const Text('Load Data'),
             ),
             const SizedBox(width: 8),
             ElevatedButton(
-              onPressed: () => rxFuture.execute(_fetchDataWithError),
+              onPressed: () => swiftFuture.execute(_fetchDataWithError),
               child: const Text('Test Error'),
             ),
             const SizedBox(width: 8),
             ElevatedButton(
-              onPressed: () => rxFuture.reset(),
+              onPressed: () => swiftFuture.reset(),
               child: const Text('Reset'),
             ),
           ],
@@ -411,10 +411,10 @@ class FormValidationExample extends StatefulWidget {
 }
 
 class _FormValidationExampleState extends State<FormValidationExample> {
-  // RxField is a specialized class for form validation
+  // SwiftField is a specialized class for form validation
   // It extends Rx<T> with validation capabilities
-  final emailField = RxField<String>('');
-  final passwordField = RxField<String>('');
+  final emailField = SwiftField<String>('');
+  final passwordField = SwiftField<String>('');
 
   @override
   void initState() {
@@ -595,10 +595,10 @@ class TweenExample extends StatefulWidget {
 }
 
 class _TweenExampleState extends State<TweenExample> {
-  // RxTween is a specialized class for reactive animations
+  // SwiftTween is a specialized class for reactive animations
   // It manages tween interpolation with reactive progress
-  late final RxTween<double> sizeTween;
-  late final RxTween<Color?> colorTween;
+  late final SwiftTween<double> sizeTween;
+  late final SwiftTween<Color?> colorTween;
 
   @override
   void initState() {
@@ -755,16 +755,16 @@ class PersistenceExample extends StatefulWidget {
 }
 
 class _PersistenceExampleState extends State<PersistenceExample> {
-  // RxPersisted is a specialized class that extends Rx<T>
+  // SwiftPersisted is a specialized class that extends Rx<T>
   // It automatically saves/loads values from storage
-  late final RxPersisted<int> counter;
+  late final SwiftPersisted<int> counter;
   final storage = MemoryStorage();
 
   @override
   void initState() {
     super.initState();
-    // RxPersisted needs explicit type and storage configuration
-    counter = RxPersisted<int>(0, 'example_counter', storage);
+    // SwiftPersisted needs explicit type and storage configuration
+    counter = SwiftPersisted<int>(0, 'example_counter', storage);
   }
 
   @override

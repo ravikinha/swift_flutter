@@ -58,7 +58,7 @@ class AsyncValue<T> {
 }
 
 /// Reactive Future wrapper that tracks loading/error states
-class RxFuture<T> extends ChangeNotifier {
+class SwiftFuture<T> extends ChangeNotifier {
   Rx<AsyncValue<T>> _state;
 
   RxFuture() : _state = Rx(AsyncValue<T>.idle());
