@@ -411,6 +411,8 @@ class FormValidationExample extends StatefulWidget {
 }
 
 class _FormValidationExampleState extends State<FormValidationExample> {
+  // RxField is a specialized class for form validation
+  // It extends Rx<T> with validation capabilities
   final emailField = RxField<String>('');
   final passwordField = RxField<String>('');
 
