@@ -1,5 +1,28 @@
 # Changelog
 
+## [1.2.2] - 2024 - Code Quality & Linting Fixes
+
+### Fixed
+- ✅ Removed unused field `_visitedInCycle` in `computed.dart`
+- ✅ Removed unused imports across multiple files
+- ✅ Fixed error in `example/test/widget_test.dart` (MyApp → SwiftFlutterExampleApp)
+- ✅ Removed unused catch stack trace parameters
+- ✅ Fixed invalid use of `notifyListeners` in `transaction.dart`
+- ✅ Fixed unnecessary type check warnings
+- ✅ Fixed HTML in doc comments
+- ✅ Removed platform-specific folders and build artifacts from git tracking
+
+### Improved
+- ✅ Better pub.dev static analysis scores
+- ✅ Cleaner codebase with no critical linting issues
+- ✅ Improved code quality and maintainability
+
+### Notes
+- All changes are backwards compatible
+- Code quality improvements for better pub.dev scores
+
+---
+
 ## [1.2.1] - 2024 - Bug Fixes & Improvements
 
 ### Fixed

@@ -1,6 +1,6 @@
 name: swift_flutter
 description: A reactive state management library for Flutter with automatic dependency tracking, computed values, async state, form validation, and more.
-version: 1.2.1
+version: 1.2.2
 homepage: https://github.com/ravikinha/swift_flutter
 repository: https://github.com/ravikinha/swift_flutter
 issue_tracker: https://github.com/ravikinha/swift_flutter/issues
