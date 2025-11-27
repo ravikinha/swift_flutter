@@ -81,9 +81,7 @@ class TypeGuard {
   /// Assert value is of type T, throw if not
   static T assertType<T>(dynamic value, [String? message]) {
     if (value is! T) {
-      throw TypeError(
-        message ?? 'Expected type $T, got ${value.runtimeType}',
-      );
+      throw TypeError('Expected type $T, got ${value.runtimeType}${message != null ? ': $message' : ''}');
     }
     return value;
   }
@@ -146,7 +144,7 @@ extension RxTypeSafety<T> on Rx<T> {
   /// Assert type at runtime
   Rx<T> assertType([String? message]) {
     if (value is! T) {
-      throw TypeError(message ?? 'Type assertion failed for Rx<$T>');
+      throw TypeError('Type assertion failed for Rx<$T>${message != null ? ': $message' : ''}');
     }
     return this;
   }
