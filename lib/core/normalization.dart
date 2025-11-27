@@ -1,5 +1,5 @@
 import 'rx.dart';
-import 'logger.dart';
+import 'transaction.dart';
 
 /// Normalized state structure for managing collections
 class NormalizedState<T> {
