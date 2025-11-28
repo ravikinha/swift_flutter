@@ -300,8 +300,8 @@ class LearningHomePage extends StatelessWidget {
                             child: Text(
                               chapter.title,
                               style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                                fontSize: 14,
+                                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                                 color: isSelected
                                     ? (isDark ? Colors.white : const Color(0xFF1E1E1E))
                                     : (isDark ? const Color(0xFFCCCCCC) : const Color(0xFF424242)),
@@ -474,24 +474,24 @@ class LearningHomePage extends StatelessWidget {
                   data: markdownContent.value!,
                   styleSheet: MarkdownStyleSheet(
                     h1: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 32,
+                      fontWeight: FontWeight.w700,
                       color: isDark ? Colors.white : const Color(0xFF1E1E1E),
                       height: 1.3,
                       letterSpacing: -0.5,
                     ),
                     h1Padding: const EdgeInsets.only(bottom: 20, top: 8),
                     h2: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 26,
+                      fontWeight: FontWeight.w700,
                       color: isDark ? const Color(0xFFE8E8E8) : const Color(0xFF2D2D30),
                       height: 1.4,
                       letterSpacing: -0.3,
                     ),
                     h2Padding: const EdgeInsets.only(bottom: 14, top: 24),
                     h3: TextStyle(
-                      fontSize: 19,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
                       color: isDark ? const Color(0xFFCCCCCC) : const Color(0xFF3C3C3C),
                       height: 1.4,
                       letterSpacing: -0.2,
@@ -505,19 +505,20 @@ class LearningHomePage extends StatelessWidget {
                     ),
                     pPadding: const EdgeInsets.only(bottom: 14),
                     code: TextStyle(
-                      fontSize: 13,
+                      fontSize: 14,
                       fontFamily: 'Consolas, Monaco, Courier New, monospace',
-                      backgroundColor: isDark ? const Color(0xFF2D2D30) : const Color(0xFFF5F5F5),
-                      color: isDark ? const Color(0xFFCE9178) : const Color(0xFFA31515),
+                      backgroundColor: isDark ? const Color(0xFF1E1E1E) : const Color(0xFF1E1E1E),
+                      color: isDark ? const Color(0xFFCE9178) : const Color(0xFFCE9178),
                     ),
                     codeblockDecoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF8F8F8),
-                      borderRadius: BorderRadius.circular(6),
+                      color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFF1E1E1E),
+                      borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: isDark ? const Color(0xFF2D2D30) : const Color(0xFFDDDDDD),
+                        color: isDark ? const Color(0xFF007ACC) : const Color(0xFF007ACC),
+                        width: 2,
                       ),
                     ),
-                    codeblockPadding: const EdgeInsets.all(16),
+                    codeblockPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                     blockquote: TextStyle(
                       fontSize: 14,
                       fontStyle: FontStyle.italic,
