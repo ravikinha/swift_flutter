@@ -12,6 +12,7 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.8
   flutter_markdown: ^0.6.18
+  swift_flutter: ^2.1.0
 
 dev_dependencies:
   flutter_test:
