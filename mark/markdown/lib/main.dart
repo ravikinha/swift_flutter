@@ -24,20 +24,20 @@ class LearningApp extends StatelessWidget {
           scaffoldBackgroundColor: Colors.white,
           colorScheme: const ColorScheme.light(
             primary: Color(0xFF007ACC),
-            secondary: Color(0xFF0098FF),
-            surface: Color(0xFFF3F3F3),
+            secondary: Color(0xFF007ACC),
+            surface: Colors.white,
             background: Colors.white,
           ),
         ),
         darkTheme: ThemeData(
           useMaterial3: true,
-          brightness: Brightness.dark,
-          scaffoldBackgroundColor: const Color(0xFF1E1E1E),
-          colorScheme: const ColorScheme.dark(
+          brightness: Brightness.light,
+          scaffoldBackgroundColor: Colors.white,
+          colorScheme: const ColorScheme.light(
             primary: Color(0xFF007ACC),
-            secondary: Color(0xFF0098FF),
-            surface: Color(0xFF252526),
-            background: Color(0xFF1E1E1E),
+            secondary: Color(0xFF007ACC),
+            surface: Colors.white,
+            background: Colors.white,
           ),
         ),
         themeMode: themeMode.value,
@@ -96,7 +96,7 @@ class LearningHomePage extends StatelessWidget {
           body: Row(
             children: [
               _buildSidebar(isDark, themeMode, chapters, selectedChapterIndex, markdownContent, isLoading),
-              Container(width: 1, color: isDark ? const Color(0xFF2D2D30) : const Color(0xFFDDDDDD)),
+              Container(width: 1, color: const Color(0xFFE0E0E0)),
               Expanded(child: _buildContent(isDark, isLoading, markdownContent, selectedChapterIndex, chapters)),
             ],
           ),
@@ -192,14 +192,14 @@ class LearningHomePage extends StatelessWidget {
   ) {
     return Container(
       width: 270,
-      color: isDark ? const Color(0xFF252526) : const Color(0xFFF3F3F3),
+      color: Colors.white,
       child: Column(
         children: [
           // Header
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF007ACC) : const Color(0xFF007ACC),
+              color: const Color(0xFF007ACC),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.1),
@@ -248,13 +248,13 @@ class LearningHomePage extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  icon: Icon(
-                    themeMode.value == ThemeMode.light ? Icons.dark_mode_outlined : Icons.light_mode_outlined,
+                  icon: const Icon(
+                    Icons.brightness_6_outlined,
                     color: Colors.white,
                     size: 18,
                   ),
-                  onPressed: () => themeMode.value = themeMode.value == ThemeMode.light ? ThemeMode.dark : ThemeMode.light,
-                  tooltip: 'Toggle theme',
+                  onPressed: () {},
+                  tooltip: 'Blue & White Theme',
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                 ),
@@ -274,14 +274,12 @@ class LearningHomePage extends StatelessWidget {
                   color: Colors.transparent,
                   child: InkWell(
                     onTap: () => _loadChapter(index, chapters, selectedChapterIndex, markdownContent, isLoading),
-                    hoverColor: isDark ? const Color(0xFF2A2D2E) : const Color(0xFFE8E8E8),
+                    hoverColor: const Color(0xFFF0F8FF),
                     child: Container(
                       key: ValueKey('chapter_$index'),
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
                       decoration: BoxDecoration(
-                        color: isSelected
-                            ? (isDark ? const Color(0xFF37373D) : Colors.white)
-                            : Colors.transparent,
+                        color: isSelected ? const Color(0xFFE3F2FD) : Colors.transparent,
                         border: isSelected
                             ? const Border(left: BorderSide(color: Color(0xFF007ACC), width: 3))
                             : null,
@@ -291,9 +289,7 @@ class LearningHomePage extends StatelessWidget {
                           Icon(
                             chapter.icon,
                             size: 18,
-                            color: isSelected
-                                ? const Color(0xFF007ACC)
-                                : (isDark ? const Color(0xFF858585) : const Color(0xFF616161)),
+                            color: isSelected ? const Color(0xFF007ACC) : const Color(0xFF666666),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -302,9 +298,7 @@ class LearningHomePage extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                                color: isSelected
-                                    ? (isDark ? Colors.white : const Color(0xFF1E1E1E))
-                                    : (isDark ? const Color(0xFFCCCCCC) : const Color(0xFF424242)),
+                                color: isSelected ? const Color(0xFF007ACC) : const Color(0xFF333333),
                                 letterSpacing: -0.1,
                               ),
                             ),
@@ -320,10 +314,10 @@ class LearningHomePage extends StatelessWidget {
           // Progress
           Container(
             padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF2D2D30) : const Color(0xFFE8E8E8),
+            decoration: const BoxDecoration(
+              color: Color(0xFFF5F5F5),
               border: Border(
-                top: BorderSide(color: isDark ? const Color(0xFF3C3C3C) : const Color(0xFFDDDDDD)),
+                top: BorderSide(color: Color(0xFFE0E0E0)),
               ),
             ),
             child: Column(
@@ -331,12 +325,12 @@ class LearningHomePage extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
+                    const Text(
                       'Progress',
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
-                        color: isDark ? const Color(0xFF858585) : const Color(0xFF616161),
+                        color: Color(0xFF666666),
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -362,7 +356,7 @@ class LearningHomePage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(2),
                   child: LinearProgressIndicator(
                     value: (selectedChapterIndex.value + 1) / chapters.length,
-                    backgroundColor: isDark ? const Color(0xFF3C3C3C) : const Color(0xFFD0D0D0),
+                    backgroundColor: const Color(0xFFE0E0E0),
                     valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF007ACC)),
                     minHeight: 4,
                   ),
@@ -390,11 +384,11 @@ class LearningHomePage extends StatelessWidget {
 
     if (markdownContent.value == null) {
       return Center(
-        child: Text(
+        child: const Text(
           'No content loaded',
           style: TextStyle(
             fontSize: 14,
-            color: isDark ? const Color(0xFF858585) : const Color(0xFF616161),
+            color: Color(0xFF666666),
           ),
         ),
       );
@@ -424,11 +418,11 @@ class LearningHomePage extends StatelessWidget {
             if (selectedChapterIndex.value > 0 || selectedChapterIndex.value < chapters.length - 1)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF252526) : const Color(0xFFF8F8F8),
+                decoration: const BoxDecoration(
+                  color: Color(0xFFFAFAFA),
                   border: Border(
                     bottom: BorderSide(
-                      color: isDark ? const Color(0xFF2D2D30) : const Color(0xFFDDDDDD),
+                      color: Color(0xFFE0E0E0),
                     ),
                   ),
                 ),
@@ -447,10 +441,10 @@ class LearningHomePage extends StatelessWidget {
                       const SizedBox(width: 100),
                     Text(
                       chapters[selectedChapterIndex.value].title,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: isDark ? const Color(0xFFCCCCCC) : const Color(0xFF424242),
+                        color: Color(0xFF333333),
                       ),
                     ),
                     if (selectedChapterIndex.value < chapters.length - 1)
@@ -473,42 +467,42 @@ class LearningHomePage extends StatelessWidget {
                 child: Markdown(
                   data: markdownContent.value!,
                   styleSheet: MarkdownStyleSheet(
-                    h1: TextStyle(
+                    h1: const TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.w700,
-                      color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                      color: Color(0xFF1E1E1E),
                       height: 1.3,
                       letterSpacing: -0.5,
                     ),
                     h1Padding: const EdgeInsets.only(bottom: 20, top: 8),
-                    h2: TextStyle(
+                    h2: const TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.w700,
-                      color: isDark ? const Color(0xFFE8E8E8) : const Color(0xFF2D2D30),
+                      color: Color(0xFF2D2D30),
                       height: 1.4,
                       letterSpacing: -0.3,
                     ),
                     h2Padding: const EdgeInsets.only(bottom: 14, top: 24),
-                    h3: TextStyle(
+                    h3: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
-                      color: isDark ? const Color(0xFFCCCCCC) : const Color(0xFF3C3C3C),
+                      color: Color(0xFF3C3C3C),
                       height: 1.4,
                       letterSpacing: -0.2,
                     ),
                     h3Padding: const EdgeInsets.only(bottom: 12, top: 18),
-                    p: TextStyle(
+                    p: const TextStyle(
                       fontSize: 14,
                       height: 1.7,
-                      color: isDark ? const Color(0xFFCCCCCC) : const Color(0xFF424242),
+                      color: Color(0xFF424242),
                       letterSpacing: 0.1,
                     ),
                     pPadding: const EdgeInsets.only(bottom: 14),
-                    code: TextStyle(
+                    code: const TextStyle(
                       fontSize: 14,
                       fontFamily: 'Consolas, Monaco, Courier New, monospace',
-                      backgroundColor: isDark ? const Color(0xFF2D2D30) : const Color(0xFFE8E8E8),
-                      color: isDark ? const Color(0xFFD7BA7D) : const Color(0xFFA31515),
+                      backgroundColor: Color(0xFFE8E8E8),
+                      color: Color(0xFFA31515),
                     ),
                     codeblockDecoration: BoxDecoration(
                       color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFF1E1E1E),
@@ -520,14 +514,14 @@ class LearningHomePage extends StatelessWidget {
                     ),
                     codeblockPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                     codeblockAlign: WrapAlignment.start,
-                    blockquote: TextStyle(
+                    blockquote: const TextStyle(
                       fontSize: 14,
                       fontStyle: FontStyle.italic,
-                      color: isDark ? const Color(0xFF858585) : const Color(0xFF616161),
+                      color: Color(0xFF616161),
                     ),
-                    blockquoteDecoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF252526) : const Color(0xFFF3F3F3),
-                      border: const Border(
+                    blockquoteDecoration: const BoxDecoration(
+                      color: Color(0xFFF3F3F3),
+                      border: Border(
                         left: BorderSide(color: Color(0xFF007ACC), width: 4),
                       ),
                     ),
@@ -536,13 +530,13 @@ class LearningHomePage extends StatelessWidget {
                       color: Color(0xFF007ACC),
                       fontWeight: FontWeight.bold,
                     ),
-                    strong: TextStyle(
+                    strong: const TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                      color: Color(0xFF1E1E1E),
                     ),
-                    em: TextStyle(
+                    em: const TextStyle(
                       fontStyle: FontStyle.italic,
-                      color: isDark ? const Color(0xFFCCCCCC) : const Color(0xFF424242),
+                      color: Color(0xFF424242),
                     ),
                     a: const TextStyle(
                       color: Color(0xFF007ACC),
@@ -558,11 +552,11 @@ class LearningHomePage extends StatelessWidget {
             if (selectedChapterIndex.value > 0 || selectedChapterIndex.value < chapters.length - 1)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF252526) : const Color(0xFFF8F8F8),
+                decoration: const BoxDecoration(
+                  color: Color(0xFFFAFAFA),
                   border: Border(
                     top: BorderSide(
-                      color: isDark ? const Color(0xFF2D2D30) : const Color(0xFFDDDDDD),
+                      color: Color(0xFFE0E0E0),
                     ),
                   ),
                 ),
@@ -604,12 +598,12 @@ class LearningHomePage extends StatelessWidget {
       child: InkWell(
         onTap: onPressed,
         borderRadius: BorderRadius.circular(4),
-        hoverColor: isDark ? const Color(0xFF2A2D2E) : const Color(0xFFE8E8E8),
+        hoverColor: const Color(0xFFF0F8FF),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
           decoration: BoxDecoration(
             border: Border.all(
-              color: isDark ? const Color(0xFF3C3C3C) : const Color(0xFFDDDDDD),
+              color: const Color(0xFFDDDDDD),
             ),
             borderRadius: BorderRadius.circular(4),
           ),
@@ -617,28 +611,28 @@ class LearningHomePage extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: isLeft
                 ? [
-                    Icon(icon, size: 13, color: const Color(0xFF007ACC)),
+                    const Icon(icon, size: 13, color: Color(0xFF007ACC)),
                     const SizedBox(width: 7),
                     Text(
                       label,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
-                        color: isDark ? const Color(0xFFCCCCCC) : const Color(0xFF424242),
+                        color: Color(0xFF424242),
                       ),
                     ),
                   ]
                 : [
                     Text(
                       label,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
-                        color: isDark ? const Color(0xFFCCCCCC) : const Color(0xFF424242),
+                        color: Color(0xFF424242),
                       ),
                     ),
                     const SizedBox(width: 7),
-                    Icon(icon, size: 13, color: const Color(0xFF007ACC)),
+                    const Icon(icon, size: 13, color: Color(0xFF007ACC)),
                   ],
           ),
         ),
