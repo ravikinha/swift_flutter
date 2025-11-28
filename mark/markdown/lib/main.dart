@@ -7,13 +7,18 @@ void main() {
   runApp(const LearningApp());
 }
 
-class LearningApp extends StatelessWidget {
+class LearningApp extends StatefulWidget {
   const LearningApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final themeMode = swift(ThemeMode.light);
+  State<LearningApp> createState() => _LearningAppState();
+}
 
+class _LearningAppState extends State<LearningApp> {
+  final themeMode = swift(ThemeMode.light);
+
+  @override
+  Widget build(BuildContext context) {
     return Swift(
       builder: (context) => MaterialApp(
         title: 'swift_flutter Learning Guide',
@@ -47,7 +52,7 @@ class LearningApp extends StatelessWidget {
   }
 }
 
-class LearningHomePage extends StatelessWidget {
+class LearningHomePage extends StatefulWidget {
   final SwiftValue<ThemeMode> themeMode;
   
   const LearningHomePage({
@@ -56,48 +61,63 @@ class LearningHomePage extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final selectedChapterIndex = swift(0);
-    final markdownContent = swift<String?>(null);
-    final isLoading = swift(false);
+  State<LearningHomePage> createState() => _LearningHomePageState();
+}
 
-    final chapters = [
-      Chapter(title: 'Introduction', file: '00_introduction.md', icon: Icons.info_outline),
-      Chapter(title: 'Getting Started', file: '01_getting_started.md', icon: Icons.play_arrow),
-      Chapter(title: 'Core Concepts', file: '02_basic_concepts.md', icon: Icons.lightbulb_outline),
-      Chapter(title: 'Reactive State', file: '03_reactive_state.md', icon: Icons.autorenew),
-      Chapter(title: 'Computed Values', file: '04_computed_values.md', icon: Icons.calculate),
-      Chapter(title: 'Controllers', file: '05_controllers.md', icon: Icons.settings),
-      Chapter(title: 'Async State', file: '06_async_state.md', icon: Icons.cloud_download),
-      Chapter(title: 'Form Validation', file: '07_form_validation.md', icon: Icons.verified),
-      Chapter(title: 'Extensions', file: '08_extensions.md', icon: Icons.extension),
-      Chapter(title: 'Advanced Patterns', file: '09_advanced_patterns.md', icon: Icons.architecture),
-      Chapter(title: 'Best Practices', file: '10_best_practices.md', icon: Icons.star),
-    ];
+class _LearningHomePageState extends State<LearningHomePage> {
+  // State variables that persist across rebuilds
+  late final SwiftValue<int> selectedChapterIndex;
+  late final SwiftValue<String?> markdownContent;
+  late final SwiftValue<bool> isLoading;
+  
+  final List<Chapter> chapters = [
+    Chapter(title: 'Introduction', file: '00_introduction.md', icon: Icons.info_outline),
+    Chapter(title: 'Getting Started', file: '01_getting_started.md', icon: Icons.play_arrow),
+    Chapter(title: 'Core Concepts', file: '02_basic_concepts.md', icon: Icons.lightbulb_outline),
+    Chapter(title: 'Reactive State', file: '03_reactive_state.md', icon: Icons.autorenew),
+    Chapter(title: 'Computed Values', file: '04_computed_values.md', icon: Icons.calculate),
+    Chapter(title: 'Controllers', file: '05_controllers.md', icon: Icons.settings),
+    Chapter(title: 'Async State', file: '06_async_state.md', icon: Icons.cloud_download),
+    Chapter(title: 'Form Validation', file: '07_form_validation.md', icon: Icons.verified),
+    Chapter(title: 'Extensions', file: '08_extensions.md', icon: Icons.extension),
+    Chapter(title: 'Advanced Patterns', file: '09_advanced_patterns.md', icon: Icons.architecture),
+    Chapter(title: 'Best Practices', file: '10_best_practices.md', icon: Icons.star),
+  ];
 
+  @override
+  void initState() {
+    super.initState();
+    // Initialize state variables
+    selectedChapterIndex = swift(0);
+    markdownContent = swift<String?>(null);
+    isLoading = swift(false);
+    
     // Load initial chapter
-    Future.microtask(() => _loadChapter(0, chapters, selectedChapterIndex, markdownContent, isLoading));
+    Future.microtask(() => _loadChapter(0));
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Swift(
       builder: (context) {
         final isMobile = MediaQuery.of(context).size.width < 900;
         final isDark = Theme.of(context).brightness == Brightness.dark;
-        
+
         if (isMobile) {
           return Scaffold(
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            appBar: _buildAppBar(isDark, themeMode, context, chapters, selectedChapterIndex, markdownContent, isLoading),
-            body: _buildContent(isDark, isLoading, markdownContent, selectedChapterIndex, chapters),
+            appBar: _buildAppBar(isDark, context),
+            body: _buildContent(isDark),
           );
         }
 
-    return Scaffold(
+        return Scaffold(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           body: Row(
             children: [
-              _buildSidebar(isDark, themeMode, chapters, selectedChapterIndex, markdownContent, isLoading),
+              _buildSidebar(isDark),
               Container(width: 1, color: const Color(0xFFE0E0E0)),
-              Expanded(child: _buildContent(isDark, isLoading, markdownContent, selectedChapterIndex, chapters)),
+              Expanded(child: _buildContent(isDark)),
             ],
           ),
         );
@@ -105,15 +125,9 @@ class LearningHomePage extends StatelessWidget {
     );
   }
 
-  Future<void> _loadChapter(
-    int index,
-    List<Chapter> chapters,
-    SwiftValue<int> selectedChapterIndex,
-    SwiftValue<String?> markdownContent,
-    SwiftValue<bool> isLoading,
-  ) async {
+  Future<void> _loadChapter(int index) async {
     if (index == selectedChapterIndex.value && markdownContent.value != null) return;
-    
+
     isLoading.value = true;
     selectedChapterIndex.value = index;
 
@@ -130,15 +144,7 @@ class LearningHomePage extends StatelessWidget {
     }
   }
 
-  PreferredSizeWidget _buildAppBar(
-    bool isDark,
-    SwiftValue<ThemeMode> themeMode,
-    BuildContext context,
-    List<Chapter> chapters,
-    SwiftValue<int> selectedChapterIndex,
-    SwiftValue<String?> markdownContent,
-    SwiftValue<bool> isLoading,
-  ) {
+  PreferredSizeWidget _buildAppBar(bool isDark, BuildContext context) {
     return AppBar(
       backgroundColor: isDark ? const Color(0xFF252526) : const Color(0xFF007ACC),
       elevation: 0,
@@ -166,30 +172,23 @@ class LearningHomePage extends StatelessWidget {
       actions: [
         IconButton(
           icon: Icon(
-            themeMode.value == ThemeMode.light ? Icons.dark_mode_outlined : Icons.light_mode_outlined,
+            widget.themeMode.value == ThemeMode.light ? Icons.dark_mode_outlined : Icons.light_mode_outlined,
             color: Colors.white,
             size: 20,
           ),
-          onPressed: () => themeMode.value = themeMode.value == ThemeMode.light ? ThemeMode.dark : ThemeMode.light,
+          onPressed: () => widget.themeMode.value = widget.themeMode.value == ThemeMode.light ? ThemeMode.dark : ThemeMode.light,
           tooltip: 'Toggle theme',
         ),
         IconButton(
           icon: const Icon(Icons.menu, color: Colors.white, size: 22),
-          onPressed: () => _showChapterDrawer(context, isDark, chapters, selectedChapterIndex, markdownContent, isLoading),
+          onPressed: () => _showChapterDrawer(context, isDark),
           tooltip: 'Chapters',
         ),
       ],
     );
   }
 
-  Widget _buildSidebar(
-    bool isDark,
-    SwiftValue<ThemeMode> themeMode,
-    List<Chapter> chapters,
-    SwiftValue<int> selectedChapterIndex,
-    SwiftValue<String?> markdownContent,
-    SwiftValue<bool> isLoading,
-  ) {
+  Widget _buildSidebar(bool isDark) {
     return Container(
       width: 270,
       color: Colors.white,
@@ -269,11 +268,11 @@ class LearningHomePage extends StatelessWidget {
               itemBuilder: (context, index) {
                 final chapter = chapters[index];
                 final isSelected = index == selectedChapterIndex.value;
-                
+
                 return Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    onTap: () => _loadChapter(index, chapters, selectedChapterIndex, markdownContent, isLoading),
+                    onTap: () => _loadChapter(index),
                     hoverColor: const Color(0xFFF0F8FF),
                     child: Container(
                       key: ValueKey('chapter_$index'),
@@ -369,13 +368,7 @@ class LearningHomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildContent(
-    bool isDark,
-    SwiftValue<bool> isLoading,
-    SwiftValue<String?> markdownContent,
-    SwiftValue<int> selectedChapterIndex,
-    List<Chapter> chapters,
-  ) {
+  Widget _buildContent(bool isDark) {
     if (isLoading.value) {
       return const Center(
         child: CircularProgressIndicator(color: Color(0xFF007ACC), strokeWidth: 3),
@@ -434,7 +427,7 @@ class LearningHomePage extends StatelessWidget {
                         isDark,
                         Icons.arrow_back_ios_new,
                         chapters[selectedChapterIndex.value - 1].title,
-                        () => _loadChapter(selectedChapterIndex.value - 1, chapters, selectedChapterIndex, markdownContent, isLoading),
+                        () => _loadChapter(selectedChapterIndex.value - 1),
                         true,
                       )
                     else
@@ -452,7 +445,7 @@ class LearningHomePage extends StatelessWidget {
                         isDark,
                         Icons.arrow_forward_ios,
                         chapters[selectedChapterIndex.value + 1].title,
-                        () => _loadChapter(selectedChapterIndex.value + 1, chapters, selectedChapterIndex, markdownContent, isLoading),
+                        () => _loadChapter(selectedChapterIndex.value + 1),
                         false,
                       )
                     else
@@ -568,7 +561,7 @@ class LearningHomePage extends StatelessWidget {
                         isDark,
                         Icons.arrow_back_ios_new,
                         chapters[selectedChapterIndex.value - 1].title,
-                        () => _loadChapter(selectedChapterIndex.value - 1, chapters, selectedChapterIndex, markdownContent, isLoading),
+                        () => _loadChapter(selectedChapterIndex.value - 1),
                         true,
                       )
                     else
@@ -578,7 +571,7 @@ class LearningHomePage extends StatelessWidget {
                         isDark,
                         Icons.arrow_forward_ios,
                         chapters[selectedChapterIndex.value + 1].title,
-                        () => _loadChapter(selectedChapterIndex.value + 1, chapters, selectedChapterIndex, markdownContent, isLoading),
+                        () => _loadChapter(selectedChapterIndex.value + 1),
                         false,
                       )
                     else
@@ -611,7 +604,7 @@ class LearningHomePage extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: isLeft
                 ? [
-                    const Icon(icon, size: 13, color: Color(0xFF007ACC)),
+                     Icon(icon, size: 13, color: Color(0xFF007ACC)),
                     const SizedBox(width: 7),
                     Text(
                       label,
@@ -632,7 +625,7 @@ class LearningHomePage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 7),
-                    const Icon(icon, size: 13, color: Color(0xFF007ACC)),
+                     Icon(icon, size: 13, color: Color(0xFF007ACC)),
                   ],
           ),
         ),
@@ -640,17 +633,10 @@ class LearningHomePage extends StatelessWidget {
     );
   }
 
-  void _showChapterDrawer(
-    BuildContext context,
-    bool isDark,
-    List<Chapter> chapters,
-    SwiftValue<int> selectedChapterIndex,
-    SwiftValue<String?> markdownContent,
-    SwiftValue<bool> isLoading,
-  ) {
+  void _showChapterDrawer(BuildContext context, bool isDark) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: isDark ? const Color(0xFF252526) : Colors.white,
+      backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -662,18 +648,18 @@ class LearningHomePage extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-            Text(
+            const Text(
                   'Chapters',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : const Color(0xFF1E1E1E),
+                    color: Color(0xFF1E1E1E),
                   ),
                 ),
                 IconButton(
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.close,
-                    color: isDark ? const Color(0xFFCCCCCC) : const Color(0xFF424242),
+                    color: Color(0xFF424242),
                   ),
                   onPressed: () => Navigator.pop(context),
                 ),
@@ -686,12 +672,12 @@ class LearningHomePage extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final chapter = chapters[index];
                   final isSelected = index == selectedChapterIndex.value;
-                  
+
                   return Material(
                     color: Colors.transparent,
                     child: InkWell(
                       onTap: () {
-                        _loadChapter(index, chapters, selectedChapterIndex, markdownContent, isLoading);
+                        _loadChapter(index);
                         Navigator.pop(context);
                       },
                       child: Container(
@@ -699,9 +685,7 @@ class LearningHomePage extends StatelessWidget {
                         padding: const EdgeInsets.all(12),
                         margin: const EdgeInsets.only(bottom: 4),
                         decoration: BoxDecoration(
-                          color: isSelected
-                              ? (isDark ? const Color(0xFF37373D) : const Color(0xFFF3F3F3))
-                              : Colors.transparent,
+                          color: isSelected ? const Color(0xFFE3F2FD) : Colors.transparent,
                           borderRadius: BorderRadius.circular(6),
                           border: isSelected
                               ? Border.all(color: const Color(0xFF007ACC), width: 2)
@@ -712,9 +696,7 @@ class LearningHomePage extends StatelessWidget {
                             Icon(
                               chapter.icon,
                               size: 22,
-                              color: isSelected
-                                  ? const Color(0xFF007ACC)
-                                  : (isDark ? const Color(0xFF858585) : const Color(0xFF616161)),
+                              color: isSelected ? const Color(0xFF007ACC) : const Color(0xFF616161),
                             ),
                             const SizedBox(width: 14),
                             Expanded(
@@ -723,9 +705,7 @@ class LearningHomePage extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                                  color: isSelected
-                                      ? (isDark ? Colors.white : const Color(0xFF1E1E1E))
-                                      : (isDark ? const Color(0xFFCCCCCC) : const Color(0xFF424242)),
+                                  color: isSelected ? const Color(0xFF007ACC) : const Color(0xFF424242),
                                 ),
                               ),
                             ),
