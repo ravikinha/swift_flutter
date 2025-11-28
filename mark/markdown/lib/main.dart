@@ -20,34 +20,40 @@ class _LearningAppState extends State<LearningApp> {
   @override
   Widget build(BuildContext context) {
     return Swift(
-      builder: (context) => MaterialApp(
-        title: 'swift_flutter Learning Guide',
-        debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-          useMaterial3: true,
-          brightness: Brightness.light,
-          scaffoldBackgroundColor: Colors.white,
-          colorScheme: const ColorScheme.light(
-            primary: Color(0xFF007ACC),
-            secondary: Color(0xFF007ACC),
-            surface: Colors.white,
-            background: Colors.white,
+      builder: (context) {
+        // Access themeMode.value to ensure Swift tracks it
+        final currentThemeMode = themeMode.value;
+        
+        return MaterialApp(
+          key: ValueKey(currentThemeMode),
+          title: 'swift_flutter Learning Guide',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            useMaterial3: true,
+            brightness: Brightness.light,
+            scaffoldBackgroundColor: Colors.white,
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF007ACC),
+              secondary: Color(0xFF007ACC),
+              surface: Colors.white,
+              background: Colors.white,
+            ),
           ),
-        ),
-        darkTheme: ThemeData(
-          useMaterial3: true,
-          brightness: Brightness.light,
-          scaffoldBackgroundColor: Colors.white,
-          colorScheme: const ColorScheme.light(
-            primary: Color(0xFF007ACC),
-            secondary: Color(0xFF007ACC),
-            surface: Colors.white,
-            background: Colors.white,
+          darkTheme: ThemeData(
+            useMaterial3: true,
+            brightness: Brightness.light,
+            scaffoldBackgroundColor: Colors.white,
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF007ACC),
+              secondary: Color(0xFF007ACC),
+              surface: Colors.white,
+              background: Colors.white,
+            ),
           ),
-        ),
-        themeMode: themeMode.value,
-        home: LearningHomePage(themeMode: themeMode),
-      ),
+          themeMode: currentThemeMode,
+          home: LearningHomePage(themeMode: themeMode),
+        );
+      },
     );
   }
 }
