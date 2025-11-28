@@ -512,13 +512,14 @@ class LearningHomePage extends StatelessWidget {
                     ),
                     codeblockDecoration: BoxDecoration(
                       color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFF1E1E1E),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(6),
                       border: Border.all(
-                        color: isDark ? const Color(0xFF007ACC) : const Color(0xFF007ACC),
-                        width: 2,
+                        color: const Color(0xFF007ACC),
+                        width: 1.5,
                       ),
                     ),
-                    codeblockPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    codeblockPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    codeblockAlign: WrapAlignment.start,
                     blockquote: TextStyle(
                       fontSize: 14,
                       fontStyle: FontStyle.italic,
