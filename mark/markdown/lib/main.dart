@@ -552,6 +552,44 @@ class LearningHomePage extends StatelessWidget {
                 ),
               ),
             ),
+            // Bottom Navigation
+            if (selectedChapterIndex.value > 0 || selectedChapterIndex.value < chapters.length - 1)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF252526) : const Color(0xFFF8F8F8),
+                  border: Border(
+                    top: BorderSide(
+                      color: isDark ? const Color(0xFF2D2D30) : const Color(0xFFDDDDDD),
+                    ),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    if (selectedChapterIndex.value > 0)
+                      _buildNavButton(
+                        isDark,
+                        Icons.arrow_back_ios_new,
+                        chapters[selectedChapterIndex.value - 1].title,
+                        () => _loadChapter(selectedChapterIndex.value - 1, chapters, selectedChapterIndex, markdownContent, isLoading),
+                        true,
+                      )
+                    else
+                      const SizedBox(width: 100),
+                    if (selectedChapterIndex.value < chapters.length - 1)
+                      _buildNavButton(
+                        isDark,
+                        Icons.arrow_forward_ios,
+                        chapters[selectedChapterIndex.value + 1].title,
+                        () => _loadChapter(selectedChapterIndex.value + 1, chapters, selectedChapterIndex, markdownContent, isLoading),
+                        false,
+                      )
+                    else
+                      const SizedBox(width: 100),
+                  ],
+                ),
+              ),
           ],
         ),
       ],
