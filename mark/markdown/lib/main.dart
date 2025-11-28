@@ -507,8 +507,8 @@ class LearningHomePage extends StatelessWidget {
                     code: TextStyle(
                       fontSize: 14,
                       fontFamily: 'Consolas, Monaco, Courier New, monospace',
-                      backgroundColor: isDark ? const Color(0xFF1E1E1E) : const Color(0xFF1E1E1E),
-                      color: isDark ? const Color(0xFFCE9178) : const Color(0xFFCE9178),
+                      backgroundColor: isDark ? const Color(0xFF2D2D30) : const Color(0xFFE8E8E8),
+                      color: isDark ? const Color(0xFFD7BA7D) : const Color(0xFFA31515),
                     ),
                     codeblockDecoration: BoxDecoration(
                       color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFF1E1E1E),
