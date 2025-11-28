@@ -30,12 +30,12 @@ class _LearningAppState extends State<LearningApp> {
       theme: ThemeData(
         useMaterial3: true,
         brightness: Brightness.light,
-        scaffoldBackgroundColor: const Color(0xFFF5F5F5),
+        scaffoldBackgroundColor: Colors.white,
         colorScheme: const ColorScheme.light(
-          primary: Color(0xFF2196F3),
-          secondary: Color(0xFF1976D2),
-          surface: Colors.white,
-          background: Color(0xFFF5F5F5),
+          primary: Color(0xFF007ACC),
+          secondary: Color(0xFF0098FF),
+          surface: Color(0xFFF3F3F3),
+          background: Colors.white,
         ),
       ),
       darkTheme: ThemeData(
@@ -43,9 +43,9 @@ class _LearningAppState extends State<LearningApp> {
         brightness: Brightness.dark,
         scaffoldBackgroundColor: const Color(0xFF1E1E1E),
         colorScheme: const ColorScheme.dark(
-          primary: Color(0xFF4FC3F7),
-          secondary: Color(0xFF29B6F6),
-          surface: Color(0xFF2B2B2B),
+          primary: Color(0xFF007ACC),
+          secondary: Color(0xFF0098FF),
+          surface: Color(0xFF252526),
           background: Color(0xFF1E1E1E),
         ),
       ),
@@ -144,7 +144,7 @@ class _LearningHomePageState extends State<LearningHomePage> {
       body: Row(
         children: [
           _buildSidebar(isDark),
-          Container(width: 1, color: isDark ? const Color(0xFF3C3C3C) : const Color(0xFFE0E0E0)),
+          Container(width: 1, color: isDark ? const Color(0xFF2D2D30) : const Color(0xFFE5E5E5)),
           Expanded(child: _buildContent(isDark)),
         ],
       ),
@@ -153,26 +153,25 @@ class _LearningHomePageState extends State<LearningHomePage> {
 
   PreferredSizeWidget _buildAppBar(bool isDark) {
     return AppBar(
-      backgroundColor: isDark ? const Color(0xFF2B2B2B) : Colors.white,
+      backgroundColor: isDark ? const Color(0xFF252526) : const Color(0xFF007ACC),
       elevation: 0,
-      title: Text(
-        'swift_flutter Learning',
-        style: TextStyle(
-          color: isDark ? Colors.white : Colors.black87,
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
-        ),
+      title: Row(
+        children: [
+          Image.asset('assets/images/swift_flutter_logo.png', height: 24, errorBuilder: (_, __, ___) => const Icon(Icons.school, size: 24)),
+          const SizedBox(width: 12),
+          const Text(
+            'swift_flutter Learning',
+            style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+          ),
+        ],
       ),
       actions: [
         IconButton(
-          icon: Icon(
-            widget.themeMode == ThemeMode.light ? Icons.dark_mode : Icons.light_mode,
-            color: isDark ? Colors.white70 : Colors.black54,
-          ),
+          icon: Icon(widget.themeMode == ThemeMode.light ? Icons.dark_mode_outlined : Icons.light_mode_outlined, color: Colors.white),
           onPressed: widget.onThemeToggle,
         ),
         IconButton(
-          icon: Icon(Icons.menu, color: isDark ? Colors.white70 : Colors.black54),
+          icon: const Icon(Icons.menu, color: Colors.white),
           onPressed: () => _showChapterDrawer(context),
         ),
       ],
@@ -181,60 +180,45 @@ class _LearningHomePageState extends State<LearningHomePage> {
 
   Widget _buildSidebar(bool isDark) {
     return Container(
-      width: 300,
-      color: isDark ? const Color(0xFF2B2B2B) : Colors.white,
+      width: 280,
+      color: isDark ? const Color(0xFF252526) : const Color(0xFFF3F3F3),
       child: Column(
         children: [
           // Header
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  color: isDark ? const Color(0xFF3C3C3C) : const Color(0xFFE0E0E0),
-                ),
-              ),
+              color: isDark ? const Color(0xFF2D2D30) : const Color(0xFF007ACC),
             ),
             child: Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF2196F3), Color(0xFF1976D2)],
+                Image.asset(
+                  'assets/images/swift_flutter_logo.png',
+                  height: 32,
+                  errorBuilder: (_, __, ___) => Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(6),
                     ),
-                    borderRadius: BorderRadius.circular(8),
+                    child: const Icon(Icons.school, color: Colors.white, size: 20),
                   ),
-                  child: const Icon(Icons.school, color: Colors.white, size: 24),
                 ),
                 const SizedBox(width: 12),
-                Expanded(
+                const Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'swift_flutter',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : Colors.black87,
-                        ),
-                      ),
-                      Text(
-                        'Learning Guide',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: isDark ? Colors.white60 : Colors.black54,
-                        ),
-                      ),
+                      Text('swift_flutter', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white)),
+                      Text('Learning Guide', style: TextStyle(fontSize: 11, color: Colors.white70)),
                     ],
                   ),
                 ),
                 IconButton(
                   icon: Icon(
                     widget.themeMode == ThemeMode.light ? Icons.dark_mode_outlined : Icons.light_mode_outlined,
-                    color: isDark ? Colors.white70 : Colors.black54,
-                    size: 20,
+                    color: Colors.white,
+                    size: 18,
                   ),
                   onPressed: widget.onThemeToggle,
                 ),
@@ -244,7 +228,7 @@ class _LearningHomePageState extends State<LearningHomePage> {
           // Chapters
           Expanded(
             child: ListView.builder(
-              padding: const EdgeInsets.symmetric(vertical: 8),
+              padding: const EdgeInsets.symmetric(vertical: 4),
               itemCount: chapters.length,
               itemBuilder: (context, index) {
                 final chapter = chapters[index];
@@ -256,56 +240,50 @@ class _LearningHomePageState extends State<LearningHomePage> {
                     onTap: () => _loadChapter(index),
                     child: Container(
                       key: ValueKey('chapter_$index'),
-                      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? (isDark ? const Color(0xFF0D47A1).withOpacity(0.3) : const Color(0xFFE3F2FD))
+                            ? (isDark ? const Color(0xFF37373D) : Colors.white)
                             : Colors.transparent,
-                        borderRadius: BorderRadius.circular(6),
                         border: isSelected
-                            ? Border.all(color: isDark ? const Color(0xFF2196F3) : const Color(0xFF2196F3), width: 1)
+                            ? Border(left: BorderSide(color: const Color(0xFF007ACC), width: 2))
                             : null,
                       ),
                       child: Row(
                         children: [
                           Container(
-                            width: 28,
-                            height: 28,
+                            width: 24,
+                            height: 24,
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
-                              color: isSelected
-                                  ? const Color(0xFF2196F3)
-                                  : (isDark ? const Color(0xFF3C3C3C) : const Color(0xFFF5F5F5)),
-                              borderRadius: BorderRadius.circular(4),
+                              color: isSelected ? const Color(0xFF007ACC) : Colors.transparent,
+                              borderRadius: BorderRadius.circular(3),
                             ),
                             child: Text(
                               '${index + 1}',
                               style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: isSelected ? Colors.white : (isDark ? Colors.white60 : Colors.black54),
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: isSelected ? Colors.white : (isDark ? const Color(0xFF858585) : const Color(0xFF616161)),
                               ),
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: 10),
                           Icon(
                             chapter.icon,
-                            size: 18,
-                            color: isSelected
-                                ? const Color(0xFF2196F3)
-                                : (isDark ? Colors.white60 : Colors.black54),
+                            size: 16,
+                            color: isSelected ? const Color(0xFF007ACC) : (isDark ? const Color(0xFF858585) : const Color(0xFF616161)),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: 10),
                           Expanded(
                             child: Text(
                               chapter.title,
                               style: TextStyle(
                                 fontSize: 13,
-                                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                                fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
                                 color: isSelected
-                                    ? (isDark ? Colors.white : Colors.black87)
-                                    : (isDark ? Colors.white70 : Colors.black87),
+                                    ? (isDark ? Colors.white : const Color(0xFF1E1E1E))
+                                    : (isDark ? const Color(0xFFCCCCCC) : const Color(0xFF3C3C3C)),
                               ),
                             ),
                           ),
@@ -319,11 +297,9 @@ class _LearningHomePageState extends State<LearningHomePage> {
           ),
           // Progress
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              border: Border(
-                top: BorderSide(color: isDark ? const Color(0xFF3C3C3C) : const Color(0xFFE0E0E0)),
-              ),
+              border: Border(top: BorderSide(color: isDark ? const Color(0xFF2D2D30) : const Color(0xFFE5E5E5))),
             ),
             child: Column(
               children: [
@@ -332,30 +308,22 @@ class _LearningHomePageState extends State<LearningHomePage> {
                   children: [
                     Text(
                       'Progress',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: isDark ? Colors.white60 : Colors.black54,
-                      ),
+                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: isDark ? const Color(0xFF858585) : const Color(0xFF616161)),
                     ),
                     Text(
                       '${selectedChapterIndex + 1}/${chapters.length}',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF2196F3),
-                      ),
+                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF007ACC)),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(2),
                   child: LinearProgressIndicator(
                     value: (selectedChapterIndex + 1) / chapters.length,
                     backgroundColor: isDark ? const Color(0xFF3C3C3C) : const Color(0xFFE0E0E0),
-                    valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF2196F3)),
-                    minHeight: 4,
+                    valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF007ACC)),
+                    minHeight: 3,
                   ),
                 ),
               ],
@@ -368,123 +336,100 @@ class _LearningHomePageState extends State<LearningHomePage> {
 
   Widget _buildContent(bool isDark) {
     if (isLoading) {
-      return Center(
-        child: CircularProgressIndicator(color: const Color(0xFF2196F3)),
-      );
+      return const Center(child: CircularProgressIndicator(color: Color(0xFF007ACC)));
     }
 
     if (markdownContent == null) {
       return Center(
-        child: Text(
-          'No content loaded',
-          style: TextStyle(color: isDark ? Colors.white60 : Colors.black54),
-        ),
+        child: Text('No content loaded', style: TextStyle(color: isDark ? const Color(0xFF858585) : const Color(0xFF616161))),
       );
     }
 
-    return Column(
+    return Stack(
       children: [
-        // Navigation
-        if (selectedChapterIndex > 0 || selectedChapterIndex < chapters.length - 1)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF2B2B2B) : Colors.white,
-              border: Border(
-                bottom: BorderSide(color: isDark ? const Color(0xFF3C3C3C) : const Color(0xFFE0E0E0)),
+        // Watermark
+        Positioned.fill(
+          child: Center(
+            child: Opacity(
+              opacity: 0.05,
+              child: Image.asset(
+                'assets/images/swift_flutter_logo.png',
+                width: 400,
+                height: 400,
+                fit: BoxFit.contain,
+                errorBuilder: (_, __, ___) => const SizedBox(),
               ),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                if (selectedChapterIndex > 0)
-                  _buildNavButton(isDark, Icons.arrow_back, chapters[selectedChapterIndex - 1].title, () => _loadChapter(selectedChapterIndex - 1), true)
-                else
-                  const SizedBox(width: 100),
-                if (selectedChapterIndex < chapters.length - 1)
-                  _buildNavButton(isDark, Icons.arrow_forward, chapters[selectedChapterIndex + 1].title, () => _loadChapter(selectedChapterIndex + 1), false)
-                else
-                  const SizedBox(width: 100),
-              ],
-            ),
           ),
+        ),
         // Content
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.all(32),
-            child: Markdown(
-              data: markdownContent!,
-              styleSheet: MarkdownStyleSheet(
-                h1: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : Colors.black87,
-                  height: 1.3,
+        Column(
+          children: [
+            // Navigation
+            if (selectedChapterIndex > 0 || selectedChapterIndex < chapters.length - 1)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF252526) : const Color(0xFFF3F3F3),
+                  border: Border(bottom: BorderSide(color: isDark ? const Color(0xFF2D2D30) : const Color(0xFFE5E5E5))),
                 ),
-                h1Padding: const EdgeInsets.only(bottom: 16, top: 8),
-                h2: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : Colors.black87,
-                  height: 1.4,
-                ),
-                h2Padding: const EdgeInsets.only(bottom: 12, top: 24),
-                h3: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white : Colors.black87,
-                  height: 1.4,
-                ),
-                h3Padding: const EdgeInsets.only(bottom: 10, top: 20),
-                p: TextStyle(
-                  fontSize: 15,
-                  height: 1.6,
-                  color: isDark ? const Color(0xFFCCCCCC) : const Color(0xFF424242),
-                ),
-                pPadding: const EdgeInsets.only(bottom: 12),
-                code: TextStyle(
-                  fontSize: 13,
-                  fontFamily: 'JetBrains Mono, Consolas, monospace',
-                  backgroundColor: isDark ? const Color(0xFF2B2B2B) : const Color(0xFFF5F5F5),
-                  color: isDark ? const Color(0xFFCC7832) : const Color(0xFFD32F2F),
-                ),
-                codeblockDecoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF2B2B2B) : const Color(0xFFFAFAFA),
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(
-                    color: isDark ? const Color(0xFF3C3C3C) : const Color(0xFFE0E0E0),
-                  ),
-                ),
-                codeblockPadding: const EdgeInsets.all(16),
-                blockquote: TextStyle(
-                  fontSize: 15,
-                  fontStyle: FontStyle.italic,
-                  color: isDark ? const Color(0xFF9E9E9E) : const Color(0xFF616161),
-                ),
-                blockquoteDecoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF2B2B2B) : const Color(0xFFF5F5F5),
-                  border: Border(
-                    left: BorderSide(color: const Color(0xFF2196F3), width: 3),
-                  ),
-                ),
-                blockquotePadding: const EdgeInsets.all(12),
-                listBullet: TextStyle(color: const Color(0xFF2196F3)),
-                strong: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : Colors.black87,
-                ),
-                em: TextStyle(
-                  fontStyle: FontStyle.italic,
-                  color: isDark ? const Color(0xFFCCCCCC) : const Color(0xFF424242),
-                ),
-                a: const TextStyle(
-                  color: Color(0xFF2196F3),
-                  decoration: TextDecoration.underline,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    if (selectedChapterIndex > 0)
+                      _buildNavButton(isDark, Icons.arrow_back_ios, chapters[selectedChapterIndex - 1].title, () => _loadChapter(selectedChapterIndex - 1), true)
+                    else
+                      const SizedBox(width: 80),
+                    if (selectedChapterIndex < chapters.length - 1)
+                      _buildNavButton(isDark, Icons.arrow_forward_ios, chapters[selectedChapterIndex + 1].title, () => _loadChapter(selectedChapterIndex + 1), false)
+                    else
+                      const SizedBox(width: 80),
+                  ],
                 ),
               ),
-              selectable: true,
+            // Markdown Content
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(32),
+                child: Markdown(
+                  data: markdownContent!,
+                  styleSheet: MarkdownStyleSheet(
+                    h1: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF1E1E1E), height: 1.3),
+                    h1Padding: const EdgeInsets.only(bottom: 16, top: 8),
+                    h2: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF1E1E1E), height: 1.4),
+                    h2Padding: const EdgeInsets.only(bottom: 12, top: 20),
+                    h3: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: isDark ? Colors.white : const Color(0xFF1E1E1E), height: 1.4),
+                    h3Padding: const EdgeInsets.only(bottom: 10, top: 16),
+                    p: TextStyle(fontSize: 14, height: 1.6, color: isDark ? const Color(0xFFCCCCCC) : const Color(0xFF3C3C3C)),
+                    pPadding: const EdgeInsets.only(bottom: 12),
+                    code: TextStyle(
+                      fontSize: 13,
+                      fontFamily: 'Consolas, Monaco, Courier New, monospace',
+                      backgroundColor: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF5F5F5),
+                      color: isDark ? const Color(0xFFCE9178) : const Color(0xFFA31515),
+                    ),
+                    codeblockDecoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF8F8F8),
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(color: isDark ? const Color(0xFF2D2D30) : const Color(0xFFE5E5E5)),
+                    ),
+                    codeblockPadding: const EdgeInsets.all(14),
+                    blockquote: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: isDark ? const Color(0xFF858585) : const Color(0xFF616161)),
+                    blockquoteDecoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF252526) : const Color(0xFFF3F3F3),
+                      border: const Border(left: BorderSide(color: Color(0xFF007ACC), width: 3)),
+                    ),
+                    blockquotePadding: const EdgeInsets.all(12),
+                    listBullet: const TextStyle(color: Color(0xFF007ACC)),
+                    strong: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF1E1E1E)),
+                    em: TextStyle(fontStyle: FontStyle.italic, color: isDark ? const Color(0xFFCCCCCC) : const Color(0xFF3C3C3C)),
+                    a: const TextStyle(color: Color(0xFF007ACC), decoration: TextDecoration.underline),
+                  ),
+                  selectable: true,
+                ),
+              ),
             ),
-          ),
+          ],
         ),
       ],
     );
@@ -495,37 +440,25 @@ class _LearningHomePageState extends State<LearningHomePage> {
       color: Colors.transparent,
       child: InkWell(
         onTap: onPressed,
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(4),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
-            border: Border.all(color: isDark ? const Color(0xFF3C3C3C) : const Color(0xFFE0E0E0)),
-            borderRadius: BorderRadius.circular(6),
+            border: Border.all(color: isDark ? const Color(0xFF2D2D30) : const Color(0xFFE5E5E5)),
+            borderRadius: BorderRadius.circular(4),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: isLeft
                 ? [
-                    Icon(icon, size: 16, color: const Color(0xFF2196F3)),
-                    const SizedBox(width: 8),
-                    Text(
-                      label,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: isDark ? Colors.white70 : Colors.black87,
-                      ),
-                    ),
+                    Icon(icon, size: 14, color: const Color(0xFF007ACC)),
+                    const SizedBox(width: 6),
+                    Text(label, style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFFCCCCCC) : const Color(0xFF3C3C3C))),
                   ]
                 : [
-                    Text(
-                      label,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: isDark ? Colors.white70 : Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Icon(icon, size: 16, color: const Color(0xFF2196F3)),
+                    Text(label, style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFFCCCCCC) : const Color(0xFF3C3C3C))),
+                    const SizedBox(width: 6),
+                    Icon(icon, size: 14, color: const Color(0xFF007ACC)),
                   ],
           ),
         ),
@@ -538,33 +471,24 @@ class _LearningHomePageState extends State<LearningHomePage> {
     
     showModalBottomSheet(
       context: context,
-      backgroundColor: isDark ? const Color(0xFF2B2B2B) : Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
+      backgroundColor: isDark ? const Color(0xFF252526) : Colors.white,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(12))),
       builder: (context) => Container(
         height: MediaQuery.of(context).size.height * 0.85,
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-            Text(
-                  'Chapters',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : Colors.black87,
-                  ),
-                ),
+                Text('Chapters', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF1E1E1E))),
                 IconButton(
-                  icon: Icon(Icons.close, color: isDark ? Colors.white70 : Colors.black54),
+                  icon: Icon(Icons.close, color: isDark ? const Color(0xFFCCCCCC) : const Color(0xFF3C3C3C)),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Expanded(
               child: ListView.builder(
                 itemCount: chapters.length,
@@ -581,49 +505,42 @@ class _LearningHomePageState extends State<LearningHomePage> {
                       },
                       child: Container(
                         key: ValueKey('drawer_chapter_$index'),
-                        padding: const EdgeInsets.all(12),
-                        margin: const EdgeInsets.only(bottom: 4),
+                        padding: const EdgeInsets.all(10),
+                        margin: const EdgeInsets.only(bottom: 2),
                         decoration: BoxDecoration(
-                          color: isSelected
-                              ? (isDark ? const Color(0xFF0D47A1).withOpacity(0.3) : const Color(0xFFE3F2FD))
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(6),
+                          color: isSelected ? (isDark ? const Color(0xFF37373D) : const Color(0xFFF3F3F3)) : Colors.transparent,
+                          borderRadius: BorderRadius.circular(4),
+                          border: isSelected ? Border(left: BorderSide(color: const Color(0xFF007ACC), width: 2)) : null,
                         ),
                         child: Row(
                           children: [
                             Container(
-                              width: 32,
-                              height: 32,
+                              width: 28,
+                              height: 28,
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
-                                color: isSelected ? const Color(0xFF2196F3) : (isDark ? const Color(0xFF3C3C3C) : const Color(0xFFF5F5F5)),
-                                borderRadius: BorderRadius.circular(4),
+                                color: isSelected ? const Color(0xFF007ACC) : (isDark ? const Color(0xFF3C3C3C) : const Color(0xFFE5E5E5)),
+                                borderRadius: BorderRadius.circular(3),
                               ),
                               child: Text(
                                 '${index + 1}',
                                 style: TextStyle(
-                                  fontSize: 13,
+                                  fontSize: 12,
                                   fontWeight: FontWeight.bold,
-                                  color: isSelected ? Colors.white : (isDark ? Colors.white60 : Colors.black54),
+                                  color: isSelected ? Colors.white : (isDark ? const Color(0xFF858585) : const Color(0xFF616161)),
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 12),
-                            Icon(
-                              chapter.icon,
-                              size: 20,
-                              color: isSelected ? const Color(0xFF2196F3) : (isDark ? Colors.white60 : Colors.black54),
-                            ),
-                            const SizedBox(width: 12),
+                            const SizedBox(width: 10),
+                            Icon(chapter.icon, size: 18, color: isSelected ? const Color(0xFF007ACC) : (isDark ? const Color(0xFF858585) : const Color(0xFF616161))),
+                            const SizedBox(width: 10),
                             Expanded(
                               child: Text(
                                 chapter.title,
                                 style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                                  color: isSelected
-                                      ? (isDark ? Colors.white : Colors.black87)
-                                      : (isDark ? Colors.white70 : Colors.black87),
+                                  fontSize: 14,
+                                  fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+                                  color: isSelected ? (isDark ? Colors.white : const Color(0xFF1E1E1E)) : (isDark ? const Color(0xFFCCCCCC) : const Color(0xFF3C3C3C)),
                                 ),
                               ),
                             ),
@@ -649,3 +566,4 @@ class Chapter {
 
   Chapter({required this.title, required this.file, required this.icon});
 }
+
