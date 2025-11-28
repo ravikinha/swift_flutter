@@ -247,13 +247,13 @@ class _LearningHomePageState extends State<LearningHomePage> {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(
-                    Icons.brightness_6_outlined,
+                  icon: Icon(
+                    widget.themeMode.value == ThemeMode.light ? Icons.dark_mode_outlined : Icons.light_mode_outlined,
                     color: Colors.white,
                     size: 18,
                   ),
-                  onPressed: () {},
-                  tooltip: 'Blue & White Theme',
+                  onPressed: () => widget.themeMode.value = widget.themeMode.value == ThemeMode.light ? ThemeMode.dark : ThemeMode.light,
+                  tooltip: 'Toggle theme',
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                 ),
