@@ -3,19 +3,19 @@ import '../core/performance_monitor.dart';
 import '../core/devtools.dart' show SwiftDevTools;
 
 /// Internal state interface for Mark widget
-abstract class MarkState {
+abstract class SwiftState {
   /// Register a ChangeNotifier as a dependency
   void register(ChangeNotifier controller);
 }
 
 /// Registry for tracking active Mark widgets (stack-based for nested support)
 class MarkRegistry {
-  static final List<MarkState> _stack = [];
+  static final List<SwiftState> _stack = [];
 
-  static MarkState? get current => 
+  static SwiftState? get current =>
     _stack.isNotEmpty ? _stack.last : null;
 
-  static void push(MarkState mark) => _stack.add(mark);
+  static void push(SwiftState mark) => _stack.add(mark);
   static void pop() => _stack.removeLast();
 }
 
@@ -32,18 +32,18 @@ class MarkRegistry {
 ///   builder: (context) => Text('Count: ${counter.value}'),
 /// )
 /// ```
-class Mark extends StatefulWidget {
+class Swift extends StatefulWidget {
   /// Builder function that creates the widget
   final Widget Function(BuildContext) builder;
   
   /// Creates a Mark widget
-  const Mark({super.key, required this.builder});
+  const Swift({super.key, required this.builder});
 
   @override
-  State<Mark> createState() => _MarkState();
+  State<Swift> createState() => _MarkState();
 }
 
-class _MarkState extends State<Mark> implements MarkState {
+class _MarkState extends State<Swift> implements SwiftState {
   final Set<ChangeNotifier> dependencies = {};
 
   @override

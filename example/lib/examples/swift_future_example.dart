@@ -36,7 +36,7 @@ class _SwiftFutureExampleState extends State<SwiftFutureExample> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Mark(
+        Swift(
           builder: (context) => swiftFuture.value.when(
             idle: () => const Text('Click to load data', style: TextStyle(fontSize: 16)),
             loading: () => const Row(

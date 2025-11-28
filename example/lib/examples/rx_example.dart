@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:swift_flutter/swift_flutter.dart';
 
-/// Reactive State (Rx) Example
+/// Reactive State (Rx) Example - Using Controller Pattern
 class RxExample extends StatefulWidget {
   const RxExample({super.key});
 
@@ -9,24 +9,35 @@ class RxExample extends StatefulWidget {
   State<RxExample> createState() => _RxExampleState();
 }
 
-class _RxExampleState extends State<RxExample> {
-  // Using swift() helper for automatic type inference
-  // swift() creates Rx<T> instances - cleaner than Rx<int>(0)
-  final counter = swift(0);  // Automatically inferred as Rx<int>
-  final name = swift('Swift Flutter');  // Automatically inferred as Rx<String>
+/// Controller for managing reactive state
+/// ✅ No ReadOnlyRx getters needed! Just use swift() directly.
+class RxExampleController extends SwiftController {
+  // ✅ Just use swift() - automatically read-only from views!
+  final counter = swift(0);  // Automatically inferred as ControllerRx<int>
+  final name = swift('Swift Flutter');  // Automatically inferred as ControllerRx<String>
   
   // Or use explicit typing if you prefer:
   // final counter = swift<int>(0);
   // final name = swift<String>('Swift Flutter');
   
-  // Note: SwiftFuture, SwiftField, SwiftTween, SwiftPersisted are different classes
-  // They are specialized wrappers, not Rx<T> instances
-  // They use the Swift prefix to match the library naming convention
+  // Methods to update state - only controllers can modify
+  void decrement() => counter.value--;
+  void increment() => counter.value++;
+  void updateName() => name.value = 'Updated: ${DateTime.now().second}';
+}
+
+class _RxExampleState extends State<RxExample> {
+  late final RxExampleController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = RxExampleController();
+  }
 
   @override
   void dispose() {
-    counter.dispose();
-    name.dispose();
+    controller.dispose();
     super.dispose();
   }
 
@@ -35,16 +46,26 @@ class _RxExampleState extends State<RxExample> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Mark(
+        const Text(
+          'Reactive State Example (with Controller Pattern)',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'Note: SwiftFuture, SwiftField, SwiftTween, SwiftPersisted are specialized classes',
+          style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
+        ),
+        const SizedBox(height: 16),
+        Swift(
           builder: (context) => Text(
-            'Counter: ${counter.value}',
+            'Counter: ${controller.counter.value}',
             style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
         ),
         const SizedBox(height: 8),
-        Mark(
+        Swift(
           builder: (context) => Text(
-            'Name: ${name.value}',
+            'Name: ${controller.name.value}',
             style: const TextStyle(fontSize: 18),
           ),
         ),
@@ -53,15 +74,15 @@ class _RxExampleState extends State<RxExample> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             ElevatedButton(
-              onPressed: () => counter.value--,
+              onPressed: controller.decrement,
               child: const Text('-'),
             ),
             ElevatedButton(
-              onPressed: () => counter.value++,
+              onPressed: controller.increment,
               child: const Text('+'),
             ),
             ElevatedButton(
-              onPressed: () => name.value = 'Updated: ${DateTime.now().second}',
+              onPressed: controller.updateName,
               child: const Text('Update Name'),
             ),
           ],

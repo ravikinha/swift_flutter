@@ -5,7 +5,9 @@
 ///
 /// ## Features
 ///
-/// - **Reactive State (Rx)**: Automatic dependency tracking with [Rx] and [swift]
+/// - **Reactive State (SwiftValue)**: Automatic dependency tracking with [SwiftValue] and [swift]
+/// - **Two Patterns**: Direct state management OR Controller pattern with enforced separation
+/// - **Swift-like Extensions**: 80+ convenient methods (toggle, add, sub, mul, div, etc.)
 /// - **Mark Widget**: Auto-rebuild widget that tracks dependencies automatically
 /// - **Computed Values**: Derived state that automatically updates when dependencies change
 /// - **Async State**: [SwiftFuture] for managing loading/error/success states
@@ -23,23 +25,25 @@
 /// ```dart
 /// import 'package:swift_flutter/swift_flutter.dart';
 ///
-/// // Create reactive state
+/// // Pattern 1: Direct state management (for view-local state)
 /// final counter = swift(0);
-///
-/// // Use in widget
-/// Mark(
+/// Swift(
 ///   builder: (context) => Text('Count: ${counter.value}'),
 /// )
+/// counter.value = 10; // Direct modification
 ///
-/// // Update value - widget rebuilds automatically!
-/// counter.value = 10;
+/// // Pattern 2: Controller pattern (for business logic)
+/// class CounterController extends SwiftController {
+///   final counter = swift(0);
+///   void increment() => counter.value++;
+/// }
 /// ```
 ///
 /// See the [README](https://github.com/ravikinha/swift_flutter) for more examples.
 library;
 
 // Core
-export 'core/rx.dart' show Rx, swift;
+export 'core/rx.dart' show SwiftValue, Rx, swift;
 export 'core/computed.dart';
 export 'core/rx_future.dart';
 export 'core/rx_field.dart';
@@ -48,6 +52,7 @@ export 'core/tween.dart';
 export 'core/logger.dart';
 export 'core/lifecycle.dart';
 export 'core/persistence.dart';
+export 'core/controller.dart' show SwiftController, ReadOnlyRx;
 export 'core/performance_monitor.dart';
 export 'core/error_boundary.dart';
 export 'core/test_helpers.dart';

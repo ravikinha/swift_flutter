@@ -37,7 +37,7 @@ class _TweenExampleState extends State<TweenExample> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Mark(
+        Swift(
           builder: (context) => Center(
             child: Container(
               width: sizeTween.value,
@@ -64,7 +64,7 @@ class _TweenExampleState extends State<TweenExample> {
           ],
         ),
         const SizedBox(height: 8),
-        Mark(
+        Swift(
           builder: (context) => Slider(
             value: sizeTween.progress,
             min: 0.0,
@@ -72,7 +72,7 @@ class _TweenExampleState extends State<TweenExample> {
             onChanged: (v) => sizeTween.progress = v,
           ),
         ),
-        Mark(
+        Swift(
           builder: (context) => Text('Progress: ${(sizeTween.progress * 100).toStringAsFixed(0)}%'),
         ),
       ],

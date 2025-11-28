@@ -5,16 +5,16 @@ import 'package:swift_flutter/core/computed.dart';
 void main() {
   group('Computed', () {
     test('should compute value from dependencies', () {
-      final a = Rx<int>(5);
-      final b = Rx<int>(10);
+      final a = swift(5);
+      final b = swift(10);
       final sum = Computed<int>(() => a.value + b.value);
       
       expect(sum.value, 15);
     });
 
     test('should update when dependency changes', () {
-      final a = Rx<int>(5);
-      final b = Rx<int>(10);
+      final a = swift(5);
+      final b = swift(10);
       final sum = Computed<int>(() => a.value + b.value);
       
       expect(sum.value, 15);
@@ -24,7 +24,7 @@ void main() {
     });
 
     test('should notify listeners when recomputed', () {
-      final a = Rx<int>(5);
+      final a = swift(5);
       final sum = Computed<int>(() => a.value * 2);
       
       var notified = false;
@@ -36,9 +36,9 @@ void main() {
     });
 
     test('should handle multiple dependencies', () {
-      final x = Rx<int>(1);
-      final y = Rx<int>(2);
-      final z = Rx<int>(3);
+      final x = swift(1);
+      final y = swift(2);
+      final z = swift(3);
       final product = Computed<int>(() => x.value * y.value * z.value);
       
       expect(product.value, 6);

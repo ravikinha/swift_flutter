@@ -33,7 +33,7 @@ class _PersistenceExampleState extends State<PersistenceExample> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Mark(
+        Swift(
           builder: (context) => Text(
             'Persisted Counter: ${counter.value}',
             style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),

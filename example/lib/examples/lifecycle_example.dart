@@ -12,7 +12,7 @@ class LifecycleExample extends StatefulWidget {
 class _LifecycleExampleState extends State<LifecycleExample> with LifecycleMixin {
   @override
   Widget build(BuildContext context) {
-    return Mark(
+    return Swift(
       builder: (context) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

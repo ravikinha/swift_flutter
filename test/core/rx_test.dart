@@ -4,18 +4,18 @@ import 'package:swift_flutter/core/rx.dart';
 void main() {
   group('Rx', () {
     test('should initialize with value', () {
-      final rx = Rx<int>(42);
+      final rx = swift(42);
       expect(rx.value, 42);
     });
 
     test('should update value', () {
-      final rx = Rx<int>(0);
+      final rx = swift(0);
       rx.value = 10;
       expect(rx.value, 10);
     });
 
     test('should not notify if value unchanged', () {
-      final rx = Rx<int>(5);
+      final rx = swift(5);
       var notified = false;
       rx.addListener(() => notified = true);
       
@@ -27,18 +27,18 @@ void main() {
     });
 
     test('should update using update method', () {
-      final rx = Rx<String>('hello');
+      final rx = swift('hello');
       rx.update('world');
       expect(rx.value, 'world');
     });
 
     test('should return rawValue without dependency tracking', () {
-      final rx = Rx<int>(100);
+      final rx = swift(100);
       expect(rx.rawValue, 100);
     });
 
     test('toString should return value string', () {
-      final rx = Rx<int>(42);
+      final rx = swift(42);
       expect(rx.toString(), '42');
     });
   });

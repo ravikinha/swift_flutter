@@ -8,7 +8,7 @@ import 'devtools.dart' show SwiftDevTools;
 class Computed<T> extends ChangeNotifier {
   T? _value;
   final T Function() _compute;
-  final Set<Rx<dynamic>> _dependencies = {};
+  final Set<SwiftValue<dynamic>> _dependencies = {};
   final Set<Computed<dynamic>> _computedDependencies = {};
   bool _isDirty = true;
   bool _enableMemoization = false;
@@ -92,11 +92,11 @@ class Computed<T> extends ChangeNotifier {
       }
 
       _value = _compute();
-      _dependencies.addAll(tracker.rxDependencies);
+      _dependencies.addAll(tracker.swiftDependencies);
       
       // Zero overhead: track dependencies if DevTools is enabled
       if (SwiftDevTools.isEnabled && SwiftDevTools.isTrackingDependencies) {
-        for (var dep in tracker.rxDependencies) {
+        for (var dep in tracker.swiftDependencies) {
           SwiftDevTools.trackDependency(
             SwiftDevTools.getComputedId(this),
             SwiftDevTools.getRxId(dep),
@@ -185,10 +185,14 @@ class Computed<T> extends ChangeNotifier {
 
 /// Tracker for computed dependencies
 class ComputedTracker {
-  final Set<Rx<dynamic>> rxDependencies = {};
+  final Set<SwiftValue<dynamic>> swiftDependencies = {};
   final Set<Computed<dynamic>> computedDependencies = {};
   
-  Set<Rx<dynamic>> get dependencies => rxDependencies;
+  Set<SwiftValue<dynamic>> get dependencies => swiftDependencies;
+  
+  // Backward compatibility
+  @Deprecated('Use swiftDependencies instead')
+  Set<Rx<dynamic>> get rxDependencies => swiftDependencies.cast<Rx<dynamic>>();
 }
 
 /// Registry for computed trackers (stack-based)

@@ -1,5 +1,44 @@
 # Changelog
 
+## [2.1.0] - 2024-12-XX - Controller Pattern & Swift Naming
+
+### Added
+- ✅ **SwiftController Pattern** - Enforced separation of concerns with read-only views
+  - Controllers can modify state, views can only read
+  - Automatic read-only enforcement from views
+  - No need for manual `ReadOnlyRx` getters - just use `swift()` directly
+- ✅ **ControllerRx** - Special reactive type that automatically becomes read-only from views
+- ✅ **Both Patterns Support** - Direct pattern (for view-local state) and Controller pattern (for business logic)
+- ✅ **Comprehensive Examples** - Updated all examples to demonstrate both patterns
+
+### Changed
+- ✅ **Renamed Rx to SwiftValue** - All internal references now use `SwiftValue<T>` instead of `Rx<T>`
+  - `Rx<T>` is now a deprecated type alias (backward compatible)
+  - `swift()` function returns `SwiftValue<T>`
+  - All DevTools methods renamed: `trackSwiftCreation()`, `getSwiftId()`, etc.
+- ✅ **Updated Documentation** - README now clearly explains both patterns and when to use each
+- ✅ **Extension Methods** - Documented all 80+ Swift-like extension methods (toggle, add, sub, mul, div, etc.)
+
+### Improved
+- ✅ **Better Separation of Concerns** - Controller pattern enforces clean architecture
+- ✅ **Type Safety** - Runtime protection prevents views from modifying controller state
+- ✅ **Developer Experience** - Simplified API - no need for manual `ReadOnlyRx` getters
+- ✅ **Consistent Naming** - Project now uses Swift naming throughout (SwiftValue, SwiftController, etc.)
+
+### Documentation
+- ✅ Updated README with both patterns clearly explained
+- ✅ Added examples showing when to use each pattern
+- ✅ Documented all extension methods (Bool, Int, Double, String, List, SwiftValue)
+- ✅ Updated CHANGELOG with all new features
+
+### Notes
+- All changes are backward compatible
+- `Rx<T>` still works but is deprecated (use `SwiftValue<T>`)
+- Direct pattern still works for simple use cases
+- Controller pattern recommended for complex apps and teams
+
+---
+
 ## [2.0.0] - 2024-11-27 - Code Quality & Linter Perfection
 
 ### Fixed

@@ -6,24 +6,24 @@ import 'performance_monitor.dart';
 import 'devtools.dart' show SwiftDevTools;
 
 /// Reactive state container that automatically tracks dependencies
-class Rx<T> extends ChangeNotifier {
+class SwiftValue<T> extends ChangeNotifier {
   T _value;
   String? _devToolsName;
   
   /// Constructor - type is automatically inferred from the value
-  Rx(this._value, {String? name}) : _devToolsName = name {
+  SwiftValue(this._value, {String? name}) : _devToolsName = name {
     // Zero overhead: only track if DevTools is enabled
     if (SwiftDevTools.isEnabled) {
-      SwiftDevTools.trackRxCreation(this, _devToolsName);
+      SwiftDevTools.trackSwiftCreation(this, _devToolsName);
     }
   }
   
   /// Factory constructor for automatic type inference.
   ///
-  /// Usage: `Rx.of(0)` instead of `Rx<int>(0)`.
-  factory Rx.of(T value) => Rx<T>(value);
+  /// Usage: `SwiftValue.of(0)` instead of `SwiftValue<int>(0)`.
+  factory SwiftValue.of(T value) => SwiftValue<T>(value);
 
-  /// Gets the current value and registers this Rx as a dependency
+  /// Gets the current value and registers this SwiftValue as a dependency
   T get value {
     // Check for computed tracker first
     final computedTracker = ComputedTrackerRegistry.current;
@@ -44,7 +44,7 @@ class Rx<T> extends ChangeNotifier {
       if (SwiftDevTools.isEnabled && SwiftDevTools.isTrackingDependencies) {
         SwiftDevTools.trackDependency(
           SwiftDevTools.getMarkId(mark),
-          SwiftDevTools.getRxId(this),
+          SwiftDevTools.getSwiftId(this),
         );
       }
     }
@@ -72,7 +72,7 @@ class Rx<T> extends ChangeNotifier {
     // Zero overhead: only track if DevTools is enabled
     if (SwiftDevTools.isEnabled) {
       SwiftDevTools.trackStateChange(
-        SwiftDevTools.getRxId(this),
+        SwiftDevTools.getSwiftId(this),
         oldValue,
         newValue,
       );
@@ -80,7 +80,7 @@ class Rx<T> extends ChangeNotifier {
         SwiftDevTools.trackPerformanceEvent(
           _devToolsName ?? runtimeType.toString(),
           stopwatch.elapsed,
-          {'type': 'RxUpdate'},
+          {'type': 'SwiftUpdate'},
         );
       }
     }
@@ -110,17 +110,21 @@ class Rx<T> extends ChangeNotifier {
   String toString() => _value.toString();
 }
 
-/// Creates an Rx with optional type inference.
+/// Creates a SwiftValue with optional type inference.
 ///
-/// Usage with automatic inference: `swift(0)` creates `Rx<int>`.
-/// Usage with explicit type: `swift<int>(0)` creates `Rx<int>`.
-/// Usage for models: `swift<MyModel>(myModel)` creates `Rx<MyModel>`.
+/// Usage with automatic inference: `swift(0)` creates `SwiftValue<int>`.
+/// Usage with explicit type: `swift<int>(0)` creates `SwiftValue<int>`.
+/// Usage for models: `swift<MyModel>(myModel)` creates `SwiftValue<MyModel>`.
 ///
 /// Example:
 /// ```dart
-/// final counter = swift(0);        // Automatically Rx<int>
-/// final name = swift('Hello');     // Automatically Rx<String>
+/// final counter = swift(0);        // Automatically SwiftValue<int>
+/// final name = swift('Hello');     // Automatically SwiftValue<String>
 /// final user = swift<User>(user);  // Explicit type for models
 /// ```
-Rx<T> swift<T>(T value, {String? name}) => Rx<T>(value, name: name);
+SwiftValue<T> swift<T>(T value, {String? name}) => SwiftValue<T>(value, name: name);
+
+/// Backward compatibility alias - Rx is now SwiftValue
+@Deprecated('Use SwiftValue instead. Rx will be removed in a future version.')
+typedef Rx<T> = SwiftValue<T>;
 

@@ -155,7 +155,7 @@ class _DevToolsExampleState extends State<DevToolsExample> {
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 16),
-                Mark(
+                Swift(
                   builder: (context) => Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -208,7 +208,7 @@ class _DevToolsExampleState extends State<DevToolsExample> {
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 16),
-                Mark(
+                Swift(
                   builder: (context) => Text('Store Counter: ${counterStore.value}'),
                 ),
                 const SizedBox(height: 16),

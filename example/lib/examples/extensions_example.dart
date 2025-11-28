@@ -65,7 +65,7 @@ class _ExtensionsExampleState extends State<ExtensionsExample> {
                 ],
               ),
               const SizedBox(height: 8),
-              Mark(
+              Swift(
                 builder: (context) => Row(
                   children: [
                     Expanded(
@@ -167,7 +167,7 @@ class _ExtensionsExampleState extends State<ExtensionsExample> {
                 ],
               ),
               const SizedBox(height: 16),
-              Mark(
+              Swift(
                 builder: (context) => Row(
                   children: [
                     Expanded(
@@ -308,7 +308,7 @@ class _ExtensionsExampleState extends State<ExtensionsExample> {
                 ),
               ),
               const SizedBox(height: 16),
-              Mark(
+              Swift(
                 builder: (context) => Row(
                   children: [
                     Expanded(
@@ -414,7 +414,7 @@ class _ExtensionsExampleState extends State<ExtensionsExample> {
                 ),
               ),
               const SizedBox(height: 16),
-              Mark(
+              Swift(
                 builder: (context) => Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

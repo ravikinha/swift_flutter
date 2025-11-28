@@ -15,7 +15,7 @@ class RxBuilder<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Mark(
+    return Swift(
       builder: (context) => builder(context, rx.value),
     );
   }

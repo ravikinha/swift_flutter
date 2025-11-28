@@ -16,7 +16,7 @@ class _StoreExampleState extends State<StoreExample> {
     super.initState();
     // Register services
     store.register<UserService>(UserService());
-    store.registerState('userCount', Rx<int>(0));
+    store.registerState('userCount', swift(0));
   }
 
   @override
@@ -29,7 +29,6 @@ class _StoreExampleState extends State<StoreExample> {
             final userService = store.get<UserService>();
             final count = store.getState<int>('userCount');
             count.value = userService.getUserCount();
-            
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('User count: ${count.value}')),
             );
@@ -37,7 +36,7 @@ class _StoreExampleState extends State<StoreExample> {
           child: const Text('Get User Count from Store'),
         ),
         const SizedBox(height: 16),
-        Mark(
+        Swift(
           builder: (context) => Text(
             'User Count: ${store.getState<int>('userCount').value}',
             style: const TextStyle(fontSize: 18),

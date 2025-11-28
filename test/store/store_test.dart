@@ -30,7 +30,7 @@ void main() {
     });
 
     test('should register and get state', () {
-      final state = Rx<int>(42);
+      final state = swift(42);
       store.registerState('counter', state);
       
       expect(store.hasState('counter'), true);

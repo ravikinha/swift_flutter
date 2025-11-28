@@ -25,7 +25,7 @@
 library;
 
 // Core
-export 'core/rx.dart' show Rx, swift;
+export 'core/rx.dart' show SwiftValue, Rx, swift;
 export 'core/computed.dart';
 export 'core/rx_future.dart';
 export 'core/rx_field.dart';
@@ -34,6 +34,7 @@ export 'core/tween.dart';
 export 'core/logger.dart';
 export 'core/lifecycle.dart';
 export 'core/persistence.dart';
+export 'core/controller.dart' show SwiftController, ReadOnlyRx;
 
 // Enterprise Features (import separately as needed)
 // export 'core/error_tracking.dart';

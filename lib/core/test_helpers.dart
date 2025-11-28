@@ -28,7 +28,7 @@ class SwiftTestHelpers {
   static Widget testMark(Widget Function(BuildContext) builder) {
     return MaterialApp(
       home: Scaffold(
-        body: Mark(builder: builder),
+        body: Swift(builder: builder),
       ),
     );
   }
@@ -36,7 +36,7 @@ class SwiftTestHelpers {
   /// Create a test widget with Mark and MaterialApp
   static Widget testMarkWithApp(Widget Function(BuildContext) builder) {
     return MaterialApp(
-      home: Mark(builder: builder),
+      home: Swift(builder: builder),
     );
   }
 

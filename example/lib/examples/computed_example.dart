@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:swift_flutter/swift_flutter.dart';
 
-/// Computed (Derived State) Example
+/// Computed (Derived State) Example - Using Controller Pattern
 class ComputedExample extends StatefulWidget {
   const ComputedExample({super.key});
 
@@ -9,30 +9,44 @@ class ComputedExample extends StatefulWidget {
   State<ComputedExample> createState() => _ComputedExampleState();
 }
 
-class _ComputedExampleState extends State<ComputedExample> {
-  // Automatic type inference
-  final price = swift(100.0);  // Automatically inferred as Rx<double>
-  final quantity = swift(2);  // Automatically inferred as Rx<int>
+/// Controller for computed example
+/// ✅ No ReadOnlyRx getters needed! Just use swift() directly.
+class ComputedExampleController extends SwiftController {
+  // ✅ Just use swift() - automatically read-only from views!
+  final price = swift(100.0);  // Automatically inferred as ControllerRx<double>
+  final quantity = swift(2);  // Automatically inferred as ControllerRx<int>
   
   // Or use explicit typing:
   // final price = swift<double>(100.0);
   // final quantity = swift<int>(2);
+  
   late final Computed<double> total;
   late final Computed<String> summary;
+  
+  ComputedExampleController() {
+    total = Computed(() => price.value * quantity.value);
+    summary = Computed(() => 'Total: \$${total.value.toStringAsFixed(2)}');
+  }
+  
+  // Methods to update state
+  void setPrice(double value) => price.value = value;
+  void setQuantity(int value) => quantity.value = value;
+}
+
+class _ComputedExampleState extends State<ComputedExample> {
+  late final ComputedExampleController controller;
 
   @override
   void initState() {
     super.initState();
-    total = Computed(() => price.value * quantity.value);
-    summary = Computed(() => 'Total: \$${total.value.toStringAsFixed(2)}');
+    controller = ComputedExampleController();
   }
 
   @override
   void dispose() {
-    total.dispose();
-    summary.dispose();
-    price.dispose();
-    quantity.dispose();
+    controller.total.dispose();
+    controller.summary.dispose();
+    controller.dispose();
     super.dispose();
   }
 
@@ -47,16 +61,16 @@ class _ComputedExampleState extends State<ComputedExample> {
               child: Column(
                 children: [
                   const Text('Price:'),
-                  Mark(
+                  Swift(
                     builder: (context) => Slider(
-                      value: price.value,
+                      value: controller.price.value,
                       min: 0,
                       max: 200,
-                      onChanged: (v) => price.value = v,
+                      onChanged: controller.setPrice,
                     ),
                   ),
-                  Mark(
-                    builder: (context) => Text('\$${price.value.toStringAsFixed(2)}'),
+                  Swift(
+                    builder: (context) => Text('\$${controller.price.value.toStringAsFixed(2)}'),
                   ),
                 ],
               ),
@@ -66,17 +80,17 @@ class _ComputedExampleState extends State<ComputedExample> {
               child: Column(
                 children: [
                   const Text('Quantity:'),
-                  Mark(
+                  Swift(
                     builder: (context) => Slider(
-                      value: quantity.value.toDouble(),
+                      value: controller.quantity.value.toDouble(),
                       min: 0,
                       max: 10,
                       divisions: 10,
-                      onChanged: (v) => quantity.value = v.toInt(),
+                      onChanged: (v) => controller.setQuantity(v.toInt()),
                     ),
                   ),
-                  Mark(
-                    builder: (context) => Text('${quantity.value}'),
+                  Swift(
+                    builder: (context) => Text('${controller.quantity.value}'),
                   ),
                 ],
               ),
@@ -84,7 +98,7 @@ class _ComputedExampleState extends State<ComputedExample> {
           ],
         ),
         const SizedBox(height: 16),
-        Mark(
+        Swift(
           builder: (context) => Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -92,7 +106,7 @@ class _ComputedExampleState extends State<ComputedExample> {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              summary.value,
+              controller.summary.value,
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),

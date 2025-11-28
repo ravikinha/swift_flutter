@@ -13,15 +13,17 @@ import 'examples/logger_example.dart';
 import 'examples/extensions_example.dart';
 import 'examples/currency_example.dart';
 import 'examples/devtools_example.dart';
+import 'examples/controller_example.dart';
+import 'examples/both_patterns_example.dart';
 
 void main() {
   // Enable logger for debugging
   Logger.setEnabled(true);
   Logger.setLevel(LogLevel.debug);
-  
+
   // Register middleware
   store.addMiddleware(LoggingMiddleware());
-  
+
   runApp(const SwiftFlutterExampleApp());
 }
 
@@ -130,6 +132,18 @@ class ExampleHomePage extends StatelessWidget {
             '13. DevTools Integration',
             const DevToolsExample(),
             Colors.deepOrange,
+          ),
+          _buildFeatureCard(
+            context,
+            '14. Controller Pattern (Read-Only Views)',
+            const ControllerExample(),
+            Colors.lime,
+          ),
+          _buildFeatureCard(
+            context,
+            '15. Both Patterns Comparison',
+            const BothPatternsExample(),
+            Colors.amber,
           ),
         ],
       ),

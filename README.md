@@ -3,16 +3,19 @@
 [![pub package](https://img.shields.io/pub/v/swift_flutter.svg)](https://pub.dev/packages/swift_flutter)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A reactive state management library for Flutter with automatic dependency tracking. Inspired by MobX and Vue's reactivity system, but built specifically for Flutter.
+A reactive state management library for Flutter with automatic dependency tracking. Inspired by MobX and Vue's reactivity system, but built specifically for Flutter with Swift-like extensions and two flexible patterns.
 
-## Features
+## ✨ Features
 
-✅ **Reactive State (Rx)** - Automatic dependency tracking  
-✅ **Mark Widget** - Auto-rebuild when dependencies change  
+✅ **Two Flexible Patterns** - Direct state management OR Controller pattern with enforced separation  
+✅ **Reactive State (SwiftValue)** - Automatic dependency tracking with `swift()`  
+✅ **Swift Widget** - Auto-rebuild when dependencies change  
 ✅ **Computed (Derived State)** - Automatically computed values with nested dependency support  
 ✅ **SwiftFuture / Async State** - Loading/error/success states with automatic retry and error recovery  
 ✅ **SwiftField / Form Validation** - Field validation with built-in validators  
 ✅ **SwiftPersisted / Persistence** - Automatic save/load with migration support  
+✅ **SwiftController** - Enforced separation of concerns (views read-only, controllers modify)  
+✅ **Swift-like Extensions** - Toggle, add, sub, mul, div, and 80+ convenient methods  
 ✅ **Middleware / Interceptors** - Action interception and logging  
 ✅ **Batch Update Transactions** - Prevent unnecessary rebuilds  
 ✅ **Debug Logger** - Configurable logging with history  
@@ -29,13 +32,13 @@ A reactive state management library for Flutter with automatic dependency tracki
 ✅ **Enhanced Testing Utilities** - Comprehensive test helpers  
 ✅ **DevTools Integration** - Full Flutter DevTools support with zero overhead  
 
-## Installation
+## 📦 Installation
 
 Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  swift_flutter: ^1.1.1
+  swift_flutter: ^2.1.0
 ```
 
 Then run:
@@ -44,187 +47,156 @@ Then run:
 flutter pub get
 ```
 
-## Quick Start
+## 🚀 Quick Start
 
-### Basic Reactive State
+### Pattern 1: Direct State Management (Simple & Flexible)
+
+Perfect for view-local state, simple UI, and quick prototypes.
 
 ```dart
 import 'package:swift_flutter/swift_flutter.dart';
 
-// Create reactive state with automatic type inference
-// The swift() function automatically infers the type from the value
-final counter = swift(0);        // Creates Rx<int> automatically
-final name = swift('Hello');     // Creates Rx<String> automatically
-final flag = swift(true);        // Creates Rx<bool> automatically
-final price = swift(99.99);      // Creates Rx<double> automatically
-
-// For custom models or complex types, use explicit type annotation
-// This ensures type safety and better IDE support
-final counter = swift<int>(0);                    // Explicitly typed as Rx<int>
-final user = swift<User>(User('John'));           // Required for custom classes
-final list = swift<List<String>>(['a', 'b']);    // Required for generic types
-final nullable = swift<String?>(null);            // Required for nullable types
-
-// Alternative: Use Rx constructor directly (still supported)
-final explicit = Rx<int>(0);
-
-// Wrap your widget with Mark to enable automatic rebuilds
-// Mark automatically tracks dependencies and rebuilds when values change
-Mark(
-  builder: (context) => Text('Count: ${counter.value}'),
-)
-
-// Simply update the value - the widget rebuilds automatically!
-// No need to call setState() or manage listeners manually
-counter.value = 10;
-```
-
-### Computed Values (Derived State)
-
-```dart
-// Create reactive state variables
-// These will be tracked as dependencies for computed values
-final price = swift(100.0);  // Reactive price value
-final quantity = swift(2);   // Reactive quantity value
-
-// Or use explicit typing for better type safety
-final price = swift<double>(100.0);
-final quantity = swift<int>(2);
-
-// Create a computed value that automatically updates
-// when its dependencies (price or quantity) change
-// The computation function is only called when dependencies change
-final total = Computed(() => price.value * quantity.value);
-
-// Use the computed value in your UI
-// It will automatically update when price or quantity changes
-Mark(
-  builder: (context) => Text('Total: \$${total.value}'),
-)
-```
-
-### Async State Management
-
-```dart
-// Create a SwiftFuture to manage async operations
-// It automatically tracks loading, success, and error states
-final swiftFuture = SwiftFuture<String>();
-
-// Execute an async operation
-// The state automatically transitions: idle → loading → success/error
-swiftFuture.execute(() async {
-  await Future.delayed(Duration(seconds: 2));
-  return 'Data loaded!';
-});
-
-// Display different UI based on the current async state
-// The when() method provides a type-safe way to handle all states
-Mark(
-  builder: (context) => swiftFuture.value.when(
-    idle: () => Text('Click to load'),              // Initial state
-    loading: () => CircularProgressIndicator(),     // Loading indicator
-    success: (data) => Text(data),                  // Success with data
-    error: (error, stack) => Text('Error: $error'), // Error handling
-  ),
-)
-```
-
-### Form Validation
-
-```dart
-// Create a reactive form field with validation support
-// SwiftField extends Rx<T> and adds validation capabilities
-final emailField = SwiftField<String>('');
-
-// Add validation rules
-// Validators are checked automatically when the value changes
-emailField.addValidator(Validators.required());  // Field must not be empty
-emailField.addValidator(Validators.email());      // Must be a valid email format
-
-// Use the field in a TextField
-// The error message is automatically displayed when validation fails
-TextField(
-  onChanged: (value) => emailField.value = value,  // Update field value
-  decoration: InputDecoration(
-    errorText: emailField.error,  // Shows validation error if any
-  ),
-)
-
-// Check validation status programmatically
-if (emailField.isValid) {
-  // Proceed with form submission
+class MyWidget extends StatefulWidget {
+  @override
+  Widget build(BuildContext context) {
+    // ✅ Create reactive state directly in views
+    final counter = swift(0);
+    final name = swift('Hello');
+    final isExpanded = swift(false);
+    
+    return Swift(
+      builder: (context) => Column(
+        children: [
+          Text('Count: ${counter.value}'),
+          Text('Name: ${name.value}'),
+          ElevatedButton(
+            onPressed: () => counter.value++, // ✅ Direct modification
+            child: Text('Increment'),
+          ),
+          ElevatedButton(
+            onPressed: () => isExpanded.toggle(), // ✅ Use extensions
+            child: Text('Toggle'),
+          ),
+        ],
+      ),
+    );
+  }
 }
 ```
 
-## Use Cases & Examples
+**When to use:**
+- View-local state (toggles, local counters)
+- Simple UI state
+- Quick prototypes
+- Single view usage
 
-### 1. Reactive State (Rx)
+---
 
-Create reactive state that automatically updates UI when values change.
+### Pattern 2: Controller Pattern (Enforced Separation)
+
+Perfect for business logic, shared state, and team projects.
 
 ```dart
-// Create reactive state with automatic type inference
-final counter = swift(0);
-final name = swift('Swift Flutter');
+import 'package:swift_flutter/swift_flutter.dart';
 
-// Use in widget - automatically rebuilds when value changes
-Mark(
-  builder: (context) => Column(
-    children: [
-      Text('Count: ${counter.value}'),
-      Text('Name: ${name.value}'),
-      ElevatedButton(
-        onPressed: () => counter.value++,
-        child: const Text('Increment'),
+// ✅ Controller - only place where state can be modified
+class CounterController extends SwiftController {
+  // Just use swift() - automatically read-only from views!
+  final counter = swift(0);
+  final name = swift('Hello');
+  
+  void increment() => counter.value++;  // ✅ Works inside controller
+  void updateName(String n) => name.value = n;
+}
+
+// ✅ View - can only read state and call controller methods
+class MyView extends StatefulWidget {
+  @override
+  Widget build(BuildContext context) {
+    final controller = CounterController();
+    
+    return Swift(
+      builder: (context) => Column(
+        children: [
+          Text('Count: ${controller.counter.value}'), // ✅ Can read
+          Text('Name: ${controller.name.value}'),
+          ElevatedButton(
+            onPressed: controller.increment, // ✅ Can call methods
+            child: Text('Increment'),
+          ),
+        ],
       ),
-    ],
-  ),
+    );
+    // ❌ controller.counter.value = 10; // Runtime error - cannot modify
+  }
+}
+```
+
+**When to use:**
+- Business logic & validation
+- Shared state across multiple views
+- Complex state management
+- Team projects (enforced separation)
+
+---
+
+## 📚 Core Features
+
+### 1. Reactive State with `swift()`
+
+```dart
+// Automatic type inference
+final counter = swift(0);        // SwiftValue<int>
+final name = swift('Hello');     // SwiftValue<String>
+final flag = swift(true);         // SwiftValue<bool>
+final price = swift(99.99);       // SwiftValue<double>
+
+// Explicit typing for custom types
+final user = swift<User>(User('John'));
+final list = swift<List<String>>(['a', 'b']);
+
+// Use in widget - automatically rebuilds
+Swift(
+  builder: (context) => Text('Count: ${counter.value}'),
 )
+
+// Update value - widget rebuilds automatically!
+counter.value = 10;
 ```
 
 ### 2. Computed Values (Derived State)
 
-Create computed values that automatically update when dependencies change.
-
 ```dart
-// Base reactive values
 final price = swift(100.0);
 final quantity = swift(2);
 
-// Computed value - automatically recalculates when price or quantity changes
+// Computed value - automatically updates when dependencies change
 final total = Computed(() => price.value * quantity.value);
 final summary = Computed(() => 'Total: \$${total.value.toStringAsFixed(2)}');
 
 // Use in UI
-Mark(
+Swift(
   builder: (context) => Text(summary.value),
 )
 ```
 
 ### 3. Async State Management (SwiftFuture)
 
-Handle async operations with automatic loading, success, and error states.
-
 ```dart
 final dataFuture = SwiftFuture<String>();
 
 // Execute async operation
-Future<void> loadData() async {
-  await dataFuture.execute(() async {
-    await Future.delayed(Duration(seconds: 2));
-    return 'Data loaded successfully!';
-  });
-}
+await dataFuture.execute(() async {
+  await Future.delayed(Duration(seconds: 2));
+  return 'Data loaded!';
+});
 
 // Display state in UI
-Mark(
+Swift(
   builder: (context) => dataFuture.value.when(
-    idle: () => ElevatedButton(
-      onPressed: loadData,
-      child: Text('Load Data'),
-    ),
+    idle: () => Text('Click to load'),
     loading: () => CircularProgressIndicator(),
-    success: (data) => Text('Success: $data'),
+    success: (data) => Text(data),
     error: (error, stack) => Text('Error: $error'),
   ),
 )
@@ -232,49 +204,119 @@ Mark(
 
 ### 4. Form Validation (SwiftField)
 
-Create form fields with built-in validation and error handling.
-
 ```dart
 final emailField = SwiftField<String>('');
-final passwordField = SwiftField<String>('');
 
 // Add validators
 emailField.addValidator(Validators.required());
 emailField.addValidator(Validators.email());
-passwordField.addValidator(Validators.required());
-passwordField.addValidator(Validators.minLength(8));
 
-// Use in form
-Column(
-  children: [
-    TextField(
-      onChanged: (value) => emailField.value = value,
-      decoration: InputDecoration(
-        labelText: 'Email',
-        errorText: emailField.error,
-      ),
-    ),
-    TextField(
-      onChanged: (value) => passwordField.value = value,
-      obscureText: true,
-      decoration: InputDecoration(
-        labelText: 'Password',
-        errorText: passwordField.error,
-      ),
-    ),
-    ElevatedButton(
-      onPressed: emailField.isValid && passwordField.isValid
-          ? () => print('Form is valid!')
-          : null,
-      child: Text('Submit'),
-    ),
-  ],
+// Use in TextField
+TextField(
+  onChanged: (value) => emailField.value = value,
+  decoration: InputDecoration(
+    errorText: emailField.error, // Shows validation error
+  ),
 )
+
+// Check validation
+if (emailField.isValid) {
+  // Proceed with form submission
+}
 ```
 
-### 5. Batch Updates (Transactions)
+### 5. Swift-like Extensions
 
-Batch multiple updates to prevent unnecessary rebuilds.
+**Bool Extensions:**
+```dart
+bool flag = true;
+flag = flag.toggle(); // false
+```
+
+**Int/Double Extensions:**
+```dart
+int count = 10;
+count = count.add(5);      // 15
+count = count.sub(3);      // 12
+count = count.mul(2);      // 24
+double result = count.div(3); // 8.0
+
+// Percentage operations
+double price = 100.0;
+price = price.applyPercent(20);  // 120.0 (add 20%)
+price = price.discount(10);       // 108.0 (subtract 10%)
+price = price.tax(5);             // 113.4 (add 5% tax)
+price = price.addGST(10);         // 124.74 (add 10% GST)
+
+// Range operations
+count = count.clamped(min: 0, max: 100); // Clamp between 0-100
+bool inRange = count.isBetween(0, 100);   // Check if in range
+
+// Formatting
+String formatted = count.toCurrency();     // '$10.00'
+String readable = 1500.toReadable();       // '1.5K'
+String inr = 10000.toINR();               // '₹10,000'
+```
+
+**String Extensions:**
+```dart
+String name = 'hello';
+name = name.capitalized;        // 'Hello'
+name = name.add(' world');      // 'Hello world'
+name = name.dropFirst();        // 'ello world'
+name = name.dropLast();         // 'ello worl'
+bool isEmpty = name.isEmpty;    // false
+bool isNotEmpty = name.isNotEmpty; // true
+```
+
+**List Extensions:**
+```dart
+List<int> numbers = [1, 2, 3, 4, 5];
+numbers = numbers.dropFirst();  // [2, 3, 4, 5]
+numbers = numbers.dropLast();   // [2, 3, 4]
+bool found = numbers.containsWhere((n) => n > 3); // true
+```
+
+**Reactive Extensions (on SwiftValue):**
+```dart
+// All extensions work on SwiftValue too!
+final counter = swift(10);
+counter.add(5);    // counter.value is now 15
+counter.sub(3);    // counter.value is now 12
+counter.mul(2);    // counter.value is now 24
+
+final price = swift(100.0);
+price.applyPercent(20);  // price.value is now 120.0
+price.discount(10);      // price.value is now 108.0
+price.tax(5);            // price.value is now 113.4
+
+final name = swift('hello');
+name.add(' world');      // name.value is now 'hello world'
+name.capitalized;        // Returns 'Hello world' (read-only)
+name.dropFirst();        // Returns 'ello world' (read-only)
+
+final flag = swift(true);
+flag.toggle();           // flag.value is now false
+
+final numbers = swift<List<int>>([1, 2, 3]);
+numbers.dropFirst();     // Returns [2, 3] (read-only)
+```
+
+**📦 Import Extensions:**
+```dart
+import 'package:swift_flutter/swift_flutter.dart';
+import 'package:swift_flutter/core/extensions.dart'; // Optional - for extensions
+```
+
+**Available Extensions (80+ methods):**
+- **Bool**: `toggle()`
+- **Int/Double**: `add()`, `sub()`, `mul()`, `div()`, `percent()`, `applyPercent()`, `discount()`, `tax()`, `addGST()`, `removeGST()`, `clamped()`, `isBetween()`, `lerp()`, `mapRange()`, `toCurrency()`, `toINR()`, `toReadable()`, `toOrdinal()`, and more
+- **String**: `capitalized`, `add()`, `dropFirst()`, `dropLast()`, `isEmpty`, `isNotEmpty`, and more
+- **List**: `dropFirst()`, `dropLast()`, `containsWhere()`, and more
+- **Iterable**: `containsWhere()`, and more
+- **SwiftValue**: All above methods work on reactive values too!
+
+### 6. Batch Updates (Transactions)
 
 ```dart
 final x = swift(0);
@@ -287,88 +329,35 @@ Transaction.run(() {
   y.value = 20;
   z.value = 30;
 });
-
-// All three values update, but widget rebuilds only once
-Mark(
-  builder: (context) => Text('x: ${x.value}, y: ${y.value}, z: ${z.value}'),
-)
 ```
 
-### 6. Reactive Animations (SwiftTween)
-
-Create reactive animations that respond to state changes.
+### 7. Reactive Animations (SwiftTween)
 
 ```dart
 late final SwiftTween<double> sizeTween;
-late final SwiftTween<Color?> colorTween;
 
 @override
 void initState() {
   super.initState();
-  sizeTween = TweenHelper.doubleTween(begin: 50.0, end: 200.0);
-  colorTween = TweenHelper.colorTween(
-    begin: Colors.blue,
-    end: Colors.red,
+  sizeTween = SwiftTween<double>(
+    Tween(begin: 50.0, end: 200.0),
+    vsync: this, // Use AnimationController for better performance
   );
 }
 
 // Animate to target value
-Future<void> animate() async {
-  await sizeTween.animateTo(1.0, duration: Duration(seconds: 1));
-}
+await sizeTween.animateTo(1.0, duration: Duration(seconds: 1));
 
 // Use in UI
-Mark(
+Swift(
   builder: (context) => Container(
     width: sizeTween.value,
     height: sizeTween.value,
-    color: colorTween.value,
   ),
 )
 ```
 
-### 7. Widget Lifecycle Management
-
-Track and manage widget lifecycle states.
-
-```dart
-class MyWidget extends StatefulWidget {
-  @override
-  State<MyWidget> createState() => _MyWidgetState();
-}
-
-class _MyWidgetState extends State<MyWidget> with LifecycleMixin {
-  @override
-  void onInitialized() {
-    super.onInitialized();
-    // Called when widget is initialized
-    print('Widget initialized');
-  }
-
-  @override
-  void onActivated() {
-    super.onActivated();
-    // Called when widget becomes active
-    print('Widget activated');
-  }
-
-  @override
-  void onDeactivated() {
-    super.onDeactivated();
-    // Called when widget becomes inactive
-    print('Widget deactivated');
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Text('Lifecycle: ${lifecycleState}');
-  }
-}
-```
-
-### 8. Persistent Storage (SwiftPersisted)
-
-Automatically save and load reactive values from storage.
+### 8. Persistence (SwiftPersisted)
 
 ```dart
 final storage = MemoryStorage(); // Use SharedPreferences in production
@@ -384,14 +373,12 @@ void initState() {
 counter.value = 42; // Saved automatically
 
 // Value is automatically loaded on initialization
-Mark(
+Swift(
   builder: (context) => Text('Counter: ${counter.value}'),
 )
 ```
 
 ### 9. Global Store / Dependency Injection
-
-Register and retrieve services and state globally.
 
 ```dart
 // Register a service
@@ -399,115 +386,22 @@ class UserService {
   String getUser() => 'John Doe';
 }
 
-store.registerService<UserService>(UserService());
+store.register<UserService>(UserService());
 
 // Register reactive state
 final globalCounter = swift(0);
 store.registerState('counter', globalCounter);
 
 // Retrieve service
-final userService = store.getService<UserService>();
+final userService = store.get<UserService>();
 print(userService.getUser()); // 'John Doe'
 
 // Retrieve state
-final counter = store.getState<Rx<int>>('counter');
+final counter = store.getState<int>('counter');
 print(counter.value); // 0
 ```
 
-### 10. Debug Logging
-
-Configure logging with different levels and history.
-
-```dart
-// Enable and configure logger
-Logger.setEnabled(true);
-Logger.setLevel(LogLevel.debug);
-
-// Log messages
-Logger.debug('Debug message');
-Logger.info('Info message');
-Logger.warning('Warning message');
-Logger.error('Error message');
-
-// Get log history
-final history = Logger.getHistory();
-for (final entry in history) {
-  print('${entry.level}: ${entry.message}');
-}
-
-// Clear history
-Logger.clearHistory();
-```
-
-### 11. Middleware / Interceptors
-
-Intercept and modify actions in the global store.
-
-```dart
-class LoggingMiddleware extends Middleware {
-  @override
-  Future<Action?> before(Action action) async {
-    print('Before action: ${action.runtimeType}');
-    return action;
-  }
-
-  @override
-  Future<void> after(Action action, dynamic result) async {
-    print('After action: ${action.runtimeType}, result: $result');
-  }
-}
-
-// Register middleware
-store.addMiddleware(LoggingMiddleware());
-
-// Dispatch action - middleware intercepts it
-store.dispatch(MyAction());
-```
-
-### 12. Async State with Retry and Error Recovery
-
-Handle async operations with automatic retry and error recovery:
-
-```dart
-// Create SwiftFuture with retry configuration
-final dataFuture = SwiftFuture<String>(
-  retryConfig: RetryConfig(
-    maxAttempts: 3,
-    delay: Duration(seconds: 1),
-    backoffMultiplier: 2.0, // Exponential backoff
-    shouldRetry: (error) => error is NetworkException,
-  ),
-  recoveryStrategy: ErrorRecoveryStrategy.fallback,
-  fallbackValue: 'Default value',
-);
-
-// Execute with automatic retry
-await dataFuture.execute(() async {
-  return await fetchData();
-});
-
-// Use in UI
-Mark(
-  builder: (context) => dataFuture.value.when(
-    idle: () => Text('Click to load'),
-    loading: () => Text('Loading... (attempt ${dataFuture.currentAttempt + 1})'),
-    success: (data) => Text(data),
-    error: (error, stack) => Column(
-      children: [
-        Text('Error: ${dataFuture.errorMessage}'),
-        ElevatedButton(
-          onPressed: () => dataFuture.retry(),
-          child: Text('Retry'),
-        ),
-      ],
-    ),
-  ),
-)
-```
-
-### 13. Redux-like State Management
-
-Use Redux-like pattern for predictable state updates:
+### 10. Redux-like State Management
 
 ```dart
 // Define actions
@@ -530,7 +424,7 @@ final counterReducer = (int state, Action action) {
 final counterStore = ReduxStore<int>(0, counterReducer);
 
 // Use in widget
-Mark(
+Swift(
   builder: (context) => Text('Count: ${counterStore.value}'),
 )
 
@@ -538,166 +432,90 @@ Mark(
 counterStore.dispatch(IncrementAction());
 ```
 
-### 14. State Normalization
+## 🎯 Complete Examples
 
-Efficiently manage collections with normalized state:
-
-```dart
-final usersState = RxNormalizedState<User>();
-
-// Add users
-usersState.upsert('user1', User(id: 'user1', name: 'John'));
-usersState.upsertMany({
-  'user2': User(id: 'user2', name: 'Jane'),
-  'user3': User(id: 'user3', name: 'Bob'),
-});
-
-// Get by ID
-final user = usersState.getById('user1');
-
-// Use in widget
-Mark(
-  builder: (context) => ListView(
-    children: usersState.ids.map((id) {
-      final user = usersState.getById(id);
-      return ListTile(title: Text(user?.name ?? ''));
-    }).toList(),
-  ),
-)
-```
-
-### 15. Pagination
-
-Handle paginated data easily:
+### Example 1: Direct Pattern with Extensions
 
 ```dart
-final paginationController = PaginationController<User>(
-  loadPage: (page, pageSize) async {
-    final response = await api.getUsers(page: page, pageSize: pageSize);
-    return response.users;
-  },
-  pageSize: 20,
-);
-
-// Load initial page
-await paginationController.loadInitial();
-
-// Use in widget
-Mark(
-  builder: (context) => ListView(
-    children: [
-      ...paginationController.items.map((user) => UserTile(user: user)),
-      if (paginationController.hasMore)
-        ElevatedButton(
-          onPressed: () => paginationController.loadNext(),
-          child: Text('Load More'),
-        ),
-    ],
-  ),
-)
-```
-
-### 16. Error Boundary
-
-Catch and handle errors gracefully:
-
-```dart
-ErrorBoundaryWidget(
-  errorBuilder: (context, error, stackTrace) {
-    return ErrorWidget(
-      error: error,
-      onRetry: () {
-        // Retry logic
-      },
-    );
-  },
-  child: MyWidget(),
-)
-```
-
-### 17. Performance Optimization
-
-Enable memoization for expensive computed values:
-
-```dart
-final expensiveComputation = Computed<int>(
-  () {
-    // Expensive computation
-    return heavyCalculation();
-  },
-  enableMemoization: true, // Enable memoization
-);
-```
-
-### 18. Debug Mode
-
-Enable debug mode for development:
-
-```dart
-DebugMode.enable(
-  verboseLogging: true,
-  trackDependencies: true,
-);
-
-// Use debug logger
-DebugLogger.logWithContext(
-  'State updated',
-  context: {'counter': counter.value},
-);
-```
-
-### 19. Persistence with Migration
-
-Handle data migrations when schema changes:
-
-```dart
-final persistedCounter = SwiftPersisted<int>(
-  0,
-  'counter_key',
-  storage,
-  currentVersion: 2,
-  migrations: [
-    MigrationHelper.simpleMigration<int>(
-      fromVersion: 1,
-      toVersion: 2,
-      transform: (data) => data['value'] as int? ?? 0,
-    ),
-  ],
-);
-```
-
-### 20. Enhanced Animations
-
-Use AnimationController for better performance:
-
-```dart
-class _MyWidgetState extends State<MyWidget> with SingleTickerProviderStateMixin {
-  late final SwiftTween<double> sizeTween;
-
+class CounterWidget extends StatefulWidget {
   @override
-  void initState() {
-    super.initState();
-    sizeTween = SwiftTween<double>(
-      Tween(begin: 50.0, end: 200.0),
-      vsync: this, // Use AnimationController
-    );
-  }
-
-  // Animate with staggered sequence
-  Future<void> animate() async {
-    await sizeTween.animateSequence(
-      [0.0, 0.5, 1.0],
-      stagger: Duration(milliseconds: 100),
+  Widget build(BuildContext context) {
+    final counter = swift(0);
+    final isExpanded = swift(false);
+    
+    return Swift(
+      builder: (context) => Column(
+        children: [
+          Text('Count: ${counter.value}'),
+          ElevatedButton(
+            onPressed: () => counter.add(1), // ✅ Use extension
+            child: Text('Add'),
+          ),
+          ElevatedButton(
+            onPressed: () => counter.sub(1), // ✅ Use extension
+            child: Text('Subtract'),
+          ),
+          ElevatedButton(
+            onPressed: () => isExpanded.toggle(), // ✅ Use extension
+            child: Text(isExpanded.value ? 'Collapse' : 'Expand'),
+          ),
+        ],
+      ),
     );
   }
 }
 ```
 
-### 21. Complete Example App
+### Example 2: Controller Pattern
 
-See the [example](example/) directory for a complete Flutter app demonstrating all features with interactive examples.
+```dart
+class ShoppingCartController extends SwiftController {
+  final items = swift<List<Item>>([]);
+  final total = swift(0.0);
+  
+  late final Computed<double> tax;
+  late final Computed<double> grandTotal;
+  
+  ShoppingCartController() {
+    tax = Computed(() => total.value * 0.1);
+    grandTotal = Computed(() => total.value + tax.value);
+  }
+  
+  void addItem(Item item) {
+    items.value = [...items.value, item];
+    total.value = items.value.fold(0.0, (sum, item) => sum + item.price);
+  }
+  
+  void removeItem(String itemId) {
+    items.value = items.value.where((item) => item.id != itemId).toList();
+    total.value = items.value.fold(0.0, (sum, item) => sum + item.price);
+  }
+}
 
-## Documentation
+class ShoppingCartView extends StatefulWidget {
+  @override
+  Widget build(BuildContext context) {
+    final controller = ShoppingCartController();
+    
+    return Swift(
+      builder: (context) => Column(
+        children: [
+          Text('Items: ${controller.items.value.length}'),
+          Text('Total: \$${controller.total.value.toStringAsFixed(2)}'),
+          Text('Tax: \$${controller.tax.value.toStringAsFixed(2)}'),
+          Text('Grand Total: \$${controller.grandTotal.value.toStringAsFixed(2)}'),
+          ElevatedButton(
+            onPressed: () => controller.addItem(Item(id: '1', price: 10.0)),
+            child: Text('Add Item'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+## 📖 Documentation
 
 - [Full API Documentation](https://pub.dev/documentation/swift_flutter)
 - [Architecture Review](ARCHITECTURE_REVIEW.md)
@@ -705,9 +523,19 @@ See the [example](example/) directory for a complete Flutter app demonstrating a
 - [Library Review](LIBRARY_REVIEW.md)
 - [DevTools Integration](DEVTOOLS.md)
 
-## Example
+## 🧪 Testing
 
-See the [example](example/) directory for a complete example app demonstrating all features.
+All features include comprehensive test coverage:
+
+```bash
+flutter test
+```
+
+**80+ tests passing** ✅
+
+## 📝 Example App
+
+See the [example](example/) directory for a complete Flutter app demonstrating all features with interactive examples.
 
 Run the example:
 
@@ -716,17 +544,7 @@ cd example
 flutter run
 ```
 
-## Testing
-
-All features include comprehensive test coverage:
-
-```bash
-flutter test
-```
-
-**67+ tests passing** ✅
-
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
@@ -736,14 +554,14 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## License
+## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Author
+## 👤 Author
 
 [ravikinha](https://github.com/ravikinha)
 
-## Support
+## ⭐ Support
 
 If you find this package useful, please consider giving it a ⭐ on [pub.dev](https://pub.dev/packages/swift_flutter) and [GitHub](https://github.com/ravikinha/swift_flutter)!

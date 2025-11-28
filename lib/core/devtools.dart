@@ -25,15 +25,24 @@ class SwiftDevTools {
   static final Map<String, _StateNode> _stateNodes = {};
   static final Map<String, _DependencyEdge> _dependencyGraph = {};
   static final List<_StateSnapshot> _stateHistory = [];
-  static final Map<String, _RxInfo> _rxRegistry = {};
+  static final Map<String, _SwiftInfo> _swiftRegistry = {};
   static final Map<String, _ComputedInfo> _computedRegistry = {};
   static final Map<String, _MarkInfo> _markRegistry = {};
+  static final Map<String, _ControllerInfo> _controllerRegistry = {};
   
   // References for actual objects (for state inspector)
   // Note: In debug mode, keeping strong references is acceptable for DevTools
-  static final Map<String, Rx<dynamic>> _rxRefs = {};
+  static final Map<String, SwiftValue<dynamic>> _swiftRefs = {};
+  
+  // Backward compatibility
+  @Deprecated('Use _swiftRegistry instead')
+  static Map<String, _RxInfo> get _rxRegistry => _swiftRegistry.map((k, v) => MapEntry(k, _RxInfo(id: v.id, name: v.name, type: v.type, createdAt: v.createdAt)));
+  
+  @Deprecated('Use _swiftRefs instead')
+  static Map<String, Rx<dynamic>> get _rxRefs => _swiftRefs.cast<String, Rx<dynamic>>();
   static final Map<String, Computed<dynamic>> _computedRefs = {};
   static final Map<String, ReduxStore<dynamic>> _reduxStoreRefs = {};
+  static final Map<String, dynamic> _controllerRefs = {};
   
   /// Track Mark widget creation (internal use)
   static void trackMarkCreation(dynamic mark, String name) {
@@ -101,26 +110,26 @@ class SwiftDevTools {
 
   // ========== Internal Tracking (Zero overhead when disabled) ==========
 
-  /// Track Rx creation (only called when enabled)
-  /// Internal use only - called from Rx constructor
-  static void trackRxCreation(Rx<dynamic> rx, String? name) {
+  /// Track SwiftValue creation (only called when enabled)
+  /// Internal use only - called from SwiftValue constructor
+  static void trackSwiftCreation(SwiftValue<dynamic> swift, String? name) {
     if (!_enabled || !_trackDependencies) return;
     
-    final id = getRxId(rx);
-    _rxRegistry[id] = _RxInfo(
+    final id = getSwiftId(swift);
+    _swiftRegistry[id] = _SwiftInfo(
       id: id,
-      name: name ?? rx.runtimeType.toString(),
-      type: rx.runtimeType.toString(),
+      name: name ?? swift.runtimeType.toString(),
+      type: swift.runtimeType.toString(),
       createdAt: DateTime.now(),
     );
     
     // Store reference for state inspector
-    _rxRefs[id] = rx;
+    _swiftRefs[id] = swift;
     
     _stateNodes[id] = _StateNode(
       id: id,
-      type: 'Rx',
-      name: name ?? rx.runtimeType.toString(),
+      type: 'SwiftValue',
+      name: name ?? swift.runtimeType.toString(),
     );
   }
 
@@ -145,6 +154,48 @@ class SwiftDevTools {
       type: 'Computed',
       name: name ?? computed.runtimeType.toString(),
     );
+  }
+
+  /// Track Controller creation (only called when enabled)
+  /// Internal use only - called from SwiftController constructor
+  static void trackControllerCreation(dynamic controller) {
+    if (!_enabled || !_trackDependencies) return;
+    
+    final id = getControllerId(controller);
+    _controllerRegistry[id] = _ControllerInfo(
+      id: id,
+      name: controller.runtimeType.toString(),
+      type: controller.runtimeType.toString(),
+      createdAt: DateTime.now(),
+    );
+    
+    // Store reference for state inspector
+    _controllerRefs[id] = controller;
+    
+    _stateNodes[id] = _StateNode(
+      id: id,
+      type: 'Controller',
+      name: controller.runtimeType.toString(),
+    );
+  }
+
+  /// Track Controller disposal (only called when enabled)
+  /// Internal use only - called from SwiftController dispose
+  static void trackControllerDisposal(dynamic controller) {
+    if (!_enabled || !_trackDependencies) return;
+    
+    final id = getControllerId(controller);
+    _controllerRefs.remove(id);
+    // Keep registry entry for history, but mark as disposed
+    if (_controllerRegistry.containsKey(id)) {
+      _controllerRegistry[id] = _ControllerInfo(
+        id: id,
+        name: _controllerRegistry[id]!.name,
+        type: _controllerRegistry[id]!.type,
+        createdAt: _controllerRegistry[id]!.createdAt,
+        disposedAt: DateTime.now(),
+      );
+    }
   }
 
   /// Track dependency relationship (only called when enabled)
@@ -426,15 +477,25 @@ class SwiftDevTools {
   // ========== Helper Methods ==========
 
   /// Get unique ID for Rx (internal use)
-  static String getRxId(Rx<dynamic> rx) => rx.hashCode.toString();
+  static String getSwiftId(SwiftValue<dynamic> swift) => swift.hashCode.toString();
+  
+  // Backward compatibility
+  @Deprecated('Use getSwiftId instead')
+  static String getRxId(Rx<dynamic> rx) => getSwiftId(rx);
   /// Get unique ID for Computed (internal use)
   static String getComputedId(Computed<dynamic> computed) => computed.hashCode.toString();
   /// Get unique ID for Mark (internal use)
   static String getMarkId(dynamic mark) => mark.hashCode.toString();
+  /// Get unique ID for Controller (internal use)
+  static String getControllerId(dynamic controller) => controller.hashCode.toString();
 
-  static Rx<dynamic>? _getRxById(String id) {
-    return _rxRefs[id];
+  static SwiftValue<dynamic>? _getSwiftById(String id) {
+    return _swiftRefs[id];
   }
+  
+  // Backward compatibility
+  @Deprecated('Use _getSwiftById instead')
+  static Rx<dynamic>? _getRxById(String id) => _getSwiftById(id);
 
   static Computed<dynamic>? _getComputedById(String id) {
     return _computedRefs[id];
@@ -582,6 +643,22 @@ class _PerformanceEvent {
   };
 }
 
+class _SwiftInfo {
+  final String id;
+  final String name;
+  final String type;
+  final DateTime createdAt;
+
+  _SwiftInfo({
+    required this.id,
+    required this.name,
+    required this.type,
+    required this.createdAt,
+  });
+}
+
+// Backward compatibility
+@Deprecated('Use _SwiftInfo instead')
 class _RxInfo {
   final String id;
   final String name;
@@ -619,6 +696,22 @@ class _MarkInfo {
     required this.id,
     required this.name,
     required this.createdAt,
+  });
+}
+
+class _ControllerInfo {
+  final String id;
+  final String name;
+  final String type;
+  final DateTime createdAt;
+  final DateTime? disposedAt;
+
+  _ControllerInfo({
+    required this.id,
+    required this.name,
+    required this.type,
+    required this.createdAt,
+    this.disposedAt,
   });
 }
 
