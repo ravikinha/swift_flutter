@@ -1,122 +1,380 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const LearningApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class LearningApp extends StatelessWidget {
+  const LearningApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'swift_flutter Learning Guide',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.deepPurple,
+          brightness: Brightness.light,
+        ),
+        useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.deepPurple,
+          brightness: Brightness.dark,
+        ),
+        useMaterial3: true,
+      ),
+      themeMode: ThemeMode.system,
+      home: const LearningHomePage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+class LearningHomePage extends StatefulWidget {
+  const LearningHomePage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<LearningHomePage> createState() => _LearningHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _LearningHomePageState extends State<LearningHomePage> {
+  final List<Chapter> chapters = [
+    Chapter(
+      title: 'Introduction',
+      file: '00_introduction.md',
+      icon: Icons.info_outline,
+    ),
+    Chapter(
+      title: 'Getting Started',
+      file: '01_getting_started.md',
+      icon: Icons.play_arrow,
+    ),
+    Chapter(
+      title: 'Core Concepts',
+      file: '02_basic_concepts.md',
+      icon: Icons.lightbulb_outline,
+    ),
+    Chapter(
+      title: 'Reactive State',
+      file: '03_reactive_state.md',
+      icon: Icons.autorenew,
+    ),
+    Chapter(
+      title: 'Computed Values',
+      file: '04_computed_values.md',
+      icon: Icons.calculate,
+    ),
+    Chapter(
+      title: 'Controllers',
+      file: '05_controllers.md',
+      icon: Icons.settings,
+    ),
+    Chapter(
+      title: 'Async State',
+      file: '06_async_state.md',
+      icon: Icons.cloud_download,
+    ),
+    Chapter(
+      title: 'Form Validation',
+      file: '07_form_validation.md',
+      icon: Icons.verified,
+    ),
+    Chapter(
+      title: 'Extensions',
+      file: '08_extensions.md',
+      icon: Icons.extension,
+    ),
+    Chapter(
+      title: 'Advanced Patterns',
+      file: '09_advanced_patterns.md',
+      icon: Icons.architecture,
+    ),
+    Chapter(
+      title: 'Best Practices',
+      file: '10_best_practices.md',
+      icon: Icons.star,
+    ),
+  ];
 
-  void _incrementCounter() {
+  int selectedChapterIndex = 0;
+  String? markdownContent;
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadChapter(0);
+  }
+
+  Future<void> _loadChapter(int index) async {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      isLoading = true;
+      selectedChapterIndex = index;
     });
+
+    try {
+      final chapter = chapters[index];
+      final content = await rootBundle.loadString(
+        'assets/markdown/${chapter.file}',
+      );
+      setState(() {
+        markdownContent = content;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        markdownContent = 'Error loading chapter: $e';
+        isLoading = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    final isMobile = MediaQuery.of(context).size.width < 800;
+    
+    if (isMobile) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('swift_flutter Learning'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.menu),
+              onPressed: () => _showChapterDrawer(context),
+            ),
+          ],
+        ),
+        body: _buildContent(),
+      );
+    }
+
     return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+      body: Row(
+        children: [
+          _buildSidebar(),
+          const VerticalDivider(width: 1),
+          Expanded(child: _buildContent()),
+        ],
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
+    );
+  }
+
+  Widget _buildSidebar() {
+    return Container(
+      width: 280,
+      color: Theme.of(context).colorScheme.surface,
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primaryContainer,
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.school,
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'swift_flutter\nLearning Guide',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onPrimaryContainer,
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: chapters.length,
+              itemBuilder: (context, index) {
+                final chapter = chapters[index];
+                final isSelected = index == selectedChapterIndex;
+                
+                return ListTile(
+                  leading: Icon(
+                    chapter.icon,
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.primary
+                        : null,
+                  ),
+                  title: Text(
+                    '${index + 1}. ${chapter.title}',
+                    style: TextStyle(
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      color: isSelected
+                          ? Theme.of(context).colorScheme.primary
+                          : null,
+                    ),
+                  ),
+                  selected: isSelected,
+                  onTap: () => _loadChapter(index),
+                );
+              },
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                const Divider(),
+                Text(
+                  'Progress: ${selectedChapterIndex + 1}/${chapters.length}',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                const SizedBox(height: 8),
+                LinearProgressIndicator(
+                  value: (selectedChapterIndex + 1) / chapters.length,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContent() {
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (markdownContent == null) {
+      return const Center(child: Text('No content loaded'));
+    }
+
+    return Column(
+      children: [
+        if (selectedChapterIndex > 0 || selectedChapterIndex < chapters.length - 1)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceVariant,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                if (selectedChapterIndex > 0)
+                  TextButton.icon(
+                    icon: const Icon(Icons.arrow_back),
+                    label: Text('Previous: ${chapters[selectedChapterIndex - 1].title}'),
+                    onPressed: () => _loadChapter(selectedChapterIndex - 1),
+                  )
+                else
+                  const SizedBox(),
+                if (selectedChapterIndex < chapters.length - 1)
+                  TextButton.icon(
+                    icon: const Icon(Icons.arrow_forward),
+                    label: Text('Next: ${chapters[selectedChapterIndex + 1].title}'),
+                    onPressed: () => _loadChapter(selectedChapterIndex + 1),
+                    style: TextButton.styleFrom(
+                      alignment: Alignment.centerRight,
+                    ),
+                  )
+                else
+                  const SizedBox(),
+              ],
+            ),
+          ),
+        Expanded(
+          child: Markdown(
+            data: markdownContent!,
+            styleSheet: MarkdownStyleSheet(
+              h1: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              h2: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              h3: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+              ),
+              code: TextStyle(
+                backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+                fontFamily: 'monospace',
+              ),
+              codeblockDecoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceVariant,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            selectable: true,
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showChapterDrawer(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.8,
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: .center,
           children: [
-            const Text('You have pushed the button this many times:'),
+            Container(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
             Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+                    'Chapters',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: chapters.length,
+                itemBuilder: (context, index) {
+                  final chapter = chapters[index];
+                  final isSelected = index == selectedChapterIndex;
+                  
+                  return ListTile(
+                    leading: Icon(chapter.icon),
+                    title: Text('${index + 1}. ${chapter.title}'),
+                    selected: isSelected,
+                    onTap: () {
+                      _loadChapter(index);
+                      Navigator.pop(context);
+                    },
+                  );
+                },
+              ),
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
     );
   }
+}
+
+class Chapter {
+  final String title;
+  final String file;
+  final IconData icon;
+
+  Chapter({
+    required this.title,
+    required this.file,
+    required this.icon,
+  });
 }
