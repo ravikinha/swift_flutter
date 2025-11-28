@@ -294,36 +294,14 @@ class _LearningHomePageState extends State<LearningHomePage> {
                       ),
                       child: Row(
                         children: [
-                          Container(
-                            width: 22,
-                            height: 22,
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: isSelected
-                                  ? const Color(0xFF007ACC)
-                                  : (isDark ? const Color(0xFF3C3C3C) : const Color(0xFFE0E0E0)),
-                              borderRadius: BorderRadius.circular(3),
-                            ),
-                            child: Text(
-                              '${index + 1}',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                                color: isSelected
-                                    ? Colors.white
-                                    : (isDark ? const Color(0xFF858585) : const Color(0xFF616161)),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
                           Icon(
                             chapter.icon,
-                            size: 16,
+                            size: 18,
                             color: isSelected
                                 ? const Color(0xFF007ACC)
                                 : (isDark ? const Color(0xFF858585) : const Color(0xFF616161)),
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 12),
                           Expanded(
                             child: Text(
                               chapter.title,
@@ -692,36 +670,14 @@ class _LearningHomePageState extends State<LearningHomePage> {
                         ),
                         child: Row(
                           children: [
-                            Container(
-                              width: 30,
-                              height: 30,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? const Color(0xFF007ACC)
-                                    : (isDark ? const Color(0xFF3C3C3C) : const Color(0xFFE0E0E0)),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Text(
-                                '${index + 1}',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                  color: isSelected
-                                      ? Colors.white
-                                      : (isDark ? const Color(0xFF858585) : const Color(0xFF616161)),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
                             Icon(
                               chapter.icon,
-                              size: 20,
+                              size: 22,
                               color: isSelected
                                   ? const Color(0xFF007ACC)
                                   : (isDark ? const Color(0xFF858585) : const Color(0xFF616161)),
                             ),
-                            const SizedBox(width: 12),
+                            const SizedBox(width: 14),
                             Expanded(
                               child: Text(
                                 chapter.title,
