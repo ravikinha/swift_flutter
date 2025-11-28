@@ -7,58 +7,47 @@ void main() {
   runApp(const LearningApp());
 }
 
-class LearningApp extends StatefulWidget {
+class LearningApp extends StatelessWidget {
   const LearningApp({super.key});
 
   @override
-  State<LearningApp> createState() => _LearningAppState();
-}
-
-class _LearningAppState extends State<LearningApp> {
-  final themeMode = swift(ThemeMode.light);
-
-  @override
   Widget build(BuildContext context) {
+    final themeMode = swift(ThemeMode.light);
+
     return Swift(
-      builder: (context) {
-        // Access themeMode.value to ensure Swift tracks it
-        final currentThemeMode = themeMode.value;
-        
-        return MaterialApp(
-          key: ValueKey(currentThemeMode),
-          title: 'swift_flutter Learning Guide',
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            useMaterial3: true,
-            brightness: Brightness.light,
-            scaffoldBackgroundColor: Colors.white,
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xFF007ACC),
-              secondary: Color(0xFF007ACC),
-              surface: Colors.white,
-              background: Colors.white,
-            ),
+      builder: (context) => MaterialApp(
+        title: 'swift_flutter Learning Guide',
+        debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+          useMaterial3: true,
+          brightness: Brightness.light,
+          scaffoldBackgroundColor: Colors.white,
+          colorScheme: const ColorScheme.light(
+            primary: Color(0xFF007ACC),
+            secondary: Color(0xFF0098FF),
+            surface: Color(0xFFF3F3F3),
+            background: Colors.white,
           ),
-          darkTheme: ThemeData(
-            useMaterial3: true,
-            brightness: Brightness.light,
-            scaffoldBackgroundColor: Colors.white,
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xFF007ACC),
-              secondary: Color(0xFF007ACC),
-              surface: Colors.white,
-              background: Colors.white,
-            ),
+        ),
+        darkTheme: ThemeData(
+          useMaterial3: true,
+          brightness: Brightness.dark,
+          scaffoldBackgroundColor: const Color(0xFF1E1E1E),
+          colorScheme: const ColorScheme.dark(
+            primary: Color(0xFF007ACC),
+            secondary: Color(0xFF0098FF),
+            surface: Color(0xFF252526),
+            background: Color(0xFF1E1E1E),
           ),
-          themeMode: currentThemeMode,
-          home: LearningHomePage(themeMode: themeMode),
-        );
-      },
+        ),
+        themeMode: themeMode.value,
+        home: LearningHomePage(themeMode: themeMode),
+      ),
     );
   }
 }
 
-class LearningHomePage extends StatefulWidget {
+class LearningHomePage extends StatelessWidget {
   final SwiftValue<ThemeMode> themeMode;
   
   const LearningHomePage({
@@ -67,63 +56,48 @@ class LearningHomePage extends StatefulWidget {
   });
 
   @override
-  State<LearningHomePage> createState() => _LearningHomePageState();
-}
-
-class _LearningHomePageState extends State<LearningHomePage> {
-  // State variables that persist across rebuilds
-  late final SwiftValue<int> selectedChapterIndex;
-  late final SwiftValue<String?> markdownContent;
-  late final SwiftValue<bool> isLoading;
-  
-  final List<Chapter> chapters = [
-    Chapter(title: 'Introduction', file: '00_introduction.md', icon: Icons.info_outline),
-    Chapter(title: 'Getting Started', file: '01_getting_started.md', icon: Icons.play_arrow),
-    Chapter(title: 'Core Concepts', file: '02_basic_concepts.md', icon: Icons.lightbulb_outline),
-    Chapter(title: 'Reactive State', file: '03_reactive_state.md', icon: Icons.autorenew),
-    Chapter(title: 'Computed Values', file: '04_computed_values.md', icon: Icons.calculate),
-    Chapter(title: 'Controllers', file: '05_controllers.md', icon: Icons.settings),
-    Chapter(title: 'Async State', file: '06_async_state.md', icon: Icons.cloud_download),
-    Chapter(title: 'Form Validation', file: '07_form_validation.md', icon: Icons.verified),
-    Chapter(title: 'Extensions', file: '08_extensions.md', icon: Icons.extension),
-    Chapter(title: 'Advanced Patterns', file: '09_advanced_patterns.md', icon: Icons.architecture),
-    Chapter(title: 'Best Practices', file: '10_best_practices.md', icon: Icons.star),
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    // Initialize state variables
-    selectedChapterIndex = swift(0);
-    markdownContent = swift<String?>(null);
-    isLoading = swift(false);
-    
-    // Load initial chapter
-    Future.microtask(() => _loadChapter(0));
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final selectedChapterIndex = swift(0);
+    final markdownContent = swift<String?>(null);
+    final isLoading = swift(false);
+
+    final chapters = [
+      Chapter(title: 'Introduction', file: '00_introduction.md', icon: Icons.info_outline),
+      Chapter(title: 'Getting Started', file: '01_getting_started.md', icon: Icons.play_arrow),
+      Chapter(title: 'Core Concepts', file: '02_basic_concepts.md', icon: Icons.lightbulb_outline),
+      Chapter(title: 'Reactive State', file: '03_reactive_state.md', icon: Icons.autorenew),
+      Chapter(title: 'Computed Values', file: '04_computed_values.md', icon: Icons.calculate),
+      Chapter(title: 'Controllers', file: '05_controllers.md', icon: Icons.settings),
+      Chapter(title: 'Async State', file: '06_async_state.md', icon: Icons.cloud_download),
+      Chapter(title: 'Form Validation', file: '07_form_validation.md', icon: Icons.verified),
+      Chapter(title: 'Extensions', file: '08_extensions.md', icon: Icons.extension),
+      Chapter(title: 'Advanced Patterns', file: '09_advanced_patterns.md', icon: Icons.architecture),
+      Chapter(title: 'Best Practices', file: '10_best_practices.md', icon: Icons.star),
+    ];
+
+    // Load initial chapter
+    Future.microtask(() => _loadChapter(0, chapters, selectedChapterIndex, markdownContent, isLoading));
+
     return Swift(
       builder: (context) {
         final isMobile = MediaQuery.of(context).size.width < 900;
         final isDark = Theme.of(context).brightness == Brightness.dark;
-
+        
         if (isMobile) {
           return Scaffold(
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            appBar: _buildAppBar(isDark, context),
-            body: _buildContent(isDark),
+            appBar: _buildAppBar(isDark, themeMode, context, chapters, selectedChapterIndex, markdownContent, isLoading),
+            body: _buildContent(isDark, isLoading, markdownContent, selectedChapterIndex, chapters),
           );
         }
 
-        return Scaffold(
+    return Scaffold(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           body: Row(
             children: [
-              _buildSidebar(isDark),
-              Container(width: 1, color: const Color(0xFFE0E0E0)),
-              Expanded(child: _buildContent(isDark)),
+              _buildSidebar(isDark, themeMode, chapters, selectedChapterIndex, markdownContent, isLoading),
+              Container(width: 1, color: isDark ? const Color(0xFF2D2D30) : const Color(0xFFDDDDDD)),
+              Expanded(child: _buildContent(isDark, isLoading, markdownContent, selectedChapterIndex, chapters)),
             ],
           ),
         );
@@ -131,9 +105,15 @@ class _LearningHomePageState extends State<LearningHomePage> {
     );
   }
 
-  Future<void> _loadChapter(int index) async {
+  Future<void> _loadChapter(
+    int index,
+    List<Chapter> chapters,
+    SwiftValue<int> selectedChapterIndex,
+    SwiftValue<String?> markdownContent,
+    SwiftValue<bool> isLoading,
+  ) async {
     if (index == selectedChapterIndex.value && markdownContent.value != null) return;
-
+    
     isLoading.value = true;
     selectedChapterIndex.value = index;
 
@@ -150,7 +130,15 @@ class _LearningHomePageState extends State<LearningHomePage> {
     }
   }
 
-  PreferredSizeWidget _buildAppBar(bool isDark, BuildContext context) {
+  PreferredSizeWidget _buildAppBar(
+    bool isDark,
+    SwiftValue<ThemeMode> themeMode,
+    BuildContext context,
+    List<Chapter> chapters,
+    SwiftValue<int> selectedChapterIndex,
+    SwiftValue<String?> markdownContent,
+    SwiftValue<bool> isLoading,
+  ) {
     return AppBar(
       backgroundColor: isDark ? const Color(0xFF252526) : const Color(0xFF007ACC),
       elevation: 0,
@@ -178,33 +166,40 @@ class _LearningHomePageState extends State<LearningHomePage> {
       actions: [
         IconButton(
           icon: Icon(
-            widget.themeMode.value == ThemeMode.light ? Icons.dark_mode_outlined : Icons.light_mode_outlined,
+            themeMode.value == ThemeMode.light ? Icons.dark_mode_outlined : Icons.light_mode_outlined,
             color: Colors.white,
             size: 20,
           ),
-          onPressed: () => widget.themeMode.value = widget.themeMode.value == ThemeMode.light ? ThemeMode.dark : ThemeMode.light,
+          onPressed: () => themeMode.value = themeMode.value == ThemeMode.light ? ThemeMode.dark : ThemeMode.light,
           tooltip: 'Toggle theme',
         ),
         IconButton(
           icon: const Icon(Icons.menu, color: Colors.white, size: 22),
-          onPressed: () => _showChapterDrawer(context, isDark),
+          onPressed: () => _showChapterDrawer(context, isDark, chapters, selectedChapterIndex, markdownContent, isLoading),
           tooltip: 'Chapters',
         ),
       ],
     );
   }
 
-  Widget _buildSidebar(bool isDark) {
+  Widget _buildSidebar(
+    bool isDark,
+    SwiftValue<ThemeMode> themeMode,
+    List<Chapter> chapters,
+    SwiftValue<int> selectedChapterIndex,
+    SwiftValue<String?> markdownContent,
+    SwiftValue<bool> isLoading,
+  ) {
     return Container(
       width: 270,
-      color: Colors.white,
+      color: isDark ? const Color(0xFF252526) : const Color(0xFFF3F3F3),
       child: Column(
         children: [
           // Header
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
-              color: const Color(0xFF007ACC),
+              color: isDark ? const Color(0xFF007ACC) : const Color(0xFF007ACC),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.1),
@@ -254,11 +249,11 @@ class _LearningHomePageState extends State<LearningHomePage> {
                 ),
                 IconButton(
                   icon: Icon(
-                    widget.themeMode.value == ThemeMode.light ? Icons.dark_mode_outlined : Icons.light_mode_outlined,
+                    themeMode.value == ThemeMode.light ? Icons.dark_mode_outlined : Icons.light_mode_outlined,
                     color: Colors.white,
                     size: 18,
                   ),
-                  onPressed: () => widget.themeMode.value = widget.themeMode.value == ThemeMode.light ? ThemeMode.dark : ThemeMode.light,
+                  onPressed: () => themeMode.value = themeMode.value == ThemeMode.light ? ThemeMode.dark : ThemeMode.light,
                   tooltip: 'Toggle theme',
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
@@ -274,17 +269,19 @@ class _LearningHomePageState extends State<LearningHomePage> {
               itemBuilder: (context, index) {
                 final chapter = chapters[index];
                 final isSelected = index == selectedChapterIndex.value;
-
+                
                 return Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    onTap: () => _loadChapter(index),
-                    hoverColor: const Color(0xFFF0F8FF),
+                    onTap: () => _loadChapter(index, chapters, selectedChapterIndex, markdownContent, isLoading),
+                    hoverColor: isDark ? const Color(0xFF2A2D2E) : const Color(0xFFE8E8E8),
                     child: Container(
                       key: ValueKey('chapter_$index'),
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
                       decoration: BoxDecoration(
-                        color: isSelected ? const Color(0xFFE3F2FD) : Colors.transparent,
+                        color: isSelected
+                            ? (isDark ? const Color(0xFF37373D) : Colors.white)
+                            : Colors.transparent,
                         border: isSelected
                             ? const Border(left: BorderSide(color: Color(0xFF007ACC), width: 3))
                             : null,
@@ -294,7 +291,9 @@ class _LearningHomePageState extends State<LearningHomePage> {
                           Icon(
                             chapter.icon,
                             size: 18,
-                            color: isSelected ? const Color(0xFF007ACC) : const Color(0xFF666666),
+                            color: isSelected
+                                ? const Color(0xFF007ACC)
+                                : (isDark ? const Color(0xFF858585) : const Color(0xFF616161)),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -303,7 +302,9 @@ class _LearningHomePageState extends State<LearningHomePage> {
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                                color: isSelected ? const Color(0xFF007ACC) : const Color(0xFF333333),
+                                color: isSelected
+                                    ? (isDark ? Colors.white : const Color(0xFF1E1E1E))
+                                    : (isDark ? const Color(0xFFCCCCCC) : const Color(0xFF424242)),
                                 letterSpacing: -0.1,
                               ),
                             ),
@@ -319,10 +320,10 @@ class _LearningHomePageState extends State<LearningHomePage> {
           // Progress
           Container(
             padding: const EdgeInsets.all(14),
-            decoration: const BoxDecoration(
-              color: Color(0xFFF5F5F5),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF2D2D30) : const Color(0xFFE8E8E8),
               border: Border(
-                top: BorderSide(color: Color(0xFFE0E0E0)),
+                top: BorderSide(color: isDark ? const Color(0xFF3C3C3C) : const Color(0xFFDDDDDD)),
               ),
             ),
             child: Column(
@@ -330,12 +331,12 @@ class _LearningHomePageState extends State<LearningHomePage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'Progress',
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF666666),
+                        color: isDark ? const Color(0xFF858585) : const Color(0xFF616161),
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -361,7 +362,7 @@ class _LearningHomePageState extends State<LearningHomePage> {
                   borderRadius: BorderRadius.circular(2),
                   child: LinearProgressIndicator(
                     value: (selectedChapterIndex.value + 1) / chapters.length,
-                    backgroundColor: const Color(0xFFE0E0E0),
+                    backgroundColor: isDark ? const Color(0xFF3C3C3C) : const Color(0xFFD0D0D0),
                     valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF007ACC)),
                     minHeight: 4,
                   ),
@@ -374,7 +375,13 @@ class _LearningHomePageState extends State<LearningHomePage> {
     );
   }
 
-  Widget _buildContent(bool isDark) {
+  Widget _buildContent(
+    bool isDark,
+    SwiftValue<bool> isLoading,
+    SwiftValue<String?> markdownContent,
+    SwiftValue<int> selectedChapterIndex,
+    List<Chapter> chapters,
+  ) {
     if (isLoading.value) {
       return const Center(
         child: CircularProgressIndicator(color: Color(0xFF007ACC), strokeWidth: 3),
@@ -383,11 +390,11 @@ class _LearningHomePageState extends State<LearningHomePage> {
 
     if (markdownContent.value == null) {
       return Center(
-        child: const Text(
+        child: Text(
           'No content loaded',
           style: TextStyle(
             fontSize: 14,
-            color: Color(0xFF666666),
+            color: isDark ? const Color(0xFF858585) : const Color(0xFF616161),
           ),
         ),
       );
@@ -417,11 +424,11 @@ class _LearningHomePageState extends State<LearningHomePage> {
             if (selectedChapterIndex.value > 0 || selectedChapterIndex.value < chapters.length - 1)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFAFAFA),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF252526) : const Color(0xFFF8F8F8),
                   border: Border(
                     bottom: BorderSide(
-                      color: Color(0xFFE0E0E0),
+                      color: isDark ? const Color(0xFF2D2D30) : const Color(0xFFDDDDDD),
                     ),
                   ),
                 ),
@@ -433,17 +440,17 @@ class _LearningHomePageState extends State<LearningHomePage> {
                         isDark,
                         Icons.arrow_back_ios_new,
                         chapters[selectedChapterIndex.value - 1].title,
-                        () => _loadChapter(selectedChapterIndex.value - 1),
+                        () => _loadChapter(selectedChapterIndex.value - 1, chapters, selectedChapterIndex, markdownContent, isLoading),
                         true,
                       )
                     else
                       const SizedBox(width: 100),
                     Text(
                       chapters[selectedChapterIndex.value].title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF333333),
+                        color: isDark ? const Color(0xFFCCCCCC) : const Color(0xFF424242),
                       ),
                     ),
                     if (selectedChapterIndex.value < chapters.length - 1)
@@ -451,7 +458,7 @@ class _LearningHomePageState extends State<LearningHomePage> {
                         isDark,
                         Icons.arrow_forward_ios,
                         chapters[selectedChapterIndex.value + 1].title,
-                        () => _loadChapter(selectedChapterIndex.value + 1),
+                        () => _loadChapter(selectedChapterIndex.value + 1, chapters, selectedChapterIndex, markdownContent, isLoading),
                         false,
                       )
                     else
@@ -466,42 +473,42 @@ class _LearningHomePageState extends State<LearningHomePage> {
                 child: Markdown(
                   data: markdownContent.value!,
                   styleSheet: MarkdownStyleSheet(
-                    h1: const TextStyle(
+                    h1: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF1E1E1E),
+                      color: isDark ? Colors.white : const Color(0xFF1E1E1E),
                       height: 1.3,
                       letterSpacing: -0.5,
                     ),
                     h1Padding: const EdgeInsets.only(bottom: 20, top: 8),
-                    h2: const TextStyle(
+                    h2: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF2D2D30),
+                      color: isDark ? const Color(0xFFE8E8E8) : const Color(0xFF2D2D30),
                       height: 1.4,
                       letterSpacing: -0.3,
                     ),
                     h2Padding: const EdgeInsets.only(bottom: 14, top: 24),
-                    h3: const TextStyle(
+                    h3: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF3C3C3C),
+                      color: isDark ? const Color(0xFFCCCCCC) : const Color(0xFF3C3C3C),
                       height: 1.4,
                       letterSpacing: -0.2,
                     ),
                     h3Padding: const EdgeInsets.only(bottom: 12, top: 18),
-                    p: const TextStyle(
+                    p: TextStyle(
                       fontSize: 14,
                       height: 1.7,
-                      color: Color(0xFF424242),
+                      color: isDark ? const Color(0xFFCCCCCC) : const Color(0xFF424242),
                       letterSpacing: 0.1,
                     ),
                     pPadding: const EdgeInsets.only(bottom: 14),
-                    code: const TextStyle(
+                    code: TextStyle(
                       fontSize: 14,
                       fontFamily: 'Consolas, Monaco, Courier New, monospace',
-                      backgroundColor: Color(0xFFE8E8E8),
-                      color: Color(0xFFA31515),
+                      backgroundColor: isDark ? const Color(0xFF2D2D30) : const Color(0xFFE8E8E8),
+                      color: isDark ? const Color(0xFFD7BA7D) : const Color(0xFFA31515),
                     ),
                     codeblockDecoration: BoxDecoration(
                       color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFF1E1E1E),
@@ -513,14 +520,14 @@ class _LearningHomePageState extends State<LearningHomePage> {
                     ),
                     codeblockPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                     codeblockAlign: WrapAlignment.start,
-                    blockquote: const TextStyle(
+                    blockquote: TextStyle(
                       fontSize: 14,
                       fontStyle: FontStyle.italic,
-                      color: Color(0xFF616161),
+                      color: isDark ? const Color(0xFF858585) : const Color(0xFF616161),
                     ),
-                    blockquoteDecoration: const BoxDecoration(
-                      color: Color(0xFFF3F3F3),
-                      border: Border(
+                    blockquoteDecoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF252526) : const Color(0xFFF3F3F3),
+                      border: const Border(
                         left: BorderSide(color: Color(0xFF007ACC), width: 4),
                       ),
                     ),
@@ -529,13 +536,13 @@ class _LearningHomePageState extends State<LearningHomePage> {
                       color: Color(0xFF007ACC),
                       fontWeight: FontWeight.bold,
                     ),
-                    strong: const TextStyle(
+                    strong: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E1E1E),
+                      color: isDark ? Colors.white : const Color(0xFF1E1E1E),
                     ),
-                    em: const TextStyle(
+                    em: TextStyle(
                       fontStyle: FontStyle.italic,
-                      color: Color(0xFF424242),
+                      color: isDark ? const Color(0xFFCCCCCC) : const Color(0xFF424242),
                     ),
                     a: const TextStyle(
                       color: Color(0xFF007ACC),
@@ -551,11 +558,11 @@ class _LearningHomePageState extends State<LearningHomePage> {
             if (selectedChapterIndex.value > 0 || selectedChapterIndex.value < chapters.length - 1)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFAFAFA),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF252526) : const Color(0xFFF8F8F8),
                   border: Border(
                     top: BorderSide(
-                      color: Color(0xFFE0E0E0),
+                      color: isDark ? const Color(0xFF2D2D30) : const Color(0xFFDDDDDD),
                     ),
                   ),
                 ),
@@ -567,7 +574,7 @@ class _LearningHomePageState extends State<LearningHomePage> {
                         isDark,
                         Icons.arrow_back_ios_new,
                         chapters[selectedChapterIndex.value - 1].title,
-                        () => _loadChapter(selectedChapterIndex.value - 1),
+                        () => _loadChapter(selectedChapterIndex.value - 1, chapters, selectedChapterIndex, markdownContent, isLoading),
                         true,
                       )
                     else
@@ -577,7 +584,7 @@ class _LearningHomePageState extends State<LearningHomePage> {
                         isDark,
                         Icons.arrow_forward_ios,
                         chapters[selectedChapterIndex.value + 1].title,
-                        () => _loadChapter(selectedChapterIndex.value + 1),
+                        () => _loadChapter(selectedChapterIndex.value + 1, chapters, selectedChapterIndex, markdownContent, isLoading),
                         false,
                       )
                     else
@@ -597,12 +604,12 @@ class _LearningHomePageState extends State<LearningHomePage> {
       child: InkWell(
         onTap: onPressed,
         borderRadius: BorderRadius.circular(4),
-        hoverColor: const Color(0xFFF0F8FF),
+        hoverColor: isDark ? const Color(0xFF2A2D2E) : const Color(0xFFE8E8E8),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
           decoration: BoxDecoration(
             border: Border.all(
-              color: const Color(0xFFDDDDDD),
+              color: isDark ? const Color(0xFF3C3C3C) : const Color(0xFFDDDDDD),
             ),
             borderRadius: BorderRadius.circular(4),
           ),
@@ -610,28 +617,28 @@ class _LearningHomePageState extends State<LearningHomePage> {
             mainAxisSize: MainAxisSize.min,
             children: isLeft
                 ? [
-                     Icon(icon, size: 13, color: Color(0xFF007ACC)),
+                    Icon(icon, size: 13, color: const Color(0xFF007ACC)),
                     const SizedBox(width: 7),
                     Text(
                       label,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
-                        color: Color(0xFF424242),
+                        color: isDark ? const Color(0xFFCCCCCC) : const Color(0xFF424242),
                       ),
                     ),
                   ]
                 : [
                     Text(
                       label,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
-                        color: Color(0xFF424242),
+                        color: isDark ? const Color(0xFFCCCCCC) : const Color(0xFF424242),
                       ),
                     ),
                     const SizedBox(width: 7),
-                     Icon(icon, size: 13, color: Color(0xFF007ACC)),
+                    Icon(icon, size: 13, color: const Color(0xFF007ACC)),
                   ],
           ),
         ),
@@ -639,10 +646,17 @@ class _LearningHomePageState extends State<LearningHomePage> {
     );
   }
 
-  void _showChapterDrawer(BuildContext context, bool isDark) {
+  void _showChapterDrawer(
+    BuildContext context,
+    bool isDark,
+    List<Chapter> chapters,
+    SwiftValue<int> selectedChapterIndex,
+    SwiftValue<String?> markdownContent,
+    SwiftValue<bool> isLoading,
+  ) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? const Color(0xFF252526) : Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -654,18 +668,18 @@ class _LearningHomePageState extends State<LearningHomePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-            const Text(
+            Text(
                   'Chapters',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E1E1E),
+                    color: isDark ? Colors.white : const Color(0xFF1E1E1E),
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.close,
-                    color: Color(0xFF424242),
+                    color: isDark ? const Color(0xFFCCCCCC) : const Color(0xFF424242),
                   ),
                   onPressed: () => Navigator.pop(context),
                 ),
@@ -678,12 +692,12 @@ class _LearningHomePageState extends State<LearningHomePage> {
                 itemBuilder: (context, index) {
                   final chapter = chapters[index];
                   final isSelected = index == selectedChapterIndex.value;
-
+                  
                   return Material(
                     color: Colors.transparent,
                     child: InkWell(
                       onTap: () {
-                        _loadChapter(index);
+                        _loadChapter(index, chapters, selectedChapterIndex, markdownContent, isLoading);
                         Navigator.pop(context);
                       },
                       child: Container(
@@ -691,7 +705,9 @@ class _LearningHomePageState extends State<LearningHomePage> {
                         padding: const EdgeInsets.all(12),
                         margin: const EdgeInsets.only(bottom: 4),
                         decoration: BoxDecoration(
-                          color: isSelected ? const Color(0xFFE3F2FD) : Colors.transparent,
+                          color: isSelected
+                              ? (isDark ? const Color(0xFF37373D) : const Color(0xFFF3F3F3))
+                              : Colors.transparent,
                           borderRadius: BorderRadius.circular(6),
                           border: isSelected
                               ? Border.all(color: const Color(0xFF007ACC), width: 2)
@@ -702,7 +718,9 @@ class _LearningHomePageState extends State<LearningHomePage> {
                             Icon(
                               chapter.icon,
                               size: 22,
-                              color: isSelected ? const Color(0xFF007ACC) : const Color(0xFF616161),
+                              color: isSelected
+                                  ? const Color(0xFF007ACC)
+                                  : (isDark ? const Color(0xFF858585) : const Color(0xFF616161)),
                             ),
                             const SizedBox(width: 14),
                             Expanded(
@@ -711,7 +729,9 @@ class _LearningHomePageState extends State<LearningHomePage> {
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                                  color: isSelected ? const Color(0xFF007ACC) : const Color(0xFF424242),
+                                  color: isSelected
+                                      ? (isDark ? Colors.white : const Color(0xFF1E1E1E))
+                                      : (isDark ? const Color(0xFFCCCCCC) : const Color(0xFF424242)),
                                 ),
                               ),
                             ),
