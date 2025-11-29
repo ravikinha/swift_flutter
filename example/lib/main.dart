@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swift_flutter/main.dart';
 import 'package:swift_flutter/swift_flutter.dart';
 import 'examples/rx_example.dart';
 import 'examples/computed_example.dart';
@@ -15,11 +16,19 @@ import 'examples/currency_example.dart';
 import 'examples/devtools_example.dart';
 import 'examples/controller_example.dart';
 import 'examples/both_patterns_example.dart';
+import 'examples/animate_example.dart';
 
 void main() {
   // Enable logger for debugging
   Logger.setEnabled(true);
   Logger.setLevel(LogLevel.debug);
+
+  // Enable DevTools for visual debugging
+  SwiftDevTools.enable(
+    trackDependencies: true,
+    trackStateHistory: true,
+    trackPerformance: true,
+  );
 
   // Register middleware
   store.addMiddleware(LoggingMiddleware());
@@ -51,10 +60,87 @@ class ExampleHomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Swift Flutter - All Features'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.bug_report),
+            tooltip: 'Open DevTools',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SwiftDevToolsUI(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          // DevTools UI Card - Prominent placement
+          Card(
+            margin: const EdgeInsets.only(bottom: 16),
+            elevation: 6,
+            color: Colors.blue.shade50,
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SwiftDevToolsUI(),
+                  ),
+                );
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade700,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.bug_report,
+                        color: Colors.white,
+                        size: 32,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            '🔧 Visual DevTools UI',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blue,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Open comprehensive visual debugging tools',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey.shade700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(
+                      Icons.arrow_forward_ios,
+                      color: Colors.blue,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
           _buildFeatureCard(
             context,
             '1. Reactive State (Rx)',
@@ -144,6 +230,12 @@ class ExampleHomePage extends StatelessWidget {
             '15. Both Patterns Comparison',
             const BothPatternsExample(),
             Colors.amber,
+          ),
+          _buildFeatureCard(
+            context,
+            '16. SwiftUI-like Animations',
+            const AnimateExample(),
+            Colors.deepPurple,
           ),
         ],
       ),

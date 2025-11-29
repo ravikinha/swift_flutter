@@ -35,6 +35,7 @@ export 'core/logger.dart';
 export 'core/lifecycle.dart';
 export 'core/persistence.dart';
 export 'core/controller.dart' show SwiftController, ReadOnlyRx;
+export 'core/animate.dart';
 
 // Enterprise Features (import separately as needed)
 // export 'core/error_tracking.dart';
@@ -59,3 +60,4 @@ export 'core/reducers.dart' show ReduxStore, Reducer, Action, combineReducers, a
 // UI
 export 'ui/mark.dart';
 export 'ui/rx_builder.dart';
+export 'ui/devtools_ui.dart';

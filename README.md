@@ -20,6 +20,7 @@ A reactive state management library for Flutter with automatic dependency tracki
 ✅ **Batch Update Transactions** - Prevent unnecessary rebuilds  
 ✅ **Debug Logger** - Configurable logging with history  
 ✅ **SwiftTween / Animation Tween** - Reactive animation values with AnimationController  
+✅ **SwiftUI-like Declarative Animations** - Zero boilerplate animations (no controllers, no mixins!)  
 ✅ **Lifecycle Controller** - Widget lifecycle management  
 ✅ **Global Store / Dependency Injection** - Service registration and state management  
 ✅ **Redux-like Reducers** - Predictable state updates with action/reducer pattern  
@@ -38,7 +39,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  swift_flutter: ^2.1.0
+  swift_flutter: ^2.2.0
 ```
 
 Then run:
@@ -514,6 +515,112 @@ class ShoppingCartView extends StatefulWidget {
   }
 }
 ```
+
+## 🎬 SwiftUI-like Declarative Animations
+
+**Zero boilerplate - no controllers, no ticker providers needed!**
+
+Create smooth, professional animations with a simple chaining API. Works with just `StatefulWidget` and `StatelessWidget` - no mixins required!
+
+### Basic Usage
+
+```dart
+import 'package:swift_flutter/swift_flutter.dart';
+
+Container(
+  width: 100,
+  height: 100,
+  color: Colors.blue,
+)
+  .animate()
+  .scale(1.2)
+  .fadeIn()
+  .duration(500.ms)  // Shorthand: 500.ms or "500ms" or Duration(milliseconds: 500)
+  .repeat(reverse: true)
+```
+
+### Available Animations
+
+**Transformations:**
+- `.scale(value)` - Scale uniformly
+- `.scaleX(value)` - Scale on X axis
+- `.scaleY(value)` - Scale on Y axis
+- `.rotate(degrees)` - Rotate by degrees
+
+**Opacity:**
+- `.fadeIn()` - Fade from 0 to 1
+- `.fadeOut()` - Fade from 1 to 0
+- `.opacity(value)` - Custom opacity (0.0 to 1.0)
+
+**Slides:**
+- `.slideX(value)` - Slide on X axis
+- `.slideY(value)` - Slide on Y axis
+- `.slideInTop()` - Slide in from top
+- `.slideInBottom()` - Slide in from bottom
+- `.slideInLeft()` - Slide in from left
+- `.slideInRight()` - Slide in from right
+
+**Special Effects:**
+- `.bounce()` - Bounce animation curve
+- `.pulse()` - Pulse animation curve
+- `.fadeInScale(value)` - Combined fade and scale
+
+**Configuration:**
+- `.duration(value)` - Animation duration (supports `.500ms`, `0.5.s`, `5.m`, or `Duration`)
+- `.delay(value)` - Animation delay
+- `.curve(curve)` - Custom animation curve
+- `.repeat(reverse: bool)` - Infinite repeat
+- `.repeatCount(count, reverse: bool)` - Repeat specific times
+- `.persist()` - Keep animation state on rebuild
+
+### Shorthand Duration Examples
+
+```dart
+// String format
+.animate().duration(".500ms")
+.animate().duration("0.5s")
+.animate().duration("5m")
+
+// Number extensions (recommended)
+.animate().duration(500.ms)
+.animate().duration(0.5.s)
+.animate().duration(5.m)
+
+// Traditional Duration
+.animate().duration(const Duration(seconds: 5))
+```
+
+### Complex Example
+
+```dart
+Container(
+  width: 120,
+  height: 120,
+  decoration: BoxDecoration(
+    color: Colors.purple,
+    borderRadius: BorderRadius.circular(20),
+  ),
+)
+  .animate()
+  .fadeIn()
+  .scale(1.2)
+  .slideInBottom()
+  .rotate(180)
+  .duration(1.5.s)
+  .curve(Curves.easeInOut)
+  .repeat(reverse: true)
+```
+
+### Why Mixin-Free?
+
+Traditional Flutter animations require `SingleTickerProviderStateMixin` or `TickerProviderStateMixin` in your widget class. With swift_flutter animations:
+
+- ✅ **No mixins needed** - Just use `StatefulWidget` or `StatelessWidget`
+- ✅ **Zero boilerplate** - No controller setup or disposal
+- ✅ **Clean API** - Simple chaining like SwiftUI
+- ✅ **Automatic management** - All ticker providers handled internally
+
+The library uses `TickerProviderStateMixin` internally, but you never see it - it's completely hidden from your code!
 
 ## 📖 Documentation
 

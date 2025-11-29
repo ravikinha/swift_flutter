@@ -128,6 +128,29 @@ class _DevToolsExampleState extends State<DevToolsExample> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: _devToolsEnabled
+                        ? () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const SwiftDevToolsUI(),
+                              ),
+                            );
+                          }
+                        : null,
+                    icon: const Icon(Icons.bug_report),
+                    label: const Text('Open Visual DevTools UI'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue.shade700,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ),
                 if (_devToolsEnabled)
                   Padding(
                     padding: const EdgeInsets.only(top: 8),

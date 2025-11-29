@@ -1,5 +1,66 @@
 # Changelog
 
+## [2.2.0] - 2024-12-XX - SwiftUI-like Declarative Animations
+
+### Added
+- ✅ **SwiftUI-like Declarative Animations** - Zero boilerplate animation system
+  - No controllers, no ticker providers required in user code
+  - Works with just `StatefulWidget` and `StatelessWidget` - no mixins needed!
+  - Clean chaining API: `.animate().scale(1.2).fadeIn().repeat(reverse: true)`
+  - All animation management handled internally
+- ✅ **Comprehensive Animation Methods**
+  - `.scale()`, `.scaleX()`, `.scaleY()` - Scale transformations
+  - `.fadeIn()`, `.fadeOut()`, `.opacity()` - Opacity animations
+  - `.slideX()`, `.slideY()` - Slide animations
+  - `.slideInTop()`, `.slideInBottom()`, `.slideInLeft()`, `.slideInRight()` - Directional slide-ins
+  - `.rotate()` - Rotation animations
+  - `.fadeInScale()` - Combined fade and scale
+  - `.bounce()`, `.pulse()` - Special effect animations
+- ✅ **Animation Configuration**
+  - `.duration()` - Custom duration (supports Duration, string shorthand, or number extensions)
+  - `.delay()` - Animation delay
+  - `.curve()` - Custom animation curves
+  - `.repeat(reverse: bool)` - Infinite repeat with optional reverse
+  - `.repeatCount(int, reverse: bool)` - Repeat specific number of times
+  - `.persist()` - Keep animation state on rebuild
+- ✅ **Shorthand Duration Support**
+  - String format: `.duration(".500ms")`, `.duration("0.5s")`, `.duration("5m")`
+  - Number extensions: `.duration(500.ms)`, `.duration(0.5.s)`, `.duration(5.m)`
+  - Traditional: `.duration(const Duration(seconds: 5))`
+  - Same support for `.delay()` method
+- ✅ **Mixin-Free Architecture**
+  - Uses `TickerProviderStateMixin` internally (hidden from users)
+  - User widgets don't need any mixins - just `StatefulWidget` or `StatelessWidget`
+  - Zero boilerplate - just chain methods and it works!
+- ✅ **Comprehensive Examples**
+  - 8 sections demonstrating all animation features
+  - Interactive examples with user interaction
+  - Real-world use cases
+- ✅ **Full Test Coverage**
+  - 39+ test cases covering all animation functionality
+  - Tests for string shorthand, number extensions, and all animation methods
+  - Widget integration tests
+
+### Improved
+- ✅ **Better Developer Experience** - Animations are now as simple as SwiftUI
+- ✅ **Performance** - Internal ticker management is optimized
+- ✅ **Type Safety** - Full type checking for all animation parameters
+- ✅ **Documentation** - Comprehensive guides and examples
+
+### Documentation
+- ✅ Added animation chapter to learning guide
+- ✅ Interactive animation guide with live examples
+- ✅ Updated README with animation examples
+- ✅ Comprehensive API documentation
+
+### Notes
+- All animation features are backward compatible
+- No breaking changes to existing code
+- Animations work seamlessly with existing swift_flutter patterns
+- Perfect for creating smooth, professional animations with minimal code
+
+---
+
 ## [2.1.0] - 2024-12-XX - Controller Pattern & Swift Naming
 
 ### Added

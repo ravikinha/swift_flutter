@@ -18,6 +18,9 @@ class SwiftDevTools {
   /// Check if dependency tracking is enabled (internal use)
   static bool get isTrackingDependencies => _trackDependencies;
   
+  /// Check if state history tracking is enabled (internal use)
+  static bool get isTrackingStateHistory => _trackStateHistory;
+  
   /// Check if performance tracking is enabled (internal use)
   static bool get isTrackingPerformance => _trackPerformance;
   

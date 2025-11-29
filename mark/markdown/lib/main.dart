@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:swift_flutter/swift_flutter.dart';
+import 'animation_interactive_guide.dart';
 
 void main() {
   runApp(const LearningApp());
@@ -73,6 +74,7 @@ class LearningHomePage extends StatelessWidget {
       Chapter(title: 'Extensions', file: '08_extensions.md', icon: Icons.extension),
       Chapter(title: 'Advanced Patterns', file: '09_advanced_patterns.md', icon: Icons.architecture),
       Chapter(title: 'Best Practices', file: '10_best_practices.md', icon: Icons.star),
+      Chapter(title: 'Animations', file: null, icon: Icons.animation, isInteractive: true),
     ];
 
     // Load initial chapter
@@ -112,7 +114,7 @@ class LearningHomePage extends StatelessWidget {
     SwiftValue<String?> markdownContent,
     SwiftValue<bool> isLoading,
   ) async {
-    if (index == selectedChapterIndex.value && markdownContent.value != null) return;
+    if (index == selectedChapterIndex.value && markdownContent.value != null && !chapters[index].isInteractive) return;
     
     isLoading.value = true;
     selectedChapterIndex.value = index;
@@ -121,8 +123,13 @@ class LearningHomePage extends StatelessWidget {
 
     try {
       final chapter = chapters[index];
-      final content = await rootBundle.loadString('assets/markdown/${chapter.file}');
-      markdownContent.value = content;
+      if (chapter.isInteractive) {
+        // For interactive chapters, set special marker
+        markdownContent.value = 'INTERACTIVE_CHAPTER';
+      } else {
+        final content = await rootBundle.loadString('assets/markdown/${chapter.file}');
+        markdownContent.value = content;
+      }
     } catch (e) {
       markdownContent.value = 'Error loading chapter: $e';
     } finally {
@@ -398,6 +405,12 @@ class LearningHomePage extends StatelessWidget {
           ),
         ),
       );
+    }
+
+    // Check if this is an interactive chapter
+    final currentChapter = chapters[selectedChapterIndex.value];
+    if (currentChapter.isInteractive && markdownContent.value == 'INTERACTIVE_CHAPTER') {
+      return AnimationInteractiveGuide(isDark: isDark);
     }
 
     return Stack(
@@ -752,8 +765,14 @@ class LearningHomePage extends StatelessWidget {
 
 class Chapter {
   final String title;
-  final String file;
+  final String? file;
   final IconData icon;
+  final bool isInteractive;
 
-  Chapter({required this.title, required this.file, required this.icon});
+  Chapter({
+    required this.title,
+    required this.file,
+    required this.icon,
+    this.isInteractive = false,
+  });
 }
