@@ -36,13 +36,10 @@ class SwiftDebugFloatingButton extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    // Set navigator key if provided
+    // Set navigator key if provided (overrides any previously set key)
     if (navigatorKey != null) {
       SwiftViewInterceptor.setNavigatorKey(navigatorKey);
     }
-
-    // Set context for navigation (as fallback)
-    SwiftViewInterceptor.setContext(context);
 
     // Use IconButton wrapped in a container to avoid tooltip overlay issues
     // This works in Stack without requiring Overlay ancestor
@@ -56,6 +53,9 @@ class SwiftDebugFloatingButton extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(28),
           onTap: () {
+            // Always try to use context as fallback (in case navigatorKey isn't ready yet)
+            // The showDebugPage() method will prioritize navigatorKey if it's available
+            SwiftViewInterceptor.setContext(context);
             SwiftViewInterceptor.showDebugPage();
           },
           child: Container(

@@ -54,6 +54,10 @@ class SwiftFlutter {
     bool debugtool = false,
     GlobalKey<NavigatorState>? navigatorKey,
   }) {
+    // Debug: Log navigator key status
+    if (debugtool && navigatorKey != null) {
+      debugPrint('SwiftFlutter.init: NavigatorKey provided for debug tool');
+    }
     // Enable logger for debugging
     Logger.setEnabled(true);
     Logger.setLevel(LogLevel.debug);
