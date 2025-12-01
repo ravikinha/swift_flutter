@@ -45,7 +45,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  swift_flutter: ^2.3.0
+  swift_flutter: ^2.3.1
 ```
 
 Then run:
@@ -654,8 +654,32 @@ void main() {
 import 'package:swift_flutter/swift_flutter.dart';
 import 'package:http/http.dart' as http;
 
-// Initialize with debug tool enabled
-SwiftFlutter.init(debugtool: true);
+void main() {
+  // Initialize with debug tool enabled
+  SwiftFlutter.init(debugtool: true);
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: MyHomePage(),
+    );
+  }
+}
+
+class MyHomePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('My App')),
+      body: Center(child: Text('Hello World')),
+      // ⚠️ IMPORTANT: Add SwiftDebugFloatingButton to access debug inspector
+      floatingActionButton: const SwiftDebugFloatingButton(),
+    );
+  }
+}
 
 // Make HTTP requests - automatically intercepted!
 final response = await SwiftHttpHelper.intercept(
@@ -666,9 +690,9 @@ final response = await SwiftHttpHelper.intercept(
 
 // Use swiftPrint() for log interception
 swiftPrint('This will appear in the debug tool');
-
-// Open debug tool via floating action button (appears automatically)
 ```
+
+**⚠️ Important**: You must add `SwiftDebugFloatingButton` to your `Scaffold`'s `floatingActionButton` property to access the debug inspector page. The button will automatically appear when the debug tool is enabled.
 
 The debug tool provides:
 - **HTTP Tab**: View all HTTP requests with request/response details

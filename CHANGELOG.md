@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.3.1] - 2024-12-XX - SwiftDebugFloatingButton Documentation
+
+### Improved
+- ✅ **Documentation Update** - Added clear instructions for using `SwiftDebugFloatingButton`
+- ✅ **README Enhancement** - Explicitly mentions that `SwiftDebugFloatingButton` must be added to Scaffold to access debug inspector
+- ✅ **Usage Examples** - Updated code examples to show proper integration of debug floating button
+
+### Notes
+- Users must add `SwiftDebugFloatingButton` to their Scaffold's `floatingActionButton` property
+- The button automatically appears when debug tool is enabled via `SwiftFlutter.init(debugtool: true)`
+- This update clarifies the setup process for accessing the debug inspector page
+
+---
+
 ## [2.3.0] - 2024-12-XX - Debug Tool & Network Interception
 
 ### Added
