@@ -4,6 +4,7 @@ import 'devtools.dart';
 import 'network_interceptor.dart';
 import 'log_interceptor.dart';
 import 'websocket_interceptor.dart';
+import 'auto_injector.dart';
 import '../store/store.dart';
 import '../store/middleware.dart';
 import '../core/view_interceptor.dart';
@@ -78,6 +79,10 @@ class SwiftFlutter {
       LogInterceptor.enable();
       WebSocketInterceptor.enable();
       SwiftViewInterceptor.enable();
+      
+      // Enable automatic HTTP interception for all HTTP traffic (Dio and http package)
+      // This works automatically without requiring any app code changes
+      AutoInjector.enable();
       
       // Set navigator key if provided (for GetMaterialApp support)
       if (navigatorKey != null) {

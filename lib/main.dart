@@ -72,6 +72,7 @@ export 'core/network_interceptor.dart';
 export 'core/log_interceptor.dart' show LogInterceptor, InterceptedLogEntry, LogType, swiftPrint;
 export 'core/view_interceptor.dart';
 export 'core/http_helper.dart';
+export 'core/auto_injector.dart';
 // export 'core/http_client_wrapper.dart'; // Not ready for production use
 export 'core/websocket_interceptor.dart';
 
