@@ -560,15 +560,14 @@ class SwiftDevTools {
     _stateNodes.clear();
     _dependencyGraph.clear();
     _stateHistory.clear();
-    // ignore: deprecated_member_use_from_same_package
-    _rxRegistry.clear();
+    _swiftRegistry.clear();
     _computedRegistry.clear();
     _markRegistry.clear();
     _performanceEvents.clear();
-    // ignore: deprecated_member_use_from_same_package
-    _rxRefs.clear();
+    _swiftRefs.clear();
     _computedRefs.clear();
     _reduxStoreRefs.clear();
+    _controllerRefs.clear();
   }
 }
 
