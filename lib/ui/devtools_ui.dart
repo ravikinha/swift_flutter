@@ -4,7 +4,6 @@ import 'devtools/state_inspector.dart';
 import 'devtools/dependency_graph.dart';
 import 'devtools/performance_profiler.dart';
 import 'devtools/time_travel.dart';
-import 'devtools/devtools_tabs.dart';
 
 /// Main DevTools UI widget for Swift Flutter
 /// 

@@ -4,6 +4,7 @@ import 'mark.dart';
 
 /// Builder widget that rebuilds when Rx values change
 class RxBuilder<T> extends StatelessWidget {
+  // ignore: deprecated_member_use_from_same_package
   final Rx<T> rx;
   final Widget Function(BuildContext context, T value) builder;
 

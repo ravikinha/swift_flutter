@@ -43,6 +43,7 @@
 library;
 
 // Core
+// ignore: deprecated_member_use_from_same_package
 export 'core/rx.dart' show SwiftValue, Rx, swift;
 export 'core/computed.dart';
 export 'core/rx_future.dart';

@@ -95,7 +95,7 @@ class DebugLogger {
   }
 
   /// Log Rx value change
-  static void logRxChange<T>(Rx<T> rx, T oldValue, T newValue) {
+  static void logRxChange<T>(SwiftValue<T> rx, T oldValue, T newValue) {
     if (!DebugMode.isVerboseLogging) return;
     logWithContext(
       'Rx value changed',

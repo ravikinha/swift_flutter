@@ -252,7 +252,7 @@ class _DependencyGraphPainter extends CustomPainter {
 
       // Draw node
       final nodePaint = Paint()
-        ..color = isSelected ? nodeColor.withOpacity(0.7) : nodeColor
+        ..color = isSelected ? nodeColor.withValues(alpha: 0.7) : nodeColor
         ..style = PaintingStyle.fill;
       
       final nodeRadius = isSelected ? 20.0 : 15.0;

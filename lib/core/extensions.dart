@@ -927,6 +927,7 @@ extension IterableExtensions<T> on Iterable<T> {
 }
 
 /// Extension methods for `Rx<int>` to support arithmetic and financial operations on reactive values.
+// ignore: deprecated_member_use_from_same_package
 extension RxIntExtensions on Rx<int> {
   /// Adds a value to the reactive integer and updates it.
   ///
@@ -1007,6 +1008,7 @@ extension RxIntExtensions on Rx<int> {
 }
 
 /// Extension methods for `Rx<double>` to support arithmetic and financial operations on reactive values.
+// ignore: deprecated_member_use_from_same_package
 extension RxDoubleExtensions on Rx<double> {
   /// Adds a value to the reactive double and updates it.
   ///
@@ -1119,6 +1121,7 @@ extension RxDoubleExtensions on Rx<double> {
 }
 
 /// Extension methods for `Rx<String>` to support string operations on reactive values.
+// ignore: deprecated_member_use_from_same_package
 extension RxStringExtensions on Rx<String> {
   /// Adds (concatenates) a string to the reactive string and updates it.
   ///
@@ -1133,6 +1136,7 @@ extension RxStringExtensions on Rx<String> {
 }
 
 /// Extension methods for `Rx<bool>` to support toggle operation on reactive values.
+// ignore: deprecated_member_use_from_same_package
 extension RxBoolExtensions on Rx<bool> {
   /// Toggles the reactive boolean value.
   ///

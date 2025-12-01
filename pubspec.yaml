@@ -1,5 +1,5 @@
 name: swift_flutter
-description: A reactive state management library for Flutter with automatic dependency tracking. Supports both direct state management and controller pattern with enforced separation. Includes Swift-like extensions, computed values, async state, form validation, persistence, SwiftUI-like declarative animations, and more.
+description: Reactive state management for Flutter with automatic dependency tracking, Swift-like extensions, and SwiftUI-like animations.
 version: 2.2.0
 homepage: https://github.com/ravikinha/swift_flutter
 repository: https://github.com/ravikinha/swift_flutter

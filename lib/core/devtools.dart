@@ -39,9 +39,11 @@ class SwiftDevTools {
   
   // Backward compatibility
   @Deprecated('Use _swiftRegistry instead')
+  // ignore: deprecated_member_use_from_same_package
   static Map<String, _RxInfo> get _rxRegistry => _swiftRegistry.map((k, v) => MapEntry(k, _RxInfo(id: v.id, name: v.name, type: v.type, createdAt: v.createdAt)));
   
   @Deprecated('Use _swiftRefs instead')
+  // ignore: deprecated_member_use_from_same_package
   static Map<String, Rx<dynamic>> get _rxRefs => _swiftRefs.cast<String, Rx<dynamic>>();
   static final Map<String, Computed<dynamic>> _computedRefs = {};
   static final Map<String, ReduxStore<dynamic>> _reduxStoreRefs = {};
@@ -257,6 +259,7 @@ class SwiftDevTools {
     return {
       'nodes': _stateNodes.values.map((n) => n.toJson()).toList(),
       'edges': _dependencyGraph.values.map((e) => e.toJson()).toList(),
+      // ignore: deprecated_member_use_from_same_package
       'rxCount': _rxRegistry.length,
       'computedCount': _computedRegistry.length,
       'markCount': _markRegistry.length,
@@ -272,8 +275,10 @@ class SwiftDevTools {
     final allState = <String, dynamic>{};
     
     // Get all Rx states
+    // ignore: deprecated_member_use_from_same_package
     for (final entry in _rxRegistry.entries) {
       try {
+        // ignore: deprecated_member_use_from_same_package
         final rx = _getRxById(entry.key);
         if (rx != null) {
           allState[entry.key] = {
@@ -326,6 +331,7 @@ class SwiftDevTools {
     final storeStates = store.getAllStateKeys();
     for (final key in storeStates) {
       try {
+        // ignore: deprecated_member_use_from_same_package
         final state = store.getState<Rx<dynamic>>(key);
         allState['store:$key'] = {
           'type': 'StoreState',
@@ -357,6 +363,7 @@ class SwiftDevTools {
     return {
       'states': allState,
       'totalCount': allState.length,
+      // ignore: deprecated_member_use_from_same_package
       'rxCount': _rxRegistry.length,
       'computedCount': _computedRegistry.length,
       'markCount': _markRegistry.length,
@@ -461,6 +468,7 @@ class SwiftDevTools {
       'trackDependencies': _trackDependencies,
       'trackStateHistory': _trackStateHistory,
       'trackPerformance': _trackPerformance,
+      // ignore: deprecated_member_use_from_same_package
       'rxCount': _rxRegistry.length,
       'computedCount': _computedRegistry.length,
       'markCount': _markRegistry.length,
@@ -484,6 +492,7 @@ class SwiftDevTools {
   
   // Backward compatibility
   @Deprecated('Use getSwiftId instead')
+  // ignore: deprecated_member_use_from_same_package
   static String getRxId(Rx<dynamic> rx) => getSwiftId(rx);
   /// Get unique ID for Computed (internal use)
   static String getComputedId(Computed<dynamic> computed) => computed.hashCode.toString();
@@ -498,6 +507,7 @@ class SwiftDevTools {
   
   // Backward compatibility
   @Deprecated('Use _getSwiftById instead')
+  // ignore: deprecated_member_use_from_same_package
   static Rx<dynamic>? _getRxById(String id) => _getSwiftById(id);
 
   static Computed<dynamic>? _getComputedById(String id) {
@@ -550,10 +560,12 @@ class SwiftDevTools {
     _stateNodes.clear();
     _dependencyGraph.clear();
     _stateHistory.clear();
+    // ignore: deprecated_member_use_from_same_package
     _rxRegistry.clear();
     _computedRegistry.clear();
     _markRegistry.clear();
     _performanceEvents.clear();
+    // ignore: deprecated_member_use_from_same_package
     _rxRefs.clear();
     _computedRefs.clear();
     _reduxStoreRefs.clear();

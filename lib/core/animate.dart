@@ -265,8 +265,8 @@ extension AnimateExtension on Widget {
   /// Start the animation chain
   AnimatedWidgetBuilder animate() {
     return AnimatedWidgetBuilder(
-      child: this,
       config: AnimationConfig(),
+      child: this,
     );
   }
 }
@@ -297,8 +297,8 @@ class AnimatedWidgetBuilder extends StatelessWidget {
     AnimationConfig? config,
   }) {
     return AnimatedWidgetBuilder(
-      child: child ?? this.child,
       config: config ?? this.config,
+      child: child ?? this.child,
     );
   }
   
@@ -631,7 +631,7 @@ class _AnimatedWidgetWrapperState extends State<_AnimatedWidgetWrapper>
       
       if (hasScale) {
         result = Transform(
-          transform: Matrix4.identity()..scale(scaleX, scaleY),
+          transform: Matrix4.diagonal3Values(scaleX, scaleY, 1.0),
           alignment: Alignment.center,
           child: result,
         );

@@ -4,6 +4,7 @@ import 'middleware.dart';
 /// Global store for dependency injection and state management
 class Store {
   final Map<Type, dynamic> _services = {};
+  // ignore: deprecated_member_use_from_same_package
   final Map<String, Rx<dynamic>> _state = {};
   final List<Middleware> _middlewares = [];
 
@@ -30,30 +31,36 @@ class Store {
   }
 
   /// Register state
+  // ignore: deprecated_member_use_from_same_package
   void registerState<T>(String key, Rx<T> state) {
     _state[key] = state;
   }
 
   /// Register state with namespace
+  // ignore: deprecated_member_use_from_same_package
   void registerStateWithNamespace<T>(String namespace, String key, Rx<T> state) {
     _state['$namespace:$key'] = state;
   }
 
   /// Get state
+  // ignore: deprecated_member_use_from_same_package
   Rx<T> getState<T>(String key) {
     final state = _state[key];
     if (state == null) {
       throw StateError('State with key "$key" not found');
     }
+    // ignore: deprecated_member_use_from_same_package
     return state as Rx<T>;
   }
 
   /// Get state with namespace
+  // ignore: deprecated_member_use_from_same_package
   Rx<T> getStateWithNamespace<T>(String namespace, String key) {
     final state = _state['$namespace:$key'];
     if (state == null) {
       throw StateError('State with namespace "$namespace" and key "$key" not found');
     }
+    // ignore: deprecated_member_use_from_same_package
     return state as Rx<T>;
   }
 

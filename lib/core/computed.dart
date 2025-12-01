@@ -99,7 +99,7 @@ class Computed<T> extends ChangeNotifier {
         for (var dep in tracker.swiftDependencies) {
           SwiftDevTools.trackDependency(
             SwiftDevTools.getComputedId(this),
-            SwiftDevTools.getRxId(dep),
+            SwiftDevTools.getSwiftId(dep),
           );
         }
         for (var computedDep in tracker.computedDependencies) {

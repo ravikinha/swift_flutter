@@ -134,6 +134,7 @@ class ReactiveChain<T> {
 }
 
 /// Extension for better type safety on Rx
+// ignore: deprecated_member_use_from_same_package
 extension RxTypeSafety<T> on Rx<T> {
   /// Create a typed version
   TypedRx<T> toTyped() => TypedRx<T>(value);
@@ -142,6 +143,7 @@ extension RxTypeSafety<T> on Rx<T> {
   ReactiveChain<T> chain() => ReactiveChain<T>(this);
 
   /// Assert type at runtime
+  // ignore: deprecated_member_use_from_same_package
   Rx<T> assertType([String? message]) {
     // Runtime type check for dynamic Rx values
     // ignore: unnecessary_type_check
