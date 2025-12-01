@@ -697,20 +697,29 @@ class MyHomePage extends StatelessWidget {
 }
 
 // For GetMaterialApp with Stack in builder:
-GetMaterialApp(
-  navigatorKey: NavigatorService.navigatorKey,
-  builder: (context, child) {
-    return Stack(
-      children: [
-        child!,
-        // SwiftDebugFloatingButton works in Stack too!
-        const SwiftDebugFloatingButton(
-          navigatorKey: NavigatorService.navigatorKey, // Optional but recommended
-        ),
-      ],
-    );
-  },
-)
+final navigatorKey = GlobalKey<NavigatorState>();
+
+void main() {
+  // Pass navigatorKey to SwiftFlutter.init() for GetMaterialApp support
+  SwiftFlutter.init(
+    debugtool: true,
+    navigatorKey: navigatorKey, // Required for GetMaterialApp
+  );
+  
+  runApp(GetMaterialApp(
+    navigatorKey: navigatorKey,
+    builder: (context, child) {
+      return Stack(
+        children: [
+          child!,
+          // SwiftDebugFloatingButton works in Stack!
+          // It will automatically use the navigatorKey from SwiftFlutter.init()
+          const SwiftDebugFloatingButton(),
+        ],
+      );
+    },
+  ));
+}
 
 // Make HTTP requests - automatically intercepted!
 final response = await SwiftHttpHelper.intercept(
