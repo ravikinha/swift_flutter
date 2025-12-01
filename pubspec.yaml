@@ -1,6 +1,6 @@
 name: swift_flutter
 description: Reactive state management for Flutter with automatic dependency tracking, Swift-like extensions, and SwiftUI-like animations.
-version: 2.2.0
+version: 2.2.1
 homepage: https://github.com/ravikinha/swift_flutter
 repository: https://github.com/ravikinha/swift_flutter
 issue_tracker: https://github.com/ravikinha/swift_flutter/issues
