@@ -1,0 +1,62 @@
+import 'logger.dart';
+import 'devtools.dart';
+import 'network_interceptor.dart';
+import 'log_interceptor.dart';
+import 'websocket_interceptor.dart';
+import '../store/store.dart';
+import '../store/middleware.dart';
+import '../core/view_interceptor.dart';
+
+/// Main initialization class for Swift Flutter
+/// 
+/// Provides a single entry point to configure all Swift Flutter features.
+class SwiftFlutter {
+  static bool _debugToolEnabled = false;
+
+  /// Check if debug tool is enabled
+  static bool get isDebugToolEnabled => _debugToolEnabled;
+
+  /// Initialize Swift Flutter with default development settings
+  /// 
+  /// This method:
+  /// - Enables the logger and sets it to debug level
+  /// - Enables DevTools with dependency tracking, state history, and performance tracking
+  /// - Registers the LoggingMiddleware for action logging
+  /// - Optionally enables debug tool (network and logs tracking with floating button)
+  /// 
+  /// [debugtool] - If true, enables network request/response tracking and log capture
+  ///               with a floating action button to access the debug panel
+  /// 
+  /// Example:
+  /// ```dart
+  /// void main() {
+  ///   SwiftFlutter.init(debugtool: true);
+  ///   runApp(MyApp());
+  /// }
+  /// ```
+  static void init({bool debugtool = false}) {
+    // Enable logger for debugging
+    Logger.setEnabled(true);
+    Logger.setLevel(LogLevel.debug);
+
+    // Enable DevTools for visual debugging
+    SwiftDevTools.enable(
+      trackDependencies: true,
+      trackStateHistory: true,
+      trackPerformance: true,
+    );
+
+    // Register middleware
+    store.addMiddleware(LoggingMiddleware());
+
+    // Enable debug tool if requested
+    if (debugtool) {
+      NetworkInterceptor.enable();
+      LogInterceptor.enable();
+      WebSocketInterceptor.enable();
+      SwiftViewInterceptor.enable();
+      _debugToolEnabled = true;
+    }
+  }
+}
+

@@ -1,5 +1,64 @@
 # Changelog
 
+## [2.3.0] - 2024-12-XX - Debug Tool & Network Interception
+
+### Added
+- ✅ **Debug Tool** - Comprehensive debugging interface for network requests, logs, and WebSocket connections
+  - Single initialization: `SwiftFlutter.init(debugtool: true)` enables all debug features
+  - Floating action button for easy access to debug tool
+  - Modern, responsive UI that works on mobile, tablet, and desktop
+- ✅ **Network Interceptor** - Automatic HTTP request/response capture
+  - Captures all HTTP requests made with `http` and `dio` packages
+  - Tracks request method, URL, headers, body, and response data
+  - Generates curl commands for easy API testing
+  - Shows request duration and status codes
+  - Color-coded status indicators (green for success, red for errors)
+- ✅ **WebSocket Interceptor** - Real-time WebSocket connection tracking
+  - Captures WebSocket connections and disconnections
+  - Tracks messages sent and received
+  - Monitors connection errors
+  - Shows connection status and event history
+- ✅ **Log Interceptor** - Capture and view all print statements
+  - Intercepts `swiftPrint()` calls and standard print statements
+  - Categorizes logs by type (print, debug, info, warning, error)
+  - Color-coded log entries with icons
+  - Searchable log history
+- ✅ **Debug Page UI** - Beautiful, modern interface
+  - 4 tabs: HTTP, WebSocket, Logs, and Curl
+  - Responsive design for mobile and desktop
+  - Request/response details with syntax highlighting
+  - Copy-to-clipboard functionality for curl commands
+  - Empty states with helpful messages
+- ✅ **HTTP Helper** - Easy integration with `http` package
+  - `SwiftHttpHelper.intercept()` wraps HTTP calls for automatic interception
+  - Supports GET, POST, PUT, PATCH, DELETE methods
+  - Automatic JSON parsing and error handling
+- ✅ **View Interceptor** - Navigation management for debug page
+  - `SwiftViewInterceptor` manages debug page navigation
+  - Floating action button appears when debug tool is enabled
+- ✅ **Comprehensive Test Coverage**
+  - 35+ tests for network interceptor, log interceptor, HTTP helper, and view interceptor
+  - All tests passing with full coverage
+
+### Improved
+- ✅ **Developer Experience** - Single initialization call enables all debug features
+- ✅ **Zero Dependencies** - Debug tool works without external packages
+- ✅ **Performance** - Efficient request/event limiting to prevent memory issues
+- ✅ **Mobile Support** - Fully responsive design with mobile-optimized layouts
+
+### Documentation
+- ✅ Updated README with debug tool features
+- ✅ Added network example demonstrating HTTP and WebSocket interception
+- ✅ Comprehensive API documentation
+
+### Notes
+- Debug tool is opt-in and disabled by default (zero overhead)
+- All network interception is conditional and only active when enabled
+- Perfect for debugging API calls and network issues in development
+- Works seamlessly with existing `http` and `dio` packages
+
+---
+
 ## [2.2.1] - 2024-12-XX - Pub.dev Validation Fixes & Test Fixes
 
 ### Fixed

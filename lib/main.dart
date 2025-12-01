@@ -67,6 +67,13 @@ export 'core/routing.dart';
 export 'core/type_safety.dart';
 export 'core/structured_patterns.dart';
 export 'core/devtools.dart';
+export 'core/swift_flutter_init.dart';
+export 'core/network_interceptor.dart';
+export 'core/log_interceptor.dart' show LogInterceptor, InterceptedLogEntry, LogType, swiftPrint;
+export 'core/view_interceptor.dart';
+export 'core/http_helper.dart';
+// export 'core/http_client_wrapper.dart'; // Not ready for production use
+export 'core/websocket_interceptor.dart';
 
 // Store
 export 'store/store.dart';
@@ -75,3 +82,5 @@ export 'store/middleware.dart' show Middleware, LoggingMiddleware, ExampleAction
 // UI
 export 'ui/mark.dart';
 export 'ui/rx_builder.dart';
+export 'ui/debug_page.dart';
+export 'ui/debug_floating_button.dart';

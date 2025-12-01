@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:swift_flutter/main.dart';
 import 'package:swift_flutter/swift_flutter.dart';
+import 'package:swift_flutter/ui/debug_floating_button.dart';
 import 'examples/rx_example.dart';
 import 'examples/computed_example.dart';
 import 'examples/swift_future_example.dart';
@@ -17,21 +17,11 @@ import 'examples/devtools_example.dart';
 import 'examples/controller_example.dart';
 import 'examples/both_patterns_example.dart';
 import 'examples/animate_example.dart';
+import 'examples/network_example.dart';
 
 void main() {
-  // Enable logger for debugging
-  Logger.setEnabled(true);
-  Logger.setLevel(LogLevel.debug);
-
-  // Enable DevTools for visual debugging
-  SwiftDevTools.enable(
-    trackDependencies: true,
-    trackStateHistory: true,
-    trackPerformance: true,
-  );
-
-  // Register middleware
-  store.addMiddleware(LoggingMiddleware());
+  // Initialize Swift Flutter with all development tools including debug tool
+  SwiftFlutter.init(debugtool: true);
 
   runApp(const SwiftFlutterExampleApp());
 }
@@ -237,8 +227,15 @@ class ExampleHomePage extends StatelessWidget {
             const AnimateExample(),
             Colors.deepPurple,
           ),
+          _buildFeatureCard(
+            context,
+            '17. Network API (http & dio)',
+            const NetworkExample(),
+            Colors.blueGrey,
+          ),
         ],
       ),
+      floatingActionButton: const SwiftDebugFloatingButton(),
     );
   }
 

@@ -5,6 +5,8 @@
 
 A reactive state management library for Flutter with automatic dependency tracking. Inspired by MobX and Vue's reactivity system, but built specifically for Flutter with Swift-like extensions and two flexible patterns.
 
+**📖 Learn more at [swiftflutter.com](https://swiftflutter.com)**
+
 ## ✨ Features
 
 ✅ **Two Flexible Patterns** - Direct state management OR Controller pattern with enforced separation  
@@ -32,6 +34,10 @@ A reactive state management library for Flutter with automatic dependency tracki
 ✅ **Memoization** - Performance optimization for computed values  
 ✅ **Enhanced Testing Utilities** - Comprehensive test helpers  
 ✅ **DevTools Integration** - Full Flutter DevTools support with zero overhead  
+✅ **Debug Tool** - Network request/response interceptor with WebSocket support  
+✅ **Network Interceptor** - Automatic HTTP request capture for `http` and `dio` packages  
+✅ **WebSocket Interceptor** - Real-time WebSocket connection and event tracking  
+✅ **Log Interceptor** - Capture and view all print statements and logs  
 
 ## 📦 Installation
 
@@ -39,7 +45,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  swift_flutter: ^2.2.0
+  swift_flutter: ^2.3.0
 ```
 
 Then run:
@@ -622,9 +628,60 @@ Traditional Flutter animations require `SingleTickerProviderStateMixin` or `Tick
 
 The library uses `TickerProviderStateMixin` internally, but you never see it - it's completely hidden from your code!
 
+## 🐛 Debug Tool
+
+Swift Flutter includes a powerful debug tool for monitoring network requests, WebSocket connections, and logs. Enable it with a single line:
+
+```dart
+void main() {
+  SwiftFlutter.init(debugtool: true);
+  runApp(MyApp());
+}
+```
+
+### Features
+
+- **Network Interceptor** - Automatically captures all HTTP requests made with `http` and `dio` packages
+- **WebSocket Interceptor** - Tracks WebSocket connections, messages, and events
+- **Log Interceptor** - Captures all print statements and logs
+- **Curl Generator** - Automatically generates curl commands for API testing
+- **Modern UI** - Beautiful, responsive interface that works on all devices
+- **Zero Dependencies** - Works without any external packages
+
+### Usage
+
+```dart
+import 'package:swift_flutter/swift_flutter.dart';
+import 'package:http/http.dart' as http;
+
+// Initialize with debug tool enabled
+SwiftFlutter.init(debugtool: true);
+
+// Make HTTP requests - automatically intercepted!
+final response = await SwiftHttpHelper.intercept(
+  () => http.get(Uri.parse('https://api.example.com/data')),
+  method: 'GET',
+  url: 'https://api.example.com/data',
+);
+
+// Use swiftPrint() for log interception
+swiftPrint('This will appear in the debug tool');
+
+// Open debug tool via floating action button (appears automatically)
+```
+
+The debug tool provides:
+- **HTTP Tab**: View all HTTP requests with request/response details
+- **WebSocket Tab**: Monitor WebSocket connections and messages
+- **Logs Tab**: Browse all captured logs with filtering
+- **Curl Tab**: Copy curl commands for API testing
+
+**Learn more at [swiftflutter.com](https://swiftflutter.com)**
+
 ## 📖 Documentation
 
 - [Full API Documentation](https://pub.dev/documentation/swift_flutter)
+- [Learn more at swiftflutter.com](https://swiftflutter.com)
 - [Architecture Review](ARCHITECTURE_REVIEW.md)
 - [Advanced Patterns & Best Practices](ADVANCED_PATTERNS.md)
 - [Library Review](LIBRARY_REVIEW.md)
@@ -638,7 +695,7 @@ All features include comprehensive test coverage:
 flutter test
 ```
 
-**80+ tests passing** ✅
+**400+ tests passing** ✅
 
 ## 📝 Example App
 

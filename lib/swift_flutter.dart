@@ -37,6 +37,7 @@ export 'core/lifecycle.dart';
 export 'core/persistence.dart';
 export 'core/controller.dart' show SwiftController, ReadOnlyRx;
 export 'core/animate.dart';
+export 'core/swift_flutter_init.dart';
 
 // Enterprise Features (import separately as needed)
 // export 'core/error_tracking.dart';

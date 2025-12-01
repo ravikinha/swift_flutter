@@ -13,6 +13,8 @@ dependencies:
     sdk: flutter
   swift_flutter:
     path: ../
+  http: ^1.1.0
+  dio: ^5.4.0
 
 dev_dependencies:
   flutter_test:
