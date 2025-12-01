@@ -654,10 +654,25 @@ void main() {
 import 'package:swift_flutter/swift_flutter.dart';
 import 'package:http/http.dart' as http;
 
+// For MaterialApp
 void main() {
-  // Initialize with debug tool enabled
   SwiftFlutter.init(debugtool: true);
   runApp(MyApp());
+}
+
+// For GetMaterialApp (requires navigatorKey)
+void main() {
+  final navigatorKey = GlobalKey<NavigatorState>();
+  
+  SwiftFlutter.init(
+    debugtool: true,
+    navigatorKey: navigatorKey, // Required for GetMaterialApp
+  );
+  
+  runApp(GetMaterialApp(
+    navigatorKey: navigatorKey,
+    home: MyHomePage(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -680,6 +695,22 @@ class MyHomePage extends StatelessWidget {
     );
   }
 }
+
+// For GetMaterialApp with Stack in builder:
+GetMaterialApp(
+  navigatorKey: NavigatorService.navigatorKey,
+  builder: (context, child) {
+    return Stack(
+      children: [
+        child!,
+        // SwiftDebugFloatingButton works in Stack too!
+        const SwiftDebugFloatingButton(
+          navigatorKey: NavigatorService.navigatorKey, // Optional but recommended
+        ),
+      ],
+    );
+  },
+)
 
 // Make HTTP requests - automatically intercepted!
 final response = await SwiftHttpHelper.intercept(

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'logger.dart';
 import 'devtools.dart';
 import 'network_interceptor.dart';
@@ -26,15 +27,33 @@ class SwiftFlutter {
   /// 
   /// [debugtool] - If true, enables network request/response tracking and log capture
   ///               with a floating action button to access the debug panel
+  /// [navigatorKey] - Optional global navigator key for navigation (required for GetMaterialApp)
+  ///                  If not provided, will try to find Navigator from context
   /// 
-  /// Example:
+  /// Example with MaterialApp:
   /// ```dart
   /// void main() {
   ///   SwiftFlutter.init(debugtool: true);
   ///   runApp(MyApp());
   /// }
   /// ```
-  static void init({bool debugtool = false}) {
+  /// 
+  /// Example with GetMaterialApp (requires navigatorKey):
+  /// ```dart
+  /// final navigatorKey = GlobalKey<NavigatorState>();
+  /// 
+  /// void main() {
+  ///   SwiftFlutter.init(debugtool: true, navigatorKey: navigatorKey);
+  ///   runApp(GetMaterialApp(
+  ///     navigatorKey: navigatorKey,
+  ///     home: MyHomePage(),
+  ///   ));
+  /// }
+  /// ```
+  static void init({
+    bool debugtool = false,
+    GlobalKey<NavigatorState>? navigatorKey,
+  }) {
     // Enable logger for debugging
     Logger.setEnabled(true);
     Logger.setLevel(LogLevel.debug);
@@ -55,6 +74,12 @@ class SwiftFlutter {
       LogInterceptor.enable();
       WebSocketInterceptor.enable();
       SwiftViewInterceptor.enable();
+      
+      // Set navigator key if provided (for GetMaterialApp support)
+      if (navigatorKey != null) {
+        SwiftViewInterceptor.setNavigatorKey(navigatorKey);
+      }
+      
       _debugToolEnabled = true;
     }
   }
