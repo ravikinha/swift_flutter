@@ -1,5 +1,36 @@
 # Changelog
 
+## [2.3.2] - 2024-12-XX - Reactive State Improvements & Build Phase Fixes
+
+### Fixed
+- ✅ **UI Reactivity** - Improved immediate UI updates when clearing data
+  - All debug tool tabs (HTTP, WebSocket, Logs, Curl) now update immediately when data is cleared
+  - No longer requires hot reload to see cleared data
+  - Reactive state management ensures UI stays in sync with interceptor data
+
+### Improved
+- ✅ **Reactive State Architecture** - Converted interceptor data to use SwiftValue directly
+  - `NetworkInterceptor._requests` is now `SwiftValue<List<NetworkRequest>>`
+  - `LogInterceptor._logs` is now `SwiftValue<List<InterceptedLogEntry>>`
+  - `WebSocketInterceptor._connections` is now `SwiftValue<Map<String, WebSocketConnection>>`
+  - More idiomatic Swift Flutter architecture - data is reactive, not separate triggers
+- ✅ **Better Type Safety** - `updateTrigger` now returns the actual reactive list/map instead of a separate int trigger
+- ✅ **Performance** - Eliminated unnecessary trigger updates by using reactive values directly
+- ✅ **Code Quality** - Cleaner, more maintainable code following Swift Flutter patterns
+
+### Technical Details
+- All `SwiftValue` updates in interceptors are now wrapped in `Future.microtask()` to defer execution
+- This ensures updates happen after the current build phase completes
+- UI widgets observe the reactive values directly, ensuring automatic rebuilds when data changes
+- Zero breaking changes - all changes are internal improvements
+
+### Notes
+- All changes are backward compatible
+- Debug tool now works reliably even when logs are captured during build phase
+- Improved developer experience with immediate UI feedback
+
+---
+
 ## [2.3.1] - 2024-12-XX - SwiftDebugFloatingButton Documentation
 
 ### Improved

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'rx.dart';
 
 /// WebSocket event types
 enum WebSocketEventType {
@@ -78,16 +79,29 @@ class WebSocketConnection {
 /// WebSocket interceptor to capture WebSocket connections and events
 class WebSocketInterceptor {
   static bool _enabled = false;
-  static final Map<String, WebSocketConnection> _connections = {};
-  static final List<WebSocketEvent> _allEvents = [];
+  // Use SwiftValue for reactive state - automatically notifies UI of changes
+  static final _connections = swift<Map<String, WebSocketConnection>>({});
+  static final _allEvents = swift<List<WebSocketEvent>>([]);
   static int _maxConnections = 50;
   static int _maxEventsPerConnection = 100;
+  
+  /// Get update trigger for reactive UI updates (accesses the reactive connections)
+  static SwiftValue<Map<String, WebSocketConnection>> get updateTrigger => _connections;
 
   /// Enable WebSocket interception
+  /// Preserves existing connections and events across hot reloads
   static void enable({int maxConnections = 50, int maxEventsPerConnection = 100}) {
+    // Don't clear data if already enabled (preserves data across hot reloads)
+    if (_enabled) {
+      _maxConnections = maxConnections;
+      _maxEventsPerConnection = maxEventsPerConnection;
+      return;
+    }
     _enabled = true;
     _maxConnections = maxConnections;
     _maxEventsPerConnection = maxEventsPerConnection;
+    // Note: _connections and _allEvents preserve their data across hot reloads
+    // because static variables persist unless explicitly cleared
   }
 
   /// Disable WebSocket interception
@@ -114,8 +128,13 @@ class WebSocketInterceptor {
       connectedAt: DateTime.now(),
     );
     
-    _connections[id] = connection;
-    _trimConnections();
+    final currentConnections = Map<String, WebSocketConnection>.from(_connections.value);
+    currentConnections[id] = connection;
+    _trimConnectionsMap(currentConnections);
+    // Defer update to avoid setState during build phase
+    Future.microtask(() {
+      _connections.value = currentConnections;
+    });
     
     // Capture connect event
     captureEvent(
@@ -144,35 +163,44 @@ class WebSocketInterceptor {
       error: error,
     );
     
-    _allEvents.add(event);
+    final currentEvents = List<WebSocketEvent>.from(_allEvents.value);
+    currentEvents.add(event);
+    _trimAllEventsList(currentEvents);
+    // Defer update to avoid setState during build phase
+    Future.microtask(() {
+      _allEvents.value = currentEvents;
+    });
     
-    final connection = _connections[connectionId];
+    final currentConnections = Map<String, WebSocketConnection>.from(_connections.value);
+    final connection = currentConnections[connectionId];
     if (connection != null) {
       connection.addEvent(event);
       _trimConnectionEvents(connection);
+      // Defer update to avoid setState during build phase
+      Future.microtask(() {
+        _connections.value = currentConnections;
+      });
     }
-    
-    _trimAllEvents();
   }
 
   /// Get all connections
   static List<WebSocketConnection> getConnections() {
-    return List.unmodifiable(_connections.values.toList());
+    return List.unmodifiable(_connections.value.values.toList());
   }
 
   /// Get a specific connection by ID
   static WebSocketConnection? getConnection(String id) {
-    return _connections[id];
+    return _connections.value[id];
   }
 
   /// Get all events
   static List<WebSocketEvent> getAllEvents() {
-    return List.unmodifiable(_allEvents);
+    return List.unmodifiable(_allEvents.value);
   }
 
   /// Get events for a specific connection
   static List<WebSocketEvent> getConnectionEvents(String connectionId) {
-    final connection = _connections[connectionId];
+    final connection = _connections.value[connectionId];
     return connection != null 
         ? List.unmodifiable(connection.events)
         : [];
@@ -180,17 +208,20 @@ class WebSocketInterceptor {
 
   /// Clear all connections and events
   static void clear() {
-    _connections.clear();
-    _allEvents.clear();
+    // Defer update to avoid setState during build phase
+    Future.microtask(() {
+      _connections.value = {};
+      _allEvents.value = [];
+    });
   }
-
-  static void _trimConnections() {
-    if (_connections.length > _maxConnections) {
-      final keysToRemove = _connections.keys
-          .take(_connections.length - _maxConnections)
+  
+  static void _trimConnectionsMap(Map<String, WebSocketConnection> connections) {
+    if (connections.length > _maxConnections) {
+      final keysToRemove = connections.keys
+          .take(connections.length - _maxConnections)
           .toList();
       for (final key in keysToRemove) {
-        _connections.remove(key);
+        connections.remove(key);
       }
     }
   }
@@ -204,11 +235,11 @@ class WebSocketInterceptor {
     }
   }
 
-  static void _trimAllEvents() {
-    if (_allEvents.length > _maxEventsPerConnection * _maxConnections) {
-      _allEvents.removeRange(
+  static void _trimAllEventsList(List<WebSocketEvent> events) {
+    if (events.length > _maxEventsPerConnection * _maxConnections) {
+      events.removeRange(
         0,
-        _allEvents.length - (_maxEventsPerConnection * _maxConnections),
+        events.length - (_maxEventsPerConnection * _maxConnections),
       );
     }
   }

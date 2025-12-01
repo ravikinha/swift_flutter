@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'network_interceptor.dart';
+import 'websocket_interceptor.dart';
 
 /// Public API for automatic HTTP interception
 /// 
@@ -372,6 +373,21 @@ class _InterceptingRequest implements HttpClientRequest {
       // Ignore errors reading body
     }
 
+    // Check if this is a WebSocket upgrade request
+    final isWebSocketUpgrade = headers['upgrade']?.toLowerCase() == 'websocket' ||
+        headers['connection']?.toLowerCase().contains('upgrade') == true ||
+        _inner.uri.scheme == 'ws' || 
+        _inner.uri.scheme == 'wss';
+    
+    if (isWebSocketUpgrade && WebSocketInterceptor.isEnabled) {
+      print('[AutoInjector] Detected WebSocket upgrade request: ${_inner.uri}');
+      final wsConnectionId = WebSocketInterceptor.captureConnection(
+        url: _inner.uri.toString(),
+        headers: headers,
+      );
+      print('[AutoInjector] WebSocket connection captured with ID: $wsConnectionId');
+    }
+
     final requestId = NetworkInterceptor.captureRequest(
       method: _inner.method,
       url: _inner.uri.toString(),
@@ -435,8 +451,47 @@ class _InterceptingRequest implements HttpClientRequest {
     final wrappedResponse = _StreamedHttpClientResponse(response, transformedStream);
     print('[AutoInjector] Wrapped response created: ${wrappedResponse.runtimeType}');
     
+    // Check if this is a WebSocket upgrade response
+    final isWebSocketUpgradeResponse = responseHeaders['upgrade']?.toLowerCase() == 'websocket' ||
+        responseHeaders['connection']?.toLowerCase().contains('upgrade') == true ||
+        response.statusCode == 101; // 101 Switching Protocols
+
     // Capture response asynchronously after stream completes
     completer.future.then((responseBody) {
+      // Handle WebSocket upgrade response
+      if (isWebSocketUpgradeResponse && WebSocketInterceptor.isEnabled) {
+        print('[AutoInjector] Detected WebSocket upgrade response: statusCode=${response.statusCode}');
+        // Find the WebSocket connection ID by matching URL
+        final connections = WebSocketInterceptor.getConnections();
+        WebSocketConnection? matchingConnection;
+        try {
+          matchingConnection = connections.firstWhere(
+            (conn) => conn.url == _inner.uri.toString(),
+          );
+        } catch (e) {
+          // If no exact match, use the most recent connection
+          if (connections.isNotEmpty) {
+            matchingConnection = connections.last;
+          }
+        }
+        
+        if (matchingConnection != null) {
+          if (response.statusCode == 101) {
+            WebSocketInterceptor.captureEvent(
+              connectionId: matchingConnection.id,
+              type: WebSocketEventType.connect,
+            );
+            print('[AutoInjector] WebSocket connection established');
+          } else if (response.statusCode >= 400) {
+            WebSocketInterceptor.captureEvent(
+              connectionId: matchingConnection.id,
+              type: WebSocketEventType.error,
+              error: 'HTTP ${response.statusCode}: ${responseBody ?? "Unknown error"}',
+            );
+            print('[AutoInjector] WebSocket connection failed: ${response.statusCode}');
+          }
+        }
+      }
       print('[AutoInjector] Completer future completed, capturing response: requestId=$requestId, bodyLength=${responseBody?.length ?? 0}');
       NetworkInterceptor.captureResponse(
         requestId: requestId,

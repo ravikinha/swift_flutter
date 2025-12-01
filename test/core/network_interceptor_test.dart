@@ -23,7 +23,7 @@ void main() {
       expect(NetworkInterceptor.isEnabled, false);
     });
 
-    test('should capture request', () {
+    test('should capture request', () async {
       NetworkInterceptor.enable();
       
       final requestId = NetworkInterceptor.captureRequest(
@@ -34,6 +34,8 @@ void main() {
       );
 
       expect(requestId, isNotEmpty);
+      // Wait for microtask to complete
+      await Future.microtask(() {});
       final requests = NetworkInterceptor.getRequests();
       expect(requests.length, 1);
       expect(requests.first.method, 'GET');
@@ -41,22 +43,24 @@ void main() {
       expect(requests.first.headers['Content-Type'], 'application/json');
     });
 
-    test('should capture request with body', () {
+    test('should capture request with body', () async {
       NetworkInterceptor.enable();
       
-      final requestId = NetworkInterceptor.captureRequest(
+      NetworkInterceptor.captureRequest(
         method: 'POST',
         url: 'https://api.example.com/posts',
         headers: {'Content-Type': 'application/json'},
         body: {'title': 'Test', 'body': 'Content'},
       );
 
+      // Wait for microtask to complete
+      await Future.microtask(() {});
       final requests = NetworkInterceptor.getRequests();
       expect(requests.length, 1);
       expect(requests.first.body, {'title': 'Test', 'body': 'Content'});
     });
 
-    test('should capture response', () {
+    test('should capture response', () async {
       NetworkInterceptor.enable();
       
       final requestId = NetworkInterceptor.captureRequest(
@@ -65,6 +69,9 @@ void main() {
         headers: {},
       );
 
+      // Wait for request microtask to complete
+      await Future.microtask(() {});
+      
       NetworkInterceptor.captureResponse(
         requestId: requestId,
         statusCode: 200,
@@ -72,6 +79,9 @@ void main() {
         body: {'data': 'test'},
       );
 
+      // Wait for response microtask to complete
+      await Future.microtask(() {});
+      
       final request = NetworkInterceptor.getRequest(requestId);
       expect(request, isNotNull);
       expect(request!.response, isNotNull);
@@ -99,22 +109,25 @@ void main() {
       expect(curl, contains('title')); // Body is JSON encoded
     });
 
-    test('should limit maximum requests', () {
+    test('should limit maximum requests', () async {
       NetworkInterceptor.enable(maxRequests: 5);
       
+      // Capture requests one at a time, waiting for each to complete
       for (int i = 0; i < 10; i++) {
         NetworkInterceptor.captureRequest(
           method: 'GET',
           url: 'https://api.example.com/data$i',
           headers: {},
         );
+        // Wait for this microtask to complete before next call
+        await Future.microtask(() {});
       }
-
+      
       final requests = NetworkInterceptor.getRequests();
       expect(requests.length, 5); // Should only keep last 5
     });
 
-    test('should clear all requests', () {
+    test('should clear all requests', () async {
       NetworkInterceptor.enable();
       
       NetworkInterceptor.captureRequest(
@@ -123,12 +136,17 @@ void main() {
         headers: {},
       );
 
+      // Wait for capture microtask to complete
+      await Future.microtask(() {});
       expect(NetworkInterceptor.getRequests().length, 1);
+      
       NetworkInterceptor.clear();
+      // Wait for clear microtask to complete
+      await Future.microtask(() {});
       expect(NetworkInterceptor.getRequests().length, 0);
     });
 
-    test('should get request by ID', () {
+    test('should get request by ID', () async {
       NetworkInterceptor.enable();
       
       final requestId = NetworkInterceptor.captureRequest(
@@ -137,6 +155,8 @@ void main() {
         headers: {},
       );
 
+      // Wait for microtask to complete
+      await Future.microtask(() {});
       final request = NetworkInterceptor.getRequest(requestId);
       expect(request, isNotNull);
       expect(request!.id, requestId);

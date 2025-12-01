@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:async';
+import 'rx.dart';
 
 /// Network request/response data model
 class NetworkRequest {
@@ -87,14 +89,26 @@ class NetworkResponse {
 /// Network interceptor to capture HTTP requests and responses
 class NetworkInterceptor {
   static bool _enabled = false;
-  static final List<NetworkRequest> _requests = [];
+  // Use SwiftValue for reactive state - automatically notifies UI of changes
+  static final _requests = swift<List<NetworkRequest>>([]);
   static int _maxRequests = 100;
-  static final Map<String, DateTime> _requestStartTimes = {};
+  static Map<String, DateTime> _requestStartTimes = {};
+  
+  /// Get update trigger for reactive UI updates (accesses the reactive list)
+  static SwiftValue<List<NetworkRequest>> get updateTrigger => _requests;
 
   /// Enable network interception
+  /// Preserves existing data across hot reloads
   static void enable({int maxRequests = 100}) {
+    // Don't clear data if already enabled (preserves data across hot reloads)
+    if (_enabled) {
+      _maxRequests = maxRequests;
+      return;
+    }
     _enabled = true;
     _maxRequests = maxRequests;
+    // Note: _requests and _requestStartTimes preserve their data across hot reloads
+    // because static variables persist unless explicitly cleared
   }
 
   /// Disable network interception
@@ -127,8 +141,13 @@ class NetworkInterceptor {
       timestamp: DateTime.now(),
     );
     
-    _requests.add(request);
-    _trimRequests();
+    final currentRequests = List<NetworkRequest>.from(_requests.value);
+    currentRequests.add(request);
+    _trimRequestsList(currentRequests);
+    // Defer update to avoid setState during build phase
+    Future.microtask(() {
+      _requests.value = currentRequests;
+    });
     
     return id;
   }
@@ -155,7 +174,8 @@ class NetworkInterceptor {
       duration: duration,
     );
     
-    final request = _requests.firstWhere(
+    final currentRequests = List<NetworkRequest>.from(_requests.value);
+    final request = currentRequests.firstWhere(
       (r) => r.id == requestId,
       orElse: () => NetworkRequest(
         id: requestId,
@@ -167,15 +187,19 @@ class NetworkInterceptor {
     );
     
     request.response = response;
+    // Defer update to avoid setState during build phase
+    Future.microtask(() {
+      _requests.value = currentRequests;
+    });
   }
 
   /// Get all captured requests
-  static List<NetworkRequest> getRequests() => List.unmodifiable(_requests);
+  static List<NetworkRequest> getRequests() => List.unmodifiable(_requests.value);
 
   /// Get a specific request by ID
   static NetworkRequest? getRequest(String id) {
     try {
-      return _requests.firstWhere((r) => r.id == id);
+      return _requests.value.firstWhere((r) => r.id == id);
     } catch (e) {
       return null;
     }
@@ -183,8 +207,11 @@ class NetworkInterceptor {
 
   /// Clear all captured requests
   static void clear() {
-    _requests.clear();
     _requestStartTimes.clear();
+    // Defer update to avoid setState during build phase
+    Future.microtask(() {
+      _requests.value = [];
+    });
   }
 
   /// Set maximum number of requests to keep
@@ -194,8 +221,16 @@ class NetworkInterceptor {
   }
 
   static void _trimRequests() {
-    if (_requests.length > _maxRequests) {
-      _requests.removeRange(0, _requests.length - _maxRequests);
+    final currentRequests = List<NetworkRequest>.from(_requests.value);
+    if (currentRequests.length > _maxRequests) {
+      currentRequests.removeRange(0, currentRequests.length - _maxRequests);
+      _requests.value = currentRequests;
+    }
+  }
+  
+  static void _trimRequestsList(List<NetworkRequest> requests) {
+    if (requests.length > _maxRequests) {
+      requests.removeRange(0, requests.length - _maxRequests);
     }
   }
 }

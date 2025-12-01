@@ -4,6 +4,8 @@ import 'dart:convert';
 import '../core/network_interceptor.dart';
 import '../core/log_interceptor.dart';
 import '../core/websocket_interceptor.dart';
+import '../core/rx.dart';
+import 'mark.dart';
 
 /// Debug page to view network requests, responses, and logs
 class SwiftDebugPage extends StatefulWidget {
@@ -15,7 +17,8 @@ class SwiftDebugPage extends StatefulWidget {
 
 class _SwiftDebugPageState extends State<SwiftDebugPage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  String _selectedRequestId = '';
+  final _selectedRequestId = swift<String>('');
+  final _refreshTrigger = swift<int>(0);
 
   @override
   void initState() {
@@ -26,7 +29,13 @@ class _SwiftDebugPageState extends State<SwiftDebugPage> with SingleTickerProvid
   @override
   void dispose() {
     _tabController.dispose();
+    _selectedRequestId.dispose();
+    _refreshTrigger.dispose();
     super.dispose();
+  }
+  
+  void _refresh() {
+    _refreshTrigger.value = DateTime.now().millisecondsSinceEpoch;
   }
 
   bool get _isMobile => MediaQuery.of(context).size.width < 600;
@@ -121,9 +130,7 @@ class _SwiftDebugPageState extends State<SwiftDebugPage> with SingleTickerProvid
               NetworkInterceptor.clear();
               LogInterceptor.clear();
               WebSocketInterceptor.clear();
-              setState(() {
-                _selectedRequestId = '';
-              });
+              _selectedRequestId.value = '';
               Navigator.pop(context);
             },
             child: const Text('Clear', style: TextStyle(color: Colors.red)),
@@ -134,98 +141,48 @@ class _SwiftDebugPageState extends State<SwiftDebugPage> with SingleTickerProvid
   }
 
   Widget _buildNetworkTab() {
-    final requests = NetworkInterceptor.getRequests();
-    
-    if (requests.isEmpty) {
-      return _buildEmptyState(
-        icon: Icons.network_check,
-        title: 'No Network Requests',
-        message: 'Network requests will appear here once you make API calls.',
-      );
-    }
+    return Swift(
+      builder: (context) {
+        // Access refresh trigger and update trigger to trigger rebuild
+        _refreshTrigger.value;
+        NetworkInterceptor.updateTrigger.value; // Observe interceptor changes
+        final requests = NetworkInterceptor.getRequests();
+        
+        if (requests.isEmpty) {
+          return _buildEmptyState(
+            icon: Icons.network_check,
+            title: 'No Network Requests',
+            message: 'Network requests will appear here once you make API calls.',
+          );
+        }
 
-    if (_isMobile) {
-      return _buildMobileNetworkView(requests);
-    } else {
-      return _buildDesktopNetworkView(requests);
-    }
+        if (_isMobile) {
+          return _buildMobileNetworkView(requests);
+        } else {
+          return _buildDesktopNetworkView(requests);
+        }
+      },
+    );
   }
 
   Widget _buildMobileNetworkView(List<NetworkRequest> requests) {
-    if (_selectedRequestId.isEmpty) {
-      // Show list view
-      return Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            color: Theme.of(context).cardColor,
-            child: Row(
-              children: [
-                Icon(Icons.info_outline, size: 20, color: Colors.blue),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'Tap a request to view details',
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(8),
-              itemCount: requests.length,
-              itemBuilder: (context, index) {
-                final request = requests[requests.length - 1 - index];
-                return _buildRequestCard(request, true);
-              },
-            ),
-          ),
-        ],
-      );
-    } else {
-      // Show details view
-      return _buildRequestDetailsMobile();
-    }
-  }
-
-  Widget _buildDesktopNetworkView(List<NetworkRequest> requests) {
-    return Row(
-      children: [
-        // Request list sidebar
-        Container(
-          width: _isTablet ? 250 : 320,
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            border: Border(
-              right: BorderSide(
-                color: Theme.of(context).dividerColor,
-                width: 1,
-              ),
-            ),
-          ),
-          child: Column(
+    return Swift(
+      builder: (context) {
+        if (_selectedRequestId.value.isEmpty) {
+          // Show list view
+          return Column(
             children: [
               Container(
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: Theme.of(context).dividerColor,
-                      width: 1,
-                    ),
-                  ),
-                ),
+                color: Theme.of(context).cardColor,
                 child: Row(
                   children: [
-                    const Icon(Icons.list, size: 20),
+                    Icon(Icons.info_outline, size: 20, color: Colors.blue),
                     const SizedBox(width: 8),
-                    Text(
-                      'Requests (${requests.length})',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
+                    Expanded(
+                      child: Text(
+                        'Tap a request to view details',
+                        style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                       ),
                     ),
                   ],
@@ -233,23 +190,88 @@ class _SwiftDebugPageState extends State<SwiftDebugPage> with SingleTickerProvid
               ),
               Expanded(
                 child: ListView.builder(
+                  padding: const EdgeInsets.all(8),
                   itemCount: requests.length,
                   itemBuilder: (context, index) {
                     final request = requests[requests.length - 1 - index];
-                    return _buildRequestListItem(request);
+                    return _buildRequestCard(request, true);
                   },
                 ),
               ),
             ],
-          ),
-        ),
-        // Request details
-        Expanded(
-          child: _selectedRequestId.isEmpty
-              ? _buildEmptyDetailsView()
-              : _buildRequestDetails(),
-        ),
-      ],
+          );
+        } else {
+          // Show details view
+          return _buildRequestDetailsMobile();
+        }
+      },
+    );
+  }
+
+  Widget _buildDesktopNetworkView(List<NetworkRequest> requests) {
+    return Swift(
+      builder: (context) {
+        return Row(
+          children: [
+            // Request list sidebar
+            Container(
+              width: _isTablet ? 250 : 320,
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                border: Border(
+                  right: BorderSide(
+                    color: Theme.of(context).dividerColor,
+                    width: 1,
+                  ),
+                ),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Theme.of(context).dividerColor,
+                          width: 1,
+                        ),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.list, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Requests (${requests.length})',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: requests.length,
+                      itemBuilder: (context, index) {
+                        final request = requests[requests.length - 1 - index];
+                        return _buildRequestListItem(request);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Request details
+            Expanded(
+              child: _selectedRequestId.value.isEmpty
+                  ? _buildEmptyDetailsView()
+                  : _buildRequestDetails(),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -277,9 +299,7 @@ class _SwiftDebugPageState extends State<SwiftDebugPage> with SingleTickerProvid
       elevation: 2,
       child: InkWell(
         onTap: () {
-          setState(() {
-            _selectedRequestId = request.id;
-          });
+          _selectedRequestId.value = request.id;
         },
         child: Padding(
           padding: const EdgeInsets.all(12),
@@ -354,97 +374,99 @@ class _SwiftDebugPageState extends State<SwiftDebugPage> with SingleTickerProvid
   }
 
   Widget _buildRequestListItem(NetworkRequest request) {
-    final isSelected = request.id == _selectedRequestId;
-    final hasResponse = request.response != null;
-    final statusCode = request.response?.statusCode;
-    
-    Color statusColor = Colors.grey;
-    if (statusCode != null) {
-      if (statusCode >= 200 && statusCode < 300) {
-        statusColor = Colors.green;
-      } else if (statusCode >= 300 && statusCode < 400) {
-        statusColor = Colors.blue;
-      } else if (statusCode >= 400) {
-        statusColor = Colors.red;
-      }
-    }
+    return Swift(
+      builder: (context) {
+        final isSelected = request.id == _selectedRequestId.value;
+        final hasResponse = request.response != null;
+        final statusCode = request.response?.statusCode;
+        
+        Color statusColor = Colors.grey;
+        if (statusCode != null) {
+          if (statusCode >= 200 && statusCode < 300) {
+            statusColor = Colors.green;
+          } else if (statusCode >= 300 && statusCode < 400) {
+            statusColor = Colors.blue;
+          } else if (statusCode >= 400) {
+            statusColor = Colors.red;
+          }
+        }
 
-    return InkWell(
-      onTap: () {
-        setState(() {
-          _selectedRequestId = request.id;
-        });
+        return InkWell(
+          onTap: () {
+            _selectedRequestId.value = request.id;
+          },
+          child: Container(
+            color: isSelected ? Colors.blue.withValues(alpha: 0.1) : null,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: _getMethodColor(request.method).withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                  child: Text(
+                    request.method,
+                    style: TextStyle(
+                      color: _getMethodColor(request.method),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 11,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _getUrlPath(request.url),
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        _formatTimestamp(request.timestamp),
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (hasResponse)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: statusColor.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                    child: Text(
+                      '$statusCode',
+                      style: TextStyle(
+                        color: statusColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 11,
+                      ),
+                    ),
+                  )
+                else
+                  const SizedBox(
+                    width: 12,
+                    height: 12,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+              ],
+            ),
+          ),
+        );
       },
-      child: Container(
-        color: isSelected ? Colors.blue.withValues(alpha: 0.1) : null,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-              decoration: BoxDecoration(
-                color: _getMethodColor(request.method).withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(3),
-              ),
-              child: Text(
-                request.method,
-                style: TextStyle(
-                  color: _getMethodColor(request.method),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 11,
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    _getUrlPath(request.url),
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    _formatTimestamp(request.timestamp),
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            if (hasResponse)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: statusColor.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(3),
-                ),
-                child: Text(
-                  '$statusCode',
-                  style: TextStyle(
-                    color: statusColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 11,
-                  ),
-                ),
-              )
-            else
-              const SizedBox(
-                width: 12,
-                height: 12,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -458,11 +480,9 @@ class _SwiftDebugPageState extends State<SwiftDebugPage> with SingleTickerProvid
             children: [
               IconButton(
                 icon: const Icon(Icons.arrow_back),
-                onPressed: () {
-                  setState(() {
-                    _selectedRequestId = '';
-                  });
-                },
+              onPressed: () {
+                _selectedRequestId.value = '';
+              },
               ),
               const Expanded(
                 child: Text(
@@ -481,154 +501,158 @@ class _SwiftDebugPageState extends State<SwiftDebugPage> with SingleTickerProvid
   }
 
   Widget _buildRequestDetails() {
-    final request = NetworkInterceptor.getRequest(_selectedRequestId);
-    if (request == null) {
-      return const Center(child: Text('Request not found'));
-    }
+    return Swift(
+      builder: (context) {
+        final request = NetworkInterceptor.getRequest(_selectedRequestId.value);
+        if (request == null) {
+          return const Center(child: Text('Request not found'));
+        }
 
-    final hasResponse = request.response != null;
-    final statusCode = request.response?.statusCode;
-    
-    Color statusColor = Colors.grey;
-    if (statusCode != null) {
-      if (statusCode >= 200 && statusCode < 300) {
-        statusColor = Colors.green;
-      } else if (statusCode >= 300 && statusCode < 400) {
-        statusColor = Colors.blue;
-      } else if (statusCode >= 400) {
-        statusColor = Colors.red;
-      }
-    }
+        final hasResponse = request.response != null;
+        final statusCode = request.response?.statusCode;
+        
+        Color statusColor = Colors.grey;
+        if (statusCode != null) {
+          if (statusCode >= 200 && statusCode < 300) {
+            statusColor = Colors.green;
+          } else if (statusCode >= 300 && statusCode < 400) {
+            statusColor = Colors.blue;
+          } else if (statusCode >= 400) {
+            statusColor = Colors.red;
+          }
+        }
 
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(_isMobile ? 12 : 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Request Header Card
-          Card(
-            elevation: 2,
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+        return SingleChildScrollView(
+          padding: EdgeInsets.all(_isMobile ? 12 : 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Request Header Card
+              Card(
+                elevation: 2,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: _getMethodColor(request.method).withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          request.method,
-                          style: TextStyle(
-                            color: _getMethodColor(request.method),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: _getMethodColor(request.method).withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              request.method,
+                              style: TextStyle(
+                                color: _getMethodColor(request.method),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
                           ),
+                          if (hasResponse) ...[
+                            const SizedBox(width: 12),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: statusColor.withValues(alpha: 0.2),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                '${request.response!.statusCode}',
+                                style: TextStyle(
+                                  color: statusColor,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      SelectableText(
+                        request.url,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: 'monospace',
                         ),
                       ),
-                      if (hasResponse) ...[
-                        const SizedBox(width: 12),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: statusColor.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            '${request.response!.statusCode}',
-                            style: TextStyle(
-                              color: statusColor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
+                      const SizedBox(height: 8),
+                      Text(
+                        _formatTimestamp(request.timestamp),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                      if (hasResponse && request.response!.duration != null) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          'Duration: ${request.response!.duration!.inMilliseconds}ms',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey.shade600,
                           ),
                         ),
                       ],
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  SelectableText(
-                    request.url,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                      fontFamily: 'monospace',
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    _formatTimestamp(request.timestamp),
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                  if (hasResponse && request.response!.duration != null) ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      'Duration: ${request.response!.duration!.inMilliseconds}ms',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
+                ),
+              ),
+              
+              const SizedBox(height: 16),
+              
+              // Request Section
+              _buildDetailSection(
+                'Request',
+                Icons.arrow_upward,
+                Colors.blue,
+                [
+                  _buildDetailItem('Method', request.method),
+                  _buildDetailItem('URL', request.url),
+                  _buildDetailItem('Timestamp', _formatTimestamp(request.timestamp)),
+                  if (request.headers.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    _buildDetailSubsection('Headers', request.headers),
+                  ],
+                  if (request.body != null) ...[
+                    const SizedBox(height: 12),
+                    _buildDetailSubsection('Body', _formatBody(request.body)),
                   ],
                 ],
               ),
-            ),
-          ),
-          
-          const SizedBox(height: 16),
-          
-          // Request Section
-          _buildDetailSection(
-            'Request',
-            Icons.arrow_upward,
-            Colors.blue,
-            [
-              _buildDetailItem('Method', request.method),
-              _buildDetailItem('URL', request.url),
-              _buildDetailItem('Timestamp', _formatTimestamp(request.timestamp)),
-              if (request.headers.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                _buildDetailSubsection('Headers', request.headers),
-              ],
-              if (request.body != null) ...[
-                const SizedBox(height: 12),
-                _buildDetailSubsection('Body', _formatBody(request.body)),
+              
+              // Response Section
+              if (hasResponse) ...[
+                const SizedBox(height: 20),
+                _buildDetailSection(
+                  'Response',
+                  Icons.arrow_downward,
+                  statusColor,
+                  [
+                    _buildDetailItem('Status Code', '${request.response!.statusCode}'),
+                    _buildDetailItem('Timestamp', _formatTimestamp(request.response!.timestamp)),
+                    if (request.response!.duration != null)
+                      _buildDetailItem('Duration', '${request.response!.duration!.inMilliseconds}ms'),
+                    if (request.response!.headers.isNotEmpty) ...[
+                      const SizedBox(height: 12),
+                      _buildDetailSubsection('Headers', request.response!.headers),
+                    ],
+                    if (request.response!.body != null) ...[
+                      const SizedBox(height: 12),
+                      _buildDetailSubsection('Body', _formatBody(request.response!.body)),
+                    ],
+                  ],
+                ),
               ],
             ],
           ),
-          
-          // Response Section
-          if (hasResponse) ...[
-            const SizedBox(height: 20),
-            _buildDetailSection(
-              'Response',
-              Icons.arrow_downward,
-              statusColor,
-              [
-                _buildDetailItem('Status Code', '${request.response!.statusCode}'),
-                _buildDetailItem('Timestamp', _formatTimestamp(request.response!.timestamp)),
-                if (request.response!.duration != null)
-                  _buildDetailItem('Duration', '${request.response!.duration!.inMilliseconds}ms'),
-                if (request.response!.headers.isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  _buildDetailSubsection('Headers', request.response!.headers),
-                ],
-                if (request.response!.body != null) ...[
-                  const SizedBox(height: 12),
-                  _buildDetailSubsection('Body', _formatBody(request.response!.body)),
-                ],
-              ],
-            ),
-          ],
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -814,44 +838,58 @@ class _SwiftDebugPageState extends State<SwiftDebugPage> with SingleTickerProvid
   }
 
   Widget _buildLogsTab() {
-    final logs = LogInterceptor.getLogs();
-    
-    if (logs.isEmpty) {
-      return _buildEmptyState(
-        icon: Icons.description,
-        title: 'No Logs',
-        message: 'Logs will appear here when you use swiftPrint() or other logging functions.',
-      );
-    }
+    return Swift(
+      builder: (context) {
+        // Access refresh trigger and update trigger to trigger rebuild
+        _refreshTrigger.value;
+        LogInterceptor.updateTrigger.value; // Observe interceptor changes
+        final logs = LogInterceptor.getLogs();
+        
+        if (logs.isEmpty) {
+          return _buildEmptyState(
+            icon: Icons.description,
+            title: 'No Logs',
+            message: 'Logs will appear here when you use swiftPrint() or other logging functions.',
+          );
+        }
 
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          color: Theme.of(context).cardColor,
-          child: Row(
-            children: [
-              Icon(Icons.info_outline, size: 18, color: Colors.blue),
-              const SizedBox(width: 8),
-              Text(
-                '${logs.length} log entries',
-                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+        return Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              color: Theme.of(context).cardColor,
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline, size: 18, color: Colors.blue),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      '${logs.length} log entries',
+                      style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.refresh, size: 20),
+                    tooltip: 'Refresh logs',
+                    onPressed: _refresh,
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.all(8),
-            itemCount: logs.length,
-            reverse: true,
-            itemBuilder: (context, index) {
-              final log = logs[logs.length - 1 - index];
-              return _buildLogCard(log);
-            },
-          ),
-        ),
-      ],
+            ),
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.all(8),
+                itemCount: logs.length,
+                reverse: true,
+                itemBuilder: (context, index) {
+                  final log = logs[logs.length - 1 - index];
+                  return _buildLogCard(log);
+                },
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -888,11 +926,17 @@ class _SwiftDebugPageState extends State<SwiftDebugPage> with SingleTickerProvid
         break;
     }
 
+    // Truncate message for display (show max 200 characters)
+    final displayMessage = log.message.length > 200 
+        ? '${log.message.substring(0, 200)}...' 
+        : log.message;
+    final hasLongMessage = log.message.length > 200 || log.data != null;
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       elevation: 1,
       child: InkWell(
-        onTap: log.data != null
+        onTap: hasLongMessage
             ? () {
                 showDialog(
                   context: context,
@@ -905,9 +949,62 @@ class _SwiftDebugPageState extends State<SwiftDebugPage> with SingleTickerProvid
                       ],
                     ),
                     content: SingleChildScrollView(
-                      child: SelectableText(
-                        log.data.toString(),
-                        style: const TextStyle(fontFamily: 'monospace'),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            'Message:',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          SelectableText(
+                            log.message,
+                            style: const TextStyle(
+                              fontFamily: 'monospace',
+                              fontSize: 12,
+                            ),
+                          ),
+                          if (log.data != null) ...[
+                            const SizedBox(height: 16),
+                            const Text(
+                              'Data:',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            SelectableText(
+                              log.data.toString(),
+                              style: const TextStyle(
+                                fontFamily: 'monospace',
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                          if (log.stackTrace != null) ...[
+                            const SizedBox(height: 16),
+                            const Text(
+                              'Stack Trace:',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            SelectableText(
+                              log.stackTrace.toString(),
+                              style: const TextStyle(
+                                fontFamily: 'monospace',
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                     ),
                     actions: [
@@ -939,7 +1036,7 @@ class _SwiftDebugPageState extends State<SwiftDebugPage> with SingleTickerProvid
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SelectableText(
-                      log.message,
+                      displayMessage,
                       style: const TextStyle(
                         fontFamily: 'monospace',
                         fontSize: 13,
@@ -956,9 +1053,9 @@ class _SwiftDebugPageState extends State<SwiftDebugPage> with SingleTickerProvid
                   ],
                 ),
               ),
-              if (log.data != null)
+              if (hasLongMessage)
                 Icon(
-                  Icons.info_outline,
+                  Icons.expand_more,
                   size: 18,
                   color: Colors.grey.shade400,
                 ),
@@ -970,118 +1067,145 @@ class _SwiftDebugPageState extends State<SwiftDebugPage> with SingleTickerProvid
   }
 
   Widget _buildWebSocketTab() {
-    final connections = WebSocketInterceptor.getConnections();
-    
-    if (connections.isEmpty) {
-      return _buildEmptyState(
-        icon: Icons.cable,
-        title: 'No WebSocket Connections',
-        message: 'WebSocket connections and events will appear here when you use SwiftWebSocket.connect().',
-      );
-    }
+    return Swift(
+      builder: (context) {
+        // Access refresh trigger and update trigger to trigger rebuild
+        _refreshTrigger.value;
+        WebSocketInterceptor.updateTrigger.value; // Observe interceptor changes
+        final connections = WebSocketInterceptor.getConnections();
+        
+        if (connections.isEmpty) {
+          return _buildEmptyState(
+            icon: Icons.cable,
+            title: 'No WebSocket Connections',
+            message: 'WebSocket connections and events will appear here when you use SwiftWebSocket.connect().',
+          );
+        }
 
-    if (_isMobile) {
-      return _buildMobileWebSocketView(connections);
-    } else {
-      return _buildDesktopWebSocketView(connections);
-    }
+        if (_isMobile) {
+          return _buildMobileWebSocketView(connections);
+        } else {
+          return _buildDesktopWebSocketView(connections);
+        }
+      },
+    );
   }
 
   Widget _buildMobileWebSocketView(List<WebSocketConnection> connections) {
-    if (_selectedRequestId.isEmpty) {
-      return Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            color: Theme.of(context).cardColor,
-            child: Row(
-              children: [
-                Icon(Icons.info_outline, size: 20, color: Colors.blue),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'Tap a connection to view events',
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(8),
-              itemCount: connections.length,
-              itemBuilder: (context, index) {
-                final connection = connections[connections.length - 1 - index];
-                return _buildWebSocketCard(connection, true);
-              },
-            ),
-          ),
-        ],
-      );
-    } else {
-      return _buildWebSocketDetailsMobile();
-    }
-  }
-
-  Widget _buildDesktopWebSocketView(List<WebSocketConnection> connections) {
-    return Row(
-      children: [
-        Container(
-          width: _isTablet ? 250 : 320,
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            border: Border(
-              right: BorderSide(
-                color: Theme.of(context).dividerColor,
-                width: 1,
-              ),
-            ),
-          ),
-          child: Column(
+    return Swift(
+      builder: (context) {
+        if (_selectedRequestId.value.isEmpty) {
+          return Column(
             children: [
               Container(
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: Theme.of(context).dividerColor,
-                      width: 1,
-                    ),
-                  ),
-                ),
+                color: Theme.of(context).cardColor,
                 child: Row(
                   children: [
-                    const Icon(Icons.cable, size: 20),
+                    Icon(Icons.info_outline, size: 20, color: Colors.blue),
                     const SizedBox(width: 8),
-                    Text(
-                      'Connections (${connections.length})',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
+                    Expanded(
+                      child: Text(
+                        'Tap a connection to view events',
+                        style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                       ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.refresh, size: 20),
+                      tooltip: 'Refresh connections',
+                      onPressed: _refresh,
                     ),
                   ],
                 ),
               ),
               Expanded(
                 child: ListView.builder(
+                  padding: const EdgeInsets.all(8),
                   itemCount: connections.length,
                   itemBuilder: (context, index) {
                     final connection = connections[connections.length - 1 - index];
-                    return _buildWebSocketListItem(connection);
+                    return _buildWebSocketCard(connection, true);
                   },
                 ),
               ),
             ],
-          ),
-        ),
-        Expanded(
-          child: _selectedRequestId.isEmpty
-              ? _buildEmptyDetailsView()
-              : _buildWebSocketDetails(),
-        ),
-      ],
+          );
+        } else {
+          return _buildWebSocketDetailsMobile();
+        }
+      },
+    );
+  }
+
+  Widget _buildDesktopWebSocketView(List<WebSocketConnection> connections) {
+    return Swift(
+      builder: (context) {
+        return Row(
+          children: [
+            Container(
+              width: _isTablet ? 250 : 320,
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                border: Border(
+                  right: BorderSide(
+                    color: Theme.of(context).dividerColor,
+                    width: 1,
+                  ),
+                ),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Theme.of(context).dividerColor,
+                          width: 1,
+                        ),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.cable, size: 20),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Connections (${connections.length})',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.refresh, size: 18),
+                          tooltip: 'Refresh connections',
+                          onPressed: _refresh,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: connections.length,
+                      itemBuilder: (context, index) {
+                        final connection = connections[connections.length - 1 - index];
+                        return _buildWebSocketListItem(connection);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: _selectedRequestId.value.isEmpty
+                  ? _buildEmptyDetailsView()
+                  : _buildWebSocketDetails(),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -1091,9 +1215,7 @@ class _SwiftDebugPageState extends State<SwiftDebugPage> with SingleTickerProvid
       elevation: 2,
       child: InkWell(
         onTap: () {
-          setState(() {
-            _selectedRequestId = connection.id;
-          });
+          _selectedRequestId.value = connection.id;
         },
         child: Padding(
           padding: const EdgeInsets.all(12),
@@ -1177,13 +1299,13 @@ class _SwiftDebugPageState extends State<SwiftDebugPage> with SingleTickerProvid
   }
 
   Widget _buildWebSocketListItem(WebSocketConnection connection) {
-    final isSelected = connection.id == _selectedRequestId;
+    return Swift(
+      builder: (context) {
+        final isSelected = connection.id == _selectedRequestId.value;
     
     return InkWell(
       onTap: () {
-        setState(() {
-          _selectedRequestId = connection.id;
-        });
+        _selectedRequestId.value = connection.id;
       },
       child: Container(
         color: isSelected ? Colors.blue.withValues(alpha: 0.1) : null,
@@ -1246,6 +1368,8 @@ class _SwiftDebugPageState extends State<SwiftDebugPage> with SingleTickerProvid
         ),
       ),
     );
+      },
+    );
   }
 
   Widget _buildWebSocketDetailsMobile() {
@@ -1258,11 +1382,9 @@ class _SwiftDebugPageState extends State<SwiftDebugPage> with SingleTickerProvid
             children: [
               IconButton(
                 icon: const Icon(Icons.arrow_back),
-                onPressed: () {
-                  setState(() {
-                    _selectedRequestId = '';
-                  });
-                },
+              onPressed: () {
+                _selectedRequestId.value = '';
+              },
               ),
               const Expanded(
                 child: Text(
@@ -1281,123 +1403,151 @@ class _SwiftDebugPageState extends State<SwiftDebugPage> with SingleTickerProvid
   }
 
   Widget _buildWebSocketDetails() {
-    final connection = WebSocketInterceptor.getConnection(_selectedRequestId);
-    if (connection == null) {
-      return const Center(child: Text('Connection not found'));
-    }
+    return Swift(
+      builder: (context) {
+        final connection = WebSocketInterceptor.getConnection(_selectedRequestId.value);
+        if (connection == null) {
+          return const Center(child: Text('Connection not found'));
+        }
 
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(_isMobile ? 12 : 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Connection Header Card
-          Card(
-            elevation: 2,
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+        return SingleChildScrollView(
+          padding: EdgeInsets.all(_isMobile ? 12 : 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Connection Header Card
+              Card(
+                elevation: 2,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: connection.isConnected 
-                              ? Colors.green.withValues(alpha: 0.2)
-                              : Colors.grey.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          connection.isConnected ? Icons.cable : Icons.cable_outlined,
-                          color: connection.isConnected ? Colors.green : Colors.grey,
-                          size: 24,
-                        ),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: connection.isConnected 
+                                  ? Colors.green.withValues(alpha: 0.2)
+                                  : Colors.grey.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              connection.isConnected ? Icons.cable : Icons.cable_outlined,
+                              color: connection.isConnected ? Colors.green : Colors.grey,
+                              size: 24,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  connection.isConnected ? 'Connected' : 'Disconnected',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: connection.isConnected ? Colors.green : Colors.grey,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                SelectableText(
+                                  connection.url,
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    fontFamily: 'monospace',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              connection.isConnected ? 'Connected' : 'Disconnected',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: connection.isConnected ? Colors.green : Colors.grey,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            SelectableText(
-                              connection.url,
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontFamily: 'monospace',
-                              ),
-                            ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          _buildInfoChip('Events', '${connection.events.length}'),
+                          const SizedBox(width: 8),
+                          _buildInfoChip('Connected', _formatTimestamp(connection.connectedAt)),
+                          if (connection.disconnectedAt != null) ...[
+                            const SizedBox(width: 8),
+                            _buildInfoChip('Disconnected', _formatTimestamp(connection.disconnectedAt!)),
                           ],
-                        ),
+                        ],
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      _buildInfoChip('Events', '${connection.events.length}'),
-                      const SizedBox(width: 8),
-                      _buildInfoChip('Connected', _formatTimestamp(connection.connectedAt)),
-                      if (connection.disconnectedAt != null) ...[
-                        const SizedBox(width: 8),
-                        _buildInfoChip('Disconnected', _formatTimestamp(connection.disconnectedAt!)),
-                      ],
-                    ],
-                  ),
+                ),
+              ),
+              
+              const SizedBox(height: 16),
+              
+              // Connection Info
+              _buildDetailSection(
+                'Connection Info',
+                Icons.info,
+                Colors.blue,
+                [
+                  _buildDetailItem('URL', connection.url),
+                  _buildDetailItem('Connected At', _formatTimestamp(connection.connectedAt)),
+                  if (connection.disconnectedAt != null)
+                    _buildDetailItem('Disconnected At', _formatTimestamp(connection.disconnectedAt!)),
+                  if (connection.headers.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    _buildDetailSubsection('Headers', connection.headers),
+                  ],
                 ],
               ),
-            ),
-          ),
-          
-          const SizedBox(height: 16),
-          
-          // Connection Info
-          _buildDetailSection(
-            'Connection Info',
-            Icons.info,
-            Colors.blue,
-            [
-              _buildDetailItem('URL', connection.url),
-              _buildDetailItem('Connected At', _formatTimestamp(connection.connectedAt)),
-              if (connection.disconnectedAt != null)
-                _buildDetailItem('Disconnected At', _formatTimestamp(connection.disconnectedAt!)),
-              if (connection.headers.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                _buildDetailSubsection('Headers', connection.headers),
-              ],
+              
+              // Events Section
+              const SizedBox(height: 20),
+              Swift(
+                builder: (context) {
+                  // Access refresh trigger and update trigger to trigger rebuild
+                  _refreshTrigger.value;
+                  WebSocketInterceptor.updateTrigger.value; // Observe interceptor changes
+                  final events = connection.events;
+                  return _buildDetailSection(
+                    'Events (${events.length})',
+                    Icons.event,
+                    Colors.purple,
+                    [
+                      if (events.isEmpty)
+                        const Padding(
+                          padding: EdgeInsets.all(16),
+                          child: Text(
+                            'No events captured yet',
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        )
+                      else ...[
+                        // Refresh button
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.refresh, size: 18),
+                                tooltip: 'Refresh events',
+                                onPressed: _refresh,
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Events list
+                        ...events.map((event) => _buildEventCard(event)),
+                      ],
+                    ],
+                  );
+                },
+              ),
             ],
           ),
-          
-          // Events Section
-          const SizedBox(height: 20),
-          _buildDetailSection(
-            'Events (${connection.events.length})',
-            Icons.event,
-            Colors.purple,
-            [
-              if (connection.events.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Text(
-                    'No events captured yet',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                )
-              else
-                ...connection.events.map((event) => _buildEventCard(event)),
-            ],
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -1449,108 +1599,205 @@ class _SwiftDebugPageState extends State<SwiftDebugPage> with SingleTickerProvid
     }
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    // Get the message content
+    final messageContent = event.error ?? event.data?.toString() ?? '';
+    final hasLongMessage = messageContent.length > 200;
+    final displayMessage = hasLongMessage 
+        ? '${messageContent.substring(0, 200)}...' 
+        : messageContent;
+    final hasContent = messageContent.isNotEmpty;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       elevation: 1,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: eventColor.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(4),
+      child: InkWell(
+        onTap: hasLongMessage || hasContent
+            ? () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Row(
+                      children: [
+                        Icon(eventIcon, color: eventColor, size: 20),
+                        const SizedBox(width: 8),
+                        Text('Event: $eventLabel'),
+                      ],
+                    ),
+                    content: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _buildDetailItem('Type', eventLabel),
+                          _buildDetailItem('Timestamp', _formatTimestamp(event.timestamp)),
+                          if (event.error != null) ...[
+                            const SizedBox(height: 12),
+                            const Text(
+                              'Error:',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            SelectableText(
+                              event.error!,
+                              style: const TextStyle(
+                                fontFamily: 'monospace',
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                          if (event.data != null) ...[
+                            const SizedBox(height: 12),
+                            const Text(
+                              'Data:',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            SelectableText(
+                              event.data.toString(),
+                              style: const TextStyle(
+                                fontFamily: 'monospace',
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Close'),
+                      ),
+                    ],
                   ),
-                  child: Icon(eventIcon, color: eventColor, size: 16),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  eventLabel,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: eventColor,
-                    fontSize: 13,
-                  ),
-                ),
-                const Spacer(),
-                Text(
-                  _formatTimestamp(event.timestamp),
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: Colors.grey.shade600,
-                  ),
-                ),
-              ],
-            ),
-            if (event.data != null || event.error != null) ...[
-              const SizedBox(height: 8),
+                );
+              }
+            : null,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: isDark ? Colors.grey.shade800 : Colors.grey.shade100,
+                  color: eventColor.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(6),
                 ),
-                child: SelectableText(
-                  event.error ?? event.data?.toString() ?? '',
-                  style: TextStyle(
-                    fontFamily: 'monospace',
-                    fontSize: 11,
-                    color: isDark ? Colors.grey.shade200 : Colors.grey.shade900,
-                  ),
+                child: Icon(eventIcon, color: eventColor, size: 18),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          eventLabel,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: eventColor,
+                            fontSize: 13,
+                          ),
+                        ),
+                        const Spacer(),
+                        Text(
+                          _formatTimestamp(event.timestamp),
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (hasContent) ...[
+                      const SizedBox(height: 6),
+                      SelectableText(
+                        displayMessage,
+                        style: TextStyle(
+                          fontFamily: 'monospace',
+                          fontSize: 12,
+                          color: isDark ? Colors.grey.shade300 : Colors.grey.shade800,
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
+              if (hasLongMessage)
+                Icon(
+                  Icons.expand_more,
+                  size: 18,
+                  color: Colors.grey.shade400,
+                ),
             ],
-          ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildCurlTab() {
-    final requests = NetworkInterceptor.getRequests();
-    
-    if (requests.isEmpty) {
-      return _buildEmptyState(
-        icon: Icons.code,
-        title: 'No Curl Commands',
-        message: 'Curl commands will be generated for network requests.',
-      );
-    }
+    return Swift(
+      builder: (context) {
+        // Access refresh trigger and update trigger to trigger rebuild
+        _refreshTrigger.value;
+        NetworkInterceptor.updateTrigger.value; // Observe interceptor changes
+        final requests = NetworkInterceptor.getRequests();
+        
+        if (requests.isEmpty) {
+          return _buildEmptyState(
+            icon: Icons.code,
+            title: 'No Curl Commands',
+            message: 'Curl commands will be generated for network requests.',
+          );
+        }
 
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          color: Theme.of(context).cardColor,
-          child: Row(
-            children: [
-              Icon(Icons.info_outline, size: 18, color: Colors.blue),
-              const SizedBox(width: 8),
-              Text(
-                '${requests.length} requests available',
-                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+        return Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              color: Theme.of(context).cardColor,
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline, size: 18, color: Colors.blue),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      '${requests.length} requests available',
+                      style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.refresh, size: 20),
+                    tooltip: 'Refresh curl commands',
+                    onPressed: _refresh,
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.all(8),
-            itemCount: requests.length,
-            reverse: true,
-            itemBuilder: (context, index) {
-              final request = requests[requests.length - 1 - index];
-              return _buildCurlCard(request);
-            },
-          ),
-        ),
-      ],
+            ),
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.all(8),
+                itemCount: requests.length,
+                reverse: true,
+                itemBuilder: (context, index) {
+                  final request = requests[requests.length - 1 - index];
+                  return _buildCurlCard(request);
+                },
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 

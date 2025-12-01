@@ -45,7 +45,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  swift_flutter: ^2.3.1
+  swift_flutter: ^2.3.2
 ```
 
 Then run:
