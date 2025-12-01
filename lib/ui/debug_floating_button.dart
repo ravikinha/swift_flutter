@@ -44,13 +44,35 @@ class SwiftDebugFloatingButton extends StatelessWidget {
     // Set context for navigation (as fallback)
     SwiftViewInterceptor.setContext(context);
 
-    return FloatingActionButton(
-      onPressed: () {
-        SwiftViewInterceptor.showDebugPage();
-      },
-      backgroundColor: Colors.blue,
-      tooltip: 'Open Swift Debug Tool',
-      child: const Icon(Icons.bug_report),
+    // Use IconButton wrapped in a container to avoid tooltip overlay issues
+    // This works in Stack without requiring Overlay ancestor
+    return Positioned(
+      bottom: 16,
+      right: 16,
+      child: Material(
+        elevation: 6,
+        borderRadius: BorderRadius.circular(28),
+        color: Colors.blue,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(28),
+          onTap: () {
+            SwiftViewInterceptor.showDebugPage();
+          },
+          child: Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: Colors.blue,
+              borderRadius: BorderRadius.circular(28),
+            ),
+            child: const Icon(
+              Icons.bug_report,
+              color: Colors.white,
+              size: 24,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
