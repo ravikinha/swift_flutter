@@ -644,6 +644,9 @@ class _ReplayedHttpClientResponse extends Stream<List<int>> implements HttpClien
   Future<Socket> detachSocket() => _original.detachSocket();
 
   @override
+  HttpClientResponseCompressionState get compressionState => _original.compressionState;
+
+  @override
   dynamic noSuchMethod(Invocation invocation) => _original.noSuchMethod(invocation);
 }
 
@@ -716,6 +719,9 @@ class _StreamedHttpClientResponse extends Stream<List<int>> implements HttpClien
 
   @override
   Future<Socket> detachSocket() => _original.detachSocket();
+
+  @override
+  HttpClientResponseCompressionState get compressionState => _original.compressionState;
 
   @override
   dynamic noSuchMethod(Invocation invocation) => _original.noSuchMethod(invocation);

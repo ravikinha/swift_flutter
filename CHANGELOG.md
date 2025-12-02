@@ -1,5 +1,25 @@
 # Changelog
 
+## [2.3.3] - 2025-01-XX - Network Image Loading Fix
+
+### Fixed
+- ✅ **Network Image Loading** - Fixed `NoSuchMethodError` when loading network images
+  - Added missing `compressionState` getter to `_StreamedHttpClientResponse` and `_ReplayedHttpClientResponse` wrapper classes
+  - Fixes issue where Flutter's `consolidateHttpClientResponseBytes` couldn't access `compressionState` property
+  - Network images now load correctly without errors when using AutoInjector for HTTP interception
+
+### Technical Details
+- `compressionState` getter now properly delegates to the original `HttpClientResponse`
+- Both response wrapper classes now fully implement all required `HttpClientResponse` properties
+- Zero breaking changes - all changes are internal fixes
+
+### Notes
+- Fixes crash when loading images from network URLs (e.g., `NetworkImage`)
+- All network interception features continue to work as expected
+- Backward compatible with all existing code
+
+---
+
 ## [2.3.2] - 2024-12-XX - Reactive State Improvements & Build Phase Fixes
 
 ### Fixed
