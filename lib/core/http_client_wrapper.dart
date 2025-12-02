@@ -61,6 +61,26 @@ class InterceptedHttpClient extends HttpClient {
   void close({bool force = false}) => _client.close(force: force);
 
   @override
+  set badCertificateCallback(
+    bool Function(X509Certificate cert, String host, int port)? callback,
+  ) => _client.badCertificateCallback = callback;
+
+  @override
+  set connectionFactory(
+    Future<ConnectionTask<Socket>> Function(
+      Uri url,
+      String? proxyHost,
+      int? proxyPort,
+    )? factory,
+  ) => _client.connectionFactory = factory;
+
+  @override
+  set findProxy(String Function(Uri url)? proxy) => _client.findProxy = proxy;
+
+  @override
+  set keyLog(Function(String line)? callback) => _client.keyLog = callback;
+
+  @override
   Future<HttpClientRequest> delete(String host, int port, String path) =>
       _interceptRequest(() => _client.delete(host, port, path));
 
