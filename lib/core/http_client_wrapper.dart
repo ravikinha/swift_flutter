@@ -6,13 +6,22 @@ import 'network_interceptor.dart';
 /// 
 /// This can be used to automatically capture all HTTP requests made through
 /// the standard Dart HttpClient.
-class InterceptedHttpClient extends HttpClient {
+/// 
+/// NOTE: This class is not ready for production use and is not exported.
+/// Use AutoInjector instead for HTTP interception.
+class InterceptedHttpClient implements HttpClient {
   final HttpClient _client;
   
   InterceptedHttpClient(this._client);
 
   @override
   bool get autoUncompress => _client.autoUncompress;
+
+  @override
+  Duration? get connectionTimeout => _client.connectionTimeout;
+
+  @override
+  set connectionTimeout(Duration? timeout) => _client.connectionTimeout = timeout;
 
   @override
   Duration? get idleTimeout => _client.idleTimeout;
