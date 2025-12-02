@@ -18,16 +18,19 @@ class InterceptedHttpClient implements HttpClient {
   bool get autoUncompress => _client.autoUncompress;
 
   @override
+  set autoUncompress(bool value) => _client.autoUncompress = value;
+
+  @override
   Duration? get connectionTimeout => _client.connectionTimeout;
 
   @override
   set connectionTimeout(Duration? timeout) => _client.connectionTimeout = timeout;
 
   @override
-  Duration? get idleTimeout => _client.idleTimeout;
+  Duration get idleTimeout => _client.idleTimeout;
 
   @override
-  set idleTimeout(Duration? timeout) => _client.idleTimeout = timeout;
+  set idleTimeout(Duration timeout) => _client.idleTimeout = timeout;
 
   @override
   int? get maxConnectionsPerHost => _client.maxConnectionsPerHost;
